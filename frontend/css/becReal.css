@@ -659,4 +659,798 @@
   }
 }
 
+/* ========================================================================= */
+/* BEC INTERACTIVE PAYMENT GATEWAY & PARTIAL PAYMENT STYLES                  */
+/* ========================================================================= */
+
+.bec-pay-dialog {
+  max-width: 580px !important;
+  width: 95% !important;
+  margin: 1.5rem auto !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+  background: #FFFFFF !important;
+  border: none !important;
+}
+
+.bec-gateway-header {
+  background: linear-gradient(135deg, #0B63C5 0%, #1E40AF 100%) !important;
+  color: #FFFFFF !important;
+  padding: 1.15rem 1.4rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.bec-pay-badge-secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.03em;
+}
+
+.bec-pay-badge-secure::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 8px #22C55E;
+}
+
+.bec-modal-close-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bec-modal-close-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Student & Dues Summary Card */
+.bec-checkout-summary-card {
+  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+  border: 1px solid #DBEAFE;
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.15rem;
+}
+
+.bec-summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  margin-bottom: 0.45rem;
+}
+
+.bec-summary-label {
+  color: #64748B;
+  font-weight: 500;
+}
+
+.bec-summary-val {
+  color: #1E293B;
+  font-weight: 700;
+}
+
+.bec-summary-roll-badge {
+  background: #DBEAFE;
+  color: #1E40AF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-left: 0.35rem;
+}
+
+.bec-summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px dashed #CBD5E1;
+  padding-top: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.bec-summary-total-amt {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0B63C5;
+  font-feature-settings: "tnum";
+}
+
+/* Partial Payment Mode Selector */
+.bec-pay-type-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #F1F5F9;
+  padding: 5px;
+  border-radius: 10px;
+  margin-bottom: 1.15rem;
+  border: 1px solid #E2E8F0;
+}
+
+.bec-pay-type-btn {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pay-tab-radio {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #94A3B8;
+  display: inline-block;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.bec-pay-type-btn:hover {
+  color: #1E293B;
+}
+
+.bec-pay-type-btn.active {
+  background: #FFFFFF;
+  color: #0B63C5;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(11, 99, 197, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.bec-pay-type-btn.active .pay-tab-radio {
+  border-color: #0B63C5;
+  background: #0B63C5;
+  box-shadow: inset 0 0 0 2.5px #FFFFFF;
+}
+
+/* Partial Amount Box */
+.bec-partial-box {
+  background: #F8FAFC;
+  border: 1.5px solid #93C5FD;
+  border-radius: 12px;
+  padding: 1.1rem;
+  margin-bottom: 1.15rem;
+  box-shadow: 0 2px 8px rgba(11, 99, 197, 0.05);
+}
+
+.bec-partial-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.bec-partial-symbol {
+  position: absolute;
+  left: 14px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0B63C5;
+  pointer-events: none;
+}
+
+.bec-partial-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0B63C5;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.bec-partial-input:focus {
+  border-color: #0B63C5;
+  box-shadow: 0 0 0 3px rgba(11, 99, 197, 0.15);
+}
+
+/* Quick Amount Chips */
+.bec-amount-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+}
+
+.bec-amount-chip {
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 20px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bec-amount-chip:hover {
+  border-color: #0B63C5;
+  color: #0B63C5;
+  background: #EFF6FF;
+}
+
+.bec-amount-chip.active {
+  background: #0B63C5;
+  border-color: #0B63C5;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(11, 99, 197, 0.25);
+}
+
+/* Dues Breakdown Container */
+.bec-dues-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.bec-dues-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  margin-bottom: 0.45rem;
+  color: #475569;
+}
+
+.bec-dues-row:last-child {
+  margin-bottom: 0;
+}
+
+.bec-dues-highlight {
+  border-top: 1px dashed #CBD5E1;
+  padding-top: 0.65rem;
+  margin-top: 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+/* Payment Method Cards */
+.bec-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.bec-method-card {
+  position: relative;
+  border: 2px solid #E2E8F0;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 1.15rem 0.65rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.bec-method-card:hover {
+  border-color: #93C5FD;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 99, 197, 0.08);
+  background: #FAFAFC;
+}
+
+.bec-method-card.active {
+  border-color: #0B63C5;
+  background: #EFF6FF;
+  box-shadow: 0 0 0 1px #0B63C5, 0 6px 16px rgba(11, 99, 197, 0.12);
+  transform: translateY(-2px);
+}
+
+.bec-method-card .method-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #F1F5F9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.55rem;
+  transition: all 0.2s;
+}
+
+.bec-method-card.active .method-icon {
+  background: #DBEAFE;
+}
+
+.bec-method-card .method-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1E293B;
+  margin-bottom: 0.15rem;
+}
+
+.bec-method-card.active .method-title {
+  color: #0B63C5;
+}
+
+.bec-method-card .method-sub {
+  font-size: 0.72rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.bec-method-card .method-check {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #0B63C5;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(11, 99, 197, 0.3);
+}
+
+.bec-method-card.active .method-check {
+  display: block;
+}
+
+/* Gateway Interactive Stage */
+.bec-gateway-stage {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: #FFFFFF;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.bec-qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.bec-qr-frame {
+  background: #FFFFFF;
+  padding: 0.85rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid #E2E8F0;
+  margin-bottom: 0.75rem;
+  display: inline-block;
+}
+
+.bec-upi-apps {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0.75rem 0;
+}
+
+.bec-upi-app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bec-upi-app-btn:hover {
+  background: #EFF6FF;
+  border-color: #0B63C5;
+  color: #0B63C5;
+  transform: translateY(-1px);
+}
+
+/* Card Inputs Layout */
+.bec-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.bec-card-input-wrap {
+  position: relative;
+}
+
+.bec-card-badge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #0B63C5;
+  letter-spacing: 0.05em;
+}
+
+/* Bank Grid */
+.bec-bank-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.bec-bank-btn {
+  padding: 0.6rem 0.4rem;
+  border: 1.5px solid #CBD5E1;
+  background: #FFFFFF;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bec-bank-btn.active,
+.bec-bank-btn:hover {
+  border-color: #0B63C5;
+  background: #EFF6FF;
+  color: #0B63C5;
+  font-weight: 700;
+}
+
+/* Live Countdown & Gateway Security Bar */
+.bec-gateway-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-bottom: 1rem;
+}
+
+.bec-gateway-timer {
+  font-weight: 800;
+  color: #DC2626;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+/* Processing Spinner Screen */
+.bec-gateway-processing {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.bec-gateway-spinner {
+  width: 52px;
+  height: 52px;
+  border: 4px solid #E2E8F0;
+  border-top-color: #0B63C5;
+  border-radius: 50%;
+  animation: becSpin 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes becSpin {
+  to { transform: rotate(360deg); }
+}
+
+.bec-gateway-step {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.35rem;
+}
+
+.bec-gateway-substep {
+  font-size: 0.85rem;
+  color: #64748B;
+}
+
+.btn-pay-submit {
+  background: linear-gradient(135deg, #0B63C5 0%, #1D4ED8 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  padding: 0.75rem 1.6rem !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(11, 99, 197, 0.28) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-pay-submit:hover {
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
+  box-shadow: 0 6px 18px rgba(11, 99, 197, 0.38) !important;
+  transform: translateY(-1px);
+}
+
+/* Mobile responsive modal adjustments */
+@media (max-width: 576px) {
+  .bec-pay-dialog {
+    margin: 0.5rem auto !important;
+    width: 96% !important;
+  }
+  
+  .bec-method-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .bec-bank-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .bec-card-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ========================================================================= */
+/* OFFICIAL BEC FEE RECEIPT (AUTHENTIC DOCUMENT STYLING)                     */
+/* ========================================================================= */
+.bec-official-receipt-frame {
+  background: #FFFFFF;
+  color: #000000;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.receipt-inner-border {
+  border: 1.5px solid #000000;
+  padding: 10px 14px 12px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.receipt-college-title {
+  text-align: center;
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #006644;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.receipt-title-row {
+  position: relative;
+  margin-bottom: 6px;
+  min-height: 24px;
+}
+
+.receipt-title-badge-wrap {
+  text-align: center;
+}
+
+.receipt-title-badge {
+  display: inline-block;
+  background: #006644;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 2px 22px;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+}
+
+.receipt-no-date {
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1.35;
+}
+
+/* Metadata Grid */
+.receipt-meta-container {
+  font-size: 10px;
+  color: #000000;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.meta-cell {
+  flex: 1;
+}
+
+.meta-cell.text-right {
+  text-align: right;
+}
+
+.meta-val {
+  font-weight: 600;
+}
+
+.meta-val-bold {
+  font-weight: 800;
+}
+
+/* Fee Table */
+.receipt-fee-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1.5px solid #000000;
+  font-size: 9.5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  color: #000000;
+}
+
+.receipt-fee-table th,
+.receipt-fee-table td {
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  padding: 1.5px 4px;
+  box-sizing: border-box;
+}
+
+.receipt-fee-table th:last-child,
+.receipt-fee-table td:last-child {
+  border-right: none;
+}
+
+.receipt-fee-table thead tr th {
+  text-align: center;
+  font-weight: 700;
+  font-size: 10px;
+  background: #FFFFFF;
+  padding: 2px 4px;
+}
+
+.col-sl {
+  width: 44px;
+  text-align: center;
+}
+
+.col-particular {
+  text-align: left;
+}
+
+.col-amount-head {
+  text-align: center;
+  width: 120px;
+}
+
+.col-rs {
+  width: 78px;
+  text-align: center;
+}
+
+.col-p {
+  width: 42px;
+  text-align: center;
+}
+
+.section-row td {
+  font-weight: 800;
+  padding-top: 2px;
+  padding-bottom: 1px;
+  border-bottom: none;
+  font-size: 9.5px;
+}
+
+.receipt-fee-table tbody tr td {
+  height: 13.5px;
+  line-height: 1.15;
+}
+
+.table-total-row td {
+  border-top: 1.5px solid #000000;
+  border-bottom: none;
+  padding: 3px 6px;
+  font-weight: 800;
+  font-size: 10.5px;
+}
+
+.total-label-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-right: none;
+}
+
+.rupees-words {
+  font-weight: normal;
+  font-style: italic;
+  font-size: 9.5px;
+}
+
+/* Footer Notes */
+.receipt-footer-notes {
+  font-size: 9.5px;
+  line-height: 1.35;
+  margin-top: 4px;
+  color: #000000;
+}
+
+.receipt-signatures-area {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 0 35px;
+}
+
+.sig-block {
+  font-size: 10px;
+  font-weight: 700;
+  color: #000000;
+}
+
 

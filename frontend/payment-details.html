@@ -530,12 +530,18 @@
 
   <!-- Online Payment Checkout Modal -->
   <div id="checkoutModal" class="modal-backdrop">
-    <div class="modal-card" style="max-width: 520px;">
-      <div class="modal-header">
-        <div class="modal-title">Authorize Institutional Fee Payment</div>
-        <button class="modal-close-btn" onclick="ui.closeModal('checkoutModal')">&times;</button>
+    <div class="modal-card bec-pay-dialog">
+      <div class="modal-header bec-gateway-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <div class="modal-title" style="color: white; font-weight: 700; font-size: 1.05rem;">Authorize Institutional Fee Payment</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <span class="bec-pay-badge-secure">256-Bit SSL</span>
+          <button class="bec-modal-close-icon" onclick="ui.closeModal('checkoutModal')" title="Close">&times;</button>
+        </div>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="padding: 1.25rem;">
         <div style="background: #F1F5F9; padding: 1rem; border-radius: 6px; margin-bottom: 1.25rem;">
           <div>Invoice Reference: <strong id="checkoutInvoiceNo" style="color: #0B63C5;">INV-2026-0080</strong></div>
           <div style="font-size: 0.85rem; color: #64748B; margin-top: 0.25rem;">
@@ -543,24 +549,70 @@
           </div>
         </div>
         <input type="hidden" id="checkoutInvoiceId">
-        <div class="form-group">
+        <div class="bec-pay-type-tabs" style="margin-bottom: 0.75rem;">
+          <button type="button" id="pdPayTypeFull" class="bec-pay-type-btn active" onclick="paymentDetails.setPayType('FULL')">
+            <span>&#9679; Full Payment</span>
+          </button>
+          <button type="button" id="pdPayTypePartial" class="bec-pay-type-btn" onclick="paymentDetails.setPayType('PARTIAL')">
+            <span>&#9998; Partial Amount</span>
+          </button>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.75rem;">
           <label class="form-label" for="checkoutAmount">Payment Amount (INR)</label>
-          <input type="number" id="checkoutAmount" class="form-control" required min="1" step="0.01">
+          <div style="position: relative; display: flex; align-items: center;">
+            <span style="position: absolute; left: 12px; font-weight: 700; color: #64748B;">₹</span>
+            <input type="number" id="checkoutAmount" class="form-control" style="padding-left: 28px; font-weight: 700; font-size: 1.05rem;" required min="100" step="500" oninput="paymentDetails.handleAmountChange(this)">
+          </div>
+          <!-- Preset Chips -->
+          <div class="bec-amount-chips" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">
+            <button type="button" class="bec-amount-chip" onclick="paymentDetails.setChipAmount(10000)">₹10,000</button>
+            <button type="button" class="bec-amount-chip" onclick="paymentDetails.setChipAmount(25000)">₹25,000</button>
+            <button type="button" class="bec-amount-chip" onclick="paymentDetails.setChipAmount(50000)">₹50,000</button>
+            <button type="button" class="bec-amount-chip" onclick="paymentDetails.setChipAmount('50%')">50%</button>
+            <button type="button" class="bec-amount-chip" onclick="paymentDetails.setChipAmount('FULL')">Full</button>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Payment Channel</label>
-          <select class="form-control form-select" disabled>
-            <option>BEC Payment Gateway (UPI / NetBanking / Debit Card)</option>
-          </select>
+
+        <!-- Dues Preview -->
+        <div class="bec-dues-box" style="margin-bottom: 0.75rem; padding: 0.75rem;">
+          <div class="bec-dues-row" style="margin-bottom: 0.25rem;">
+            <span>Amount Paying:</span>
+            <strong id="pdLivePaying" style="color: #0B63C5;">₹0.00</strong>
+          </div>
+          <div class="bec-dues-row" style="margin-bottom: 0;">
+            <span>Remaining Dues:</span>
+            <strong id="pdLiveRemaining" style="color: #DC2626;">₹0.00</strong>
+          </div>
         </div>
-        <div style="font-size: 0.8rem; color: #64748B; line-height: 1.4;">
+
+        <!-- Clickable Payment Channels -->
+        <div style="margin-bottom: 0.75rem;">
+          <label class="form-label" style="margin-bottom: 0.35rem;">Select Payment Channel</label>
+          <div class="bec-method-grid" style="margin-bottom: 0;">
+            <div class="bec-method-card active" id="pdMethodUPI" onclick="paymentDetails.setMethod('UPI')">
+              <div class="method-title" style="font-size: 0.82rem;">UPI / QR</div>
+              <div class="method-sub">GPay, PhonePe</div>
+            </div>
+            <div class="bec-method-card" id="pdMethodCARD" onclick="paymentDetails.setMethod('CARD')">
+              <div class="method-title" style="font-size: 0.82rem;">Debit Card</div>
+              <div class="method-sub">RuPay / Visa</div>
+            </div>
+            <div class="bec-method-card" id="pdMethodNETBANK" onclick="paymentDetails.setMethod('NETBANK')">
+              <div class="method-title" style="font-size: 0.82rem;">NetBanking</div>
+              <div class="method-sub">SBI, HDFC</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.78rem; color: #64748B; line-height: 1.4;">
           Secured with institutional 256-bit encryption. Payment verification will update the official student fee ledger.
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="ui.closeModal('checkoutModal')">Cancel</button>
-        <button id="confirmPayBtn" class="btn btn-primary" onclick="paymentDetails.executePayment()">
-          Authorize Payment
+      <div class="modal-footer" style="padding: 1rem 1.25rem; background: #F8FAFC;">
+        <button class="btn btn-secondary" style="font-weight: 600; padding: 0.65rem 1.25rem; border-radius: 8px;" onclick="ui.closeModal('checkoutModal')">Cancel</button>
+        <button id="confirmPayBtn" class="btn-pay-submit" onclick="paymentDetails.executePayment()">
+          Authorize Secure Payment &rarr;
         </button>
       </div>
     </div>

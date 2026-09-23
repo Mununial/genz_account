@@ -77,6 +77,40 @@ const ui = {
     }).format(val);
   },
 
+  numberToWords(num) {
+    num = Math.round(Number(num) || 0);
+    if (num === 0) return 'Rupees Zero Only';
+    const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    function convertLessThanOneThousand(n) {
+      let s = '';
+      if (n >= 100) {
+        s += a[Math.floor(n / 100)] + ' Hundred ';
+        n %= 100;
+      }
+      if (n >= 20) {
+        s += b[Math.floor(n / 10)] + ' ';
+        n %= 10;
+      }
+      if (n > 0) {
+        s += a[n] + ' ';
+      }
+      return s.trim();
+    }
+    let crore = Math.floor(num / 10000000);
+    num %= 10000000;
+    let lakh = Math.floor(num / 100000);
+    num %= 100000;
+    let thousand = Math.floor(num / 1000);
+    num %= 1000;
+    let res = '';
+    if (crore > 0) res += convertLessThanOneThousand(crore) + ' Crore ';
+    if (lakh > 0) res += convertLessThanOneThousand(lakh) + ' Lakh ';
+    if (thousand > 0) res += convertLessThanOneThousand(thousand) + ' Thousand ';
+    if (num > 0) res += convertLessThanOneThousand(num) + ' ';
+    return res.trim() + ' Rupees Only';
+  },
+
   formatDate(dateStr) {
     if (!dateStr) return '-';
     try {

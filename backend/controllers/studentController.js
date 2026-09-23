@@ -251,13 +251,21 @@ async function getReceipts(req, res) {
 
   try {
     const [receipts] = await query(
-      `SELECT r.id, r.receipt_no, r.amount_paid, r.payment_method, r.transaction_id,
-              r.issued_date, i.invoice_no, p.payment_no
+      `SELECT r.id, r.receipt_no, r.amount_paid,
+              r.amount_paid AS receipt_amount,
+              r.amount_paid AS amount,
+              r.payment_method, r.transaction_id,
+              r.issued_date,
+              r.issued_date AS receipt_date,
+              i.invoice_no, p.payment_no,
+              COALESCE(sem.label, '1st Semester') AS semester,
+              0 AS discount_amount
        FROM receipts r
        JOIN invoices i ON r.invoice_id = i.id
        JOIN payments p ON r.payment_id = p.id
+       LEFT JOIN semesters sem ON i.semester_id = sem.id
        WHERE r.student_id = ?
-       ORDER BY r.issued_date DESC`,
+       ORDER BY r.issued_date DESC, r.id DESC`,
       [studentId]
     );
 

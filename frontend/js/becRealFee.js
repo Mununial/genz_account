@@ -764,6 +764,9 @@ const becRealFee = {
             <button type="button" class="btn btn-primary" onclick="window.print()" style="font-weight: 700; padding: 0.55rem 1.25rem;">
               Print Official Receipt (Ctrl + P)
             </button>
+            <button type="button" class="btn btn-secondary" onclick="becRealFee.downloadReceiptPdf('${receiptNo}')" style="font-weight: 700; background: #ffffff; border: 1.5px solid #006644; color: #006644; padding: 0.55rem 1.1rem;">
+              Download PDF Receipt
+            </button>
             <button type="button" class="btn btn-secondary" onclick="becRealFee.downloadReceiptHtml('${receiptNo}')">
               Download HTML Copy
             </button>
@@ -784,6 +787,105 @@ const becRealFee = {
     `;
 
     ui.openModal('receiptModal');
+  },
+
+  async downloadReceiptPdf(receiptNo) {
+    const foil = document.querySelector('.bec-official-receipt-frame') || document.querySelector('.bec-official-receipt') || document.getElementById('receiptModalBody');
+    if (!foil) return;
+
+    ui.showToast('Generating official 1-page PDF receipt...', 'info', 2000);
+
+    // Sandbox at (0,0) to prevent negative-coordinate clipping
+    const sandbox = document.createElement('div');
+    sandbox.id = 'receipt-pdf-sandbox';
+    sandbox.style.position = 'fixed';
+    sandbox.style.top = '0';
+    sandbox.style.left = '0';
+    sandbox.style.width = '700px';
+    sandbox.style.background = '#FFFFFF';
+    sandbox.style.zIndex = '-99999';
+    sandbox.style.opacity = '0';
+    sandbox.style.pointerEvents = 'none';
+
+    const clone = foil.cloneNode(true);
+    clone.style.width = '700px';
+    clone.style.maxWidth = '700px';
+    clone.style.boxShadow = 'none';
+    clone.style.margin = '0';
+    clone.style.padding = '8px';
+    clone.style.boxSizing = 'border-box';
+    clone.style.backgroundColor = '#FFFFFF';
+
+    const actions = clone.querySelector('.receipt-modal-actions');
+    if (actions) actions.remove();
+    sandbox.appendChild(clone);
+    document.body.appendChild(sandbox);
+
+    try {
+      const hasHtml2Canvas = typeof html2canvas !== 'undefined';
+      const jsPdfClass = (typeof window.jspdf !== 'undefined' && window.jspdf.jsPDF) || (typeof window.jsPDF !== 'undefined' && window.jsPDF);
+
+      if (hasHtml2Canvas && jsPdfClass) {
+        const canvas = await html2canvas(clone, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#FFFFFF',
+          width: 700,
+          windowWidth: 700
+        });
+
+        if (document.body.contains(sandbox)) {
+          document.body.removeChild(sandbox);
+        }
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+        const pdf = new jsPdfClass({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const pageWidth = 210;
+        const marginX = 8;
+        const printWidth = pageWidth - (marginX * 2); // 194mm (spans entire page width)
+        const printHeight = (canvas.height * printWidth) / canvas.width;
+        const marginY = 8;
+
+        pdf.addImage(imgData, 'JPEG', marginX, marginY, printWidth, printHeight);
+        pdf.save(`BEC_Receipt_${receiptNo}.pdf`);
+        ui.showToast(`Receipt ${receiptNo} downloaded (1 Page)!`, 'success');
+        return;
+      }
+
+      if (typeof html2pdf !== 'undefined') {
+        const opt = {
+          margin: [8, 8, 8, 8],
+          filename: `BEC_Receipt_${receiptNo}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false, width: 700 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        await html2pdf().set(opt).from(clone).save();
+        if (document.body.contains(sandbox)) {
+          document.body.removeChild(sandbox);
+        }
+        ui.showToast(`Receipt ${receiptNo} downloaded (1 Page)!`, 'success');
+        return;
+      }
+
+      if (document.body.contains(sandbox)) {
+        document.body.removeChild(sandbox);
+      }
+      this.downloadReceiptHtml(receiptNo);
+    } catch (err) {
+      if (document.body.contains(sandbox)) {
+        document.body.removeChild(sandbox);
+      }
+      console.warn('PDF generation error, using fallback:', err);
+      this.downloadReceiptHtml(receiptNo);
+    }
   },
 
   downloadReceiptHtml(receiptNo) {

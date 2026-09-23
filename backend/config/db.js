@@ -412,7 +412,7 @@ function executeMockQuery(sql, params) {
   }
 
   // 11. Invoice Items
-  if (/FROM invoice_items .* WHERE invoice_id = \?/i.test(cleanSql) || /FROM invoice_items it .* WHERE it\.invoice_id = \?/i.test(cleanSql)) {
+  if (/FROM invoice_items\b/i.test(cleanSql) && /WHERE\s+(?:it\.)?invoice_id = \?/i.test(cleanSql)) {
     const invId = parseInt(params[0], 10);
     const items = mockDb.invoiceItems.filter(it => it.invoice_id === invId).map(it => {
       const cat = mockDb.feeCategories.find(c => c.id === it.fee_category_id);
@@ -446,8 +446,54 @@ function executeMockQuery(sql, params) {
   // 13. Student Receipts
   if (/FROM receipts r .* WHERE r\.student_id = \?/i.test(cleanSql)) {
     const studentId = parseInt(params[0], 10);
-    const rows = mockDb.receipts.filter(r => r.student_id === studentId);
+    const rows = mockDb.receipts
+      .filter(r => r.student_id === studentId)
+      .map(r => {
+        const p = mockDb.payments.find(pay => pay.id === r.payment_id);
+        const inv = mockDb.invoices.find(iv => iv.id === r.invoice_id);
+        const rawAmt = r.amount_paid !== undefined ? r.amount_paid : (r.receipt_amount !== undefined ? r.receipt_amount : (r.amount !== undefined ? r.amount : (p ? p.amount : 0)));
+        const numAmt = parseFloat(rawAmt) || 0;
+        const dt = r.issued_date || r.receipt_date || r.created_at || (p ? p.created_at : new Date().toISOString());
+        return {
+          ...r,
+          amount_paid: numAmt,
+          receipt_amount: numAmt,
+          amount: numAmt,
+          issued_date: dt,
+          receipt_date: dt,
+          discount_amount: parseFloat(r.discount_amount !== undefined ? r.discount_amount : (r.discount !== undefined ? r.discount : 0)),
+          payment_method: r.payment_method || r.payment_mode || (p ? p.payment_method : 'Online UPI / QR'),
+          transaction_id: r.transaction_id || (p ? p.transaction_id : `TXN-${r.id}`),
+          invoice_no: inv ? inv.invoice_no : 'INV-2026-0001',
+          payment_no: p ? p.payment_no : `PAY-${r.id}`,
+          semester: r.semester || '1st Semester'
+        };
+      })
+      .sort((a, b) => new Date(b.issued_date) - new Date(a.issued_date));
     return [rows];
+  }
+
+  // 13.b Receipts by ID
+  if (/FROM receipts r/i.test(cleanSql) && /WHERE\s+r\.id = \?/i.test(cleanSql)) {
+    const rId = parseInt(params[0], 10);
+    const r = mockDb.receipts.find(rec => rec.id === rId);
+    if (r) {
+      const s = mockDb.students.find(st => st.id === r.student_id);
+      const b = s ? mockDb.branches.find(br => br.id === s.branch_id) : null;
+      const c = s ? mockDb.courses.find(cr => cr.id === s.course_id) : null;
+      const inv = mockDb.invoices.find(i => i.id === r.invoice_id);
+      return [[{
+        ...r,
+        reg_no: s ? s.reg_no : 'N/A',
+        full_name: s ? s.full_name : 'Student',
+        branch_name: b ? b.name : 'Engineering',
+        course_name: c ? c.name : 'B.Tech',
+        semester_label: '1st Semester',
+        session_name: '2026-27',
+        invoice_no: inv ? inv.invoice_no : 'INV-2026-0001'
+      }]];
+    }
+    return [[]];
   }
 
   if (/FROM receipts r .* WHERE r\.id = \?/i.test(cleanSql)) {
@@ -825,20 +871,30 @@ function executeMockQuery(sql, params) {
 
   if (/INSERT INTO receipts/i.test(cleanSql)) {
     const id = mockDb.receipts.length + 1;
+    const nowIso = new Date().toISOString();
+    const amt = parseFloat(params[4]) || 0;
     mockDb.receipts.push({
       id,
       receipt_no: params[0],
       payment_id: params[1],
       student_id: params[2],
       invoice_id: params[3],
-      amount_paid: params[4],
+      amount_paid: amt,
+      receipt_amount: amt,
+      amount: amt,
       payment_method: params[5],
       transaction_id: params[6],
-      issued_date: new Date().toISOString(),
+      issued_date: nowIso,
+      receipt_date: nowIso,
+      created_at: nowIso,
       receipt_data_json: params[7],
       created_by: params[8]
     });
     return [{ insertId: id, affectedRows: 1 }];
+  }
+
+  if (/INSERT INTO payment_events/i.test(cleanSql)) {
+    return [{ insertId: 1, affectedRows: 1 }];
   }
 
   if (/INSERT INTO audit_logs/i.test(cleanSql)) {
@@ -929,6 +985,13 @@ function executeMockQuery(sql, params) {
       inv.paid_amount = parseFloat(params[0]);
       inv.outstanding_amount = parseFloat(params[1]);
       inv.status = params[2];
+
+      const st = mockDb.students.find(s => s.id === inv.student_id);
+      if (st) {
+        const studentInvoices = mockDb.invoices.filter(i => i.student_id === st.id);
+        st.total_paid = studentInvoices.reduce((sum, i) => sum + parseFloat(i.paid_amount || 0), 0);
+        st.total_outstanding = studentInvoices.reduce((sum, i) => sum + parseFloat(i.outstanding_amount || 0), 0);
+      }
     }
     return [{ affectedRows: 1 }];
   }

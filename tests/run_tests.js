@@ -83,11 +83,11 @@ async function runTests() {
     // Student Login
     const studentLogin = await request('/api/auth/login', {
       method: 'POST',
-      body: { email: 'jitendranial@bec.ac.in', password: 'Student@BEC2026!' }
+      body: { email: 'barsha.priyadarshini@bec.ac.in', password: 'Student@BEC2026!' }
     });
-    assert(studentLogin.status === 200, 'Student (jitendranial@bec.ac.in) logs in successfully');
-    assert(studentLogin.data.data.token, 'Student receives valid JWT token');
-    const studentToken = studentLogin.data.data.token;
+    assert(studentLogin.status === 200, 'Student (barsha.priyadarshini@bec.ac.in) logs in successfully');
+    assert(studentLogin.data && studentLogin.data.data && studentLogin.data.data.token, 'Student receives valid JWT token');
+    const studentToken = studentLogin.data && studentLogin.data.data ? studentLogin.data.data.token : null;
 
     // Staff Login
     const staffLogin = await request('/api/auth/login', {
@@ -124,7 +124,7 @@ async function runTests() {
     // Invalid Password check
     const badLogin = await request('/api/auth/login', {
       method: 'POST',
-      body: { email: 'jitendranial@bec.ac.in', password: 'WrongPassword123' }
+      body: { email: 'barsha.priyadarshini@bec.ac.in', password: 'WrongPassword123' }
     });
     assert(badLogin.status === 401, 'Invalid password correctly rejected with 401');
 
@@ -158,7 +158,7 @@ async function runTests() {
       headers: { Authorization: `Bearer ${studentToken}` }
     });
     assert(profile.status === 200, 'Student profile fetched successfully');
-    assert(profile.data.data.full_name === 'Jitendra Nial', 'Correct student name returned');
+    assert(profile.data.data.full_name === 'Barsha Priyadarshini Sahoo', 'Correct student name returned');
 
     const dashboard = await request('/api/student/dashboard', {
       headers: { Authorization: `Bearer ${studentToken}` }

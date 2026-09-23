@@ -339,6 +339,9 @@ const paymentDetails = {
     `;
   },
 
+  currentCheckoutMax: 115000,
+  selectedPayMethod: 'UPI',
+
   handlePayClick(semNum, amount) {
     const u = auth.getUser();
     const s = this.currentStudent;
@@ -346,16 +349,96 @@ const paymentDetails = {
     if (!s) return;
 
     if (u && u.role === 'STUDENT') {
-      // Student online payment modal
+      this.currentCheckoutMax = parseFloat(amount) || 0;
+      this.selectedPayMethod = 'UPI';
+
       document.getElementById('checkoutAmount').value = amount;
+      document.getElementById('checkoutAmount').max = amount;
       document.getElementById('checkoutAmountMax').textContent = ui.formatCurrency(amount);
       document.getElementById('checkoutInvoiceNo').textContent = `INV-2026-00${String(s.serial_no || s.id).padStart(2, '0')} (Sem ${semNum})`;
       document.getElementById('checkoutInvoiceId').value = s.id;
+
+      this.setPayType('FULL');
+      this.setMethod('UPI');
       ui.openModal('checkoutModal');
     } else {
       // Staff / Admin: navigate to receipt desk to cut institutional receipt
       window.location.href = `/receipt-desk.html?studentId=${s.id}`;
     }
+  },
+
+  setPayType(type) {
+    const isFull = type === 'FULL';
+    const fullBtn = document.getElementById('pdPayTypeFull');
+    const partBtn = document.getElementById('pdPayTypePartial');
+    const amtInput = document.getElementById('checkoutAmount');
+
+    if (fullBtn) fullBtn.className = isFull ? 'bec-pay-type-btn active' : 'bec-pay-type-btn';
+    if (partBtn) partBtn.className = !isFull ? 'bec-pay-type-btn active' : 'bec-pay-type-btn';
+
+    if (isFull) {
+      if (amtInput) amtInput.value = this.currentCheckoutMax;
+    } else {
+      const half = Math.round(this.currentCheckoutMax * 0.5);
+      if (amtInput) amtInput.value = half > 0 ? half : this.currentCheckoutMax;
+    }
+    this.updateLiveCalculations();
+  },
+
+  setChipAmount(val) {
+    const amtInput = document.getElementById('checkoutAmount');
+    if (!amtInput) return;
+
+    if (val === 'FULL') {
+      amtInput.value = this.currentCheckoutMax;
+      this.setPayType('FULL');
+    } else if (val === '50%') {
+      amtInput.value = Math.round(this.currentCheckoutMax * 0.5);
+      this.setPayType('PARTIAL');
+    } else {
+      let num = parseFloat(val) || 0;
+      if (num > this.currentCheckoutMax) num = this.currentCheckoutMax;
+      amtInput.value = num;
+      this.setPayType('PARTIAL');
+    }
+    this.updateLiveCalculations();
+  },
+
+  handleAmountChange(input) {
+    let val = parseFloat(input.value) || 0;
+    if (val > this.currentCheckoutMax) {
+      val = this.currentCheckoutMax;
+      input.value = val;
+    }
+    this.updateLiveCalculations();
+  },
+
+  updateLiveCalculations() {
+    const amtInput = document.getElementById('checkoutAmount');
+    const paying = parseFloat(amtInput ? amtInput.value : 0) || 0;
+    const remaining = Math.max(0, this.currentCheckoutMax - paying);
+
+    const livePayingEl = document.getElementById('pdLivePaying');
+    const liveRemEl = document.getElementById('pdLiveRemaining');
+    const payBtn = document.getElementById('confirmPayBtn');
+
+    if (livePayingEl) livePayingEl.textContent = ui.formatCurrency(paying);
+    if (liveRemEl) {
+      liveRemEl.textContent = ui.formatCurrency(remaining);
+      liveRemEl.style.color = remaining > 0 ? '#DC2626' : '#16A34A';
+    }
+    if (payBtn) {
+      payBtn.disabled = paying <= 0;
+      payBtn.textContent = `Authorize ${ui.formatCurrency(paying)} Payment`;
+    }
+  },
+
+  setMethod(method) {
+    this.selectedPayMethod = method;
+    ['UPI', 'CARD', 'NETBANK'].forEach(m => {
+      const el = document.getElementById(`pdMethod${m}`);
+      if (el) el.className = (m === method) ? 'bec-method-card active' : 'bec-method-card';
+    });
   },
 
   async executePayment() {
@@ -373,27 +456,34 @@ const paymentDetails = {
       payBtn.innerHTML = '<span class="spinner"></span> Processing...';
 
       // 1. Create order
-      const orderRes = await api.post('/payments/create-order', { invoiceId: s.id, amount });
-      const { orderId } = orderRes.data;
+      const methodLabel = this.selectedPayMethod === 'UPI' ? 'Online UPI' : (this.selectedPayMethod === 'CARD' ? 'Debit Card' : 'NetBanking');
+      const orderRes = await api.post('/payments/create-order', { 
+        invoiceId: s.id, 
+        amount,
+        paymentMethod: methodLabel
+      });
+      const orderId = (orderRes && orderRes.data) ? orderRes.data.orderId : `order_${Date.now()}`;
 
       // 2. Simulate gateway handshake
-      ui.showToast('Connecting to payment gateway...', 'info', 2000);
-      await new Promise(r => setTimeout(r, 1200));
+      ui.showToast('Connecting to payment gateway...', 'info', 1000);
+      await new Promise(r => setTimeout(r, 1000));
 
       // 3. Verify payment
-      const verifyRes = await api.post('/payments/verify', {
+      await api.post('/payments/verify', {
         orderId,
         paymentId: `pay_gw_${Date.now()}`,
-        signature: 'mock_sig_valid'
+        signature: 'mock_sig_valid',
+        invoiceId: s.id,
+        paymentMethod: methodLabel
       });
 
       ui.closeModal('checkoutModal');
-      ui.showToast('Fee payment verified successfully! Digital receipt recorded.', 'success');
+      ui.showToast(`Fee payment of ${ui.formatCurrency(amount)} verified successfully! Digital receipt recorded.`, 'success');
 
       // Refresh balance
       if (s) {
-        s.total_paid = (s.total_paid || 0) + amount;
-        s.total_outstanding = Math.max(0, (s.total_outstanding || 115000) - amount);
+        s.total_paid = (parseFloat(s.total_paid) || 0) + amount;
+        s.total_outstanding = Math.max(0, (parseFloat(s.total_outstanding) || 115000) - amount);
       }
 
       this.renderTable();

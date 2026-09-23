@@ -17,15 +17,25 @@ const { createNotification } = require('../services/notificationService');
  * POST /api/payments/create-order
  */
 async function createPaymentOrder(req, res) {
-  const { invoiceId, amount } = req.body;
+  let { invoiceId, amount, paymentMethod } = req.body;
   const isStudent = req.user.role === 'STUDENT';
   const studentId = isStudent ? req.user.studentId : parseInt(req.body.studentId, 10);
 
-  if (!invoiceId) {
-    return error(res, 'Invoice ID is required to initiate payment.', 400);
-  }
-
   try {
+    if (!invoiceId) {
+      const [openInvoices] = await query(
+        `SELECT id FROM invoices 
+         WHERE student_id = ? AND status IN ('ISSUED', 'PARTIALLY_PAID', 'OVERDUE')
+         ORDER BY id ASC LIMIT 1`,
+        [studentId]
+      );
+      if (openInvoices && openInvoices.length > 0) {
+        invoiceId = openInvoices[0].id;
+      } else {
+        return error(res, 'Invoice ID is required or no pending invoice found.', 400);
+      }
+    }
+
     // 1. Fetch and validate invoice
     const [invoices] = await query(
       `SELECT i.id, i.invoice_no, i.student_id, i.outstanding_amount, i.status, s.user_id, u.email
@@ -185,13 +195,15 @@ async function verifyPayment(req, res) {
         paymentId: p.id
       });
 
+      const effectivePaymentMethod = req.body.paymentMethod || p.payment_method || 'ONLINE_GATEWAY';
+
       // Generate digital receipt
       const receipt = await generateDigitalReceipt(connection, {
         paymentId: p.id,
         studentId: p.student_id,
         invoiceId: p.invoice_id,
         amountPaid: p.amount,
-        paymentMethod: 'ONLINE_GATEWAY',
+        paymentMethod: effectivePaymentMethod,
         transactionId: paymentId || orderId,
         createdBy: req.user.id
       });

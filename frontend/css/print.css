@@ -8,157 +8,299 @@
   display: none;
 }
 
+/* ========================================================================= */
+/* ON-SCREEN OFFICIAL BEC FEE RECEIPT PREVIEW (AUTHENTIC PAPER PREVIEW)     */
+/* ========================================================================= */
+.bec-official-receipt-frame {
+  background: #FFFFFF;
+  color: #000000;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.receipt-inner-border {
+  border: 1.5px solid #000000;
+  padding: 10px 14px 12px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.receipt-college-title {
+  text-align: center;
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #006644;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.receipt-title-row {
+  position: relative;
+  margin-bottom: 6px;
+  min-height: 24px;
+}
+
+.receipt-title-badge-wrap {
+  text-align: center;
+}
+
+.receipt-title-badge {
+  display: inline-block;
+  background: #006644;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 2px 22px;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+}
+
+.receipt-no-date {
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1.35;
+}
+
+/* Metadata Grid */
+.receipt-meta-container {
+  font-size: 10px;
+  color: #000000;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.meta-cell {
+  flex: 1;
+}
+
+.meta-cell.text-right {
+  text-align: right;
+}
+
+.meta-val {
+  font-weight: 600;
+}
+
+.meta-val-bold {
+  font-weight: 800;
+}
+
+/* Fee Table */
+.receipt-fee-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1.5px solid #000000;
+  font-size: 9.5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  color: #000000;
+}
+
+.receipt-fee-table th,
+.receipt-fee-table td {
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  padding: 1.5px 4px;
+  box-sizing: border-box;
+}
+
+.receipt-fee-table th:last-child,
+.receipt-fee-table td:last-child {
+  border-right: none;
+}
+
+.receipt-fee-table thead tr th {
+  text-align: center;
+  font-weight: 700;
+  font-size: 10px;
+  background: #FFFFFF;
+  padding: 2px 4px;
+}
+
+.col-sl {
+  width: 44px;
+  text-align: center;
+}
+
+.col-particular {
+  text-align: left;
+}
+
+.col-amount-head {
+  text-align: center;
+  width: 120px;
+}
+
+.col-rs {
+  width: 78px;
+  text-align: center;
+}
+
+.col-p {
+  width: 42px;
+  text-align: center;
+}
+
+.section-row td {
+  font-weight: 800;
+  padding-top: 2px;
+  padding-bottom: 1px;
+  border-bottom: none;
+  font-size: 9.5px;
+}
+
+.receipt-fee-table tbody tr td {
+  height: 13.5px;
+  line-height: 1.15;
+}
+
+.table-total-row td {
+  border-top: 1.5px solid #000000;
+  border-bottom: none;
+  padding: 3px 6px;
+  font-weight: 800;
+  font-size: 10.5px;
+}
+
+.total-label-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-right: none;
+}
+
+.rupees-words {
+  font-weight: normal;
+  font-style: italic;
+  font-size: 9.5px;
+}
+
+/* Footer Notes */
+.receipt-footer-notes {
+  font-size: 9.5px;
+  line-height: 1.35;
+  margin-top: 4px;
+  color: #000000;
+}
+
+.receipt-signatures-area {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 0 35px;
+}
+
+.sig-block {
+  font-size: 10px;
+  font-weight: 700;
+  color: #000000;
+}
+
+/* ========================================================================= */
+/* PRINT OPTIMIZATION (@MEDIA PRINT)                                         */
+/* ========================================================================= */
+@page {
+  size: A4 portrait;
+  margin: 6mm 8mm;
+}
+
 @media print {
-  /* Hide all interactive app shell elements */
+  /* Hide all app chrome, backdrop, buttons, navbars */
   body {
     background: #FFFFFF !important;
     color: #000000 !important;
-    font-size: 12pt;
+    font-size: 10pt;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .app-sidebar,
   .app-topbar,
+  .student-topbar-blue,
+  .student-drawer,
+  .drawer-backdrop,
   .quick-actions-bar,
   .btn,
-  .modal-backdrop,
   .toast-container,
   .nav-tabs,
-  .no-print {
+  .no-print,
+  .modal-header,
+  .modal-footer {
     display: none !important;
   }
 
-  .app-main {
-    margin-left: 0 !important;
+  /* When printing from modal */
+  .modal-backdrop {
+    position: static !important;
+    background: transparent !important;
     padding: 0 !important;
-  }
-
-  .page-content {
-    padding: 0 !important;
-    max-width: 100% !important;
-  }
-
-  /* Show only printable receipt or invoice */
-  #printableReceiptArea.print-active,
-  #printableInvoiceArea.print-active {
     display: block !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin: 0;
-    padding: 20mm 15mm;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
-  .receipt-document {
-    border: 2px solid #0A2540;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-    background: #FFFFFF;
+  .modal-card {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    transform: none !important;
   }
 
-  .receipt-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-30deg);
-    font-size: 75pt;
-    font-weight: 900;
-    color: rgba(10, 37, 64, 0.05);
-    letter-spacing: 0.1em;
-    pointer-events: none;
-    z-index: 0;
+  .modal-body {
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+    max-height: none !important;
   }
 
-  .receipt-header {
-    text-align: center;
-    border-bottom: 2px solid #0A2540;
-    padding-bottom: 12px;
-    margin-bottom: 16px;
-    position: relative;
-    z-index: 1;
+  .bec-official-receipt-frame {
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .receipt-inner-border {
+    border: 1.5px solid #000000 !important;
+    padding: 10px 14px 12px !important;
+  }
+
+  .receipt-title-badge {
+    background: #006644 !important;
+    color: #FFFFFF !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .receipt-college-title {
-    font-size: 18pt;
-    font-weight: 900;
-    color: #0A2540;
-    text-transform: uppercase;
-  }
-
-  .receipt-college-sub {
-    font-size: 9.5pt;
-    color: #334155;
-    margin-top: 2px;
-  }
-
-  .receipt-badge-title {
-    display: inline-block;
-    background: #0A2540;
-    color: #FFFFFF;
-    font-weight: 700;
-    padding: 3px 18px;
-    border-radius: 20px;
-    font-size: 11pt;
-    margin-top: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .receipt-meta-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    font-size: 10pt;
-    margin-bottom: 16px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .receipt-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-    position: relative;
-    z-index: 1;
-  }
-
-  .receipt-table th, .receipt-table td {
-    border: 1px solid #CBD5E1;
-    padding: 8px 10px;
-    font-size: 10pt;
-  }
-
-  .receipt-table th {
-    background: #F1F5F9;
-    font-weight: 700;
-    color: #0F172A;
-  }
-
-  .receipt-signatures {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 50px;
-    padding-top: 20px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .signature-box {
-    text-align: center;
-    width: 200px;
-    border-top: 1px dashed #0F172A;
-    padding-top: 6px;
-    font-size: 9pt;
-    font-weight: 600;
-  }
-
-  .receipt-footer-note {
-    text-align: center;
-    font-size: 8pt;
-    color: #64748B;
-    margin-top: 24px;
-    border-top: 1px solid #E2E8F0;
-    padding-top: 6px;
+    color: #006644 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
