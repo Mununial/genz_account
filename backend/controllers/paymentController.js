@@ -11,6 +11,7 @@ const { postPaymentToLedger } = require('../services/ledgerService');
 const { generateDigitalReceipt } = require('../services/receiptService');
 const { logAudit } = require('../services/auditService');
 const { createNotification } = require('../services/notificationService');
+const { syncPaymentToFirestore } = require('../config/firebase');
 
 /**
  * Initiate Payment Order
@@ -208,18 +209,28 @@ async function verifyPayment(req, res) {
         createdBy: req.user.id
       });
 
-      // Fetch user_id for notification
+      // Fetch student details for notification & Firebase sync
       const [stUser] = await connection.query(
-        `SELECT user_id FROM students WHERE id = ?`,
+        `SELECT s.user_id, s.reg_no, s.roll_no, u.full_name, b.branch_code
+         FROM students s
+         LEFT JOIN users u ON s.user_id = u.id
+         LEFT JOIN branches b ON s.branch_id = b.id
+         WHERE s.id = ?`,
         [p.student_id]
       );
+      const studentInfo = stUser[0] || {};
 
       return {
         paymentId: p.id,
         paymentNo: p.payment_no,
         receiptNo: receipt.receiptNo,
         receiptId: receipt.id,
-        studentUserId: stUser[0] ? stUser[0].user_id : null,
+        studentId: p.student_id,
+        studentName: studentInfo.full_name || 'Student',
+        regNo: studentInfo.reg_no || '',
+        rollNo: studentInfo.roll_no || '',
+        branch: studentInfo.branch_code || 'Engineering',
+        studentUserId: studentInfo.user_id || null,
         amount: p.amount
       };
     });
@@ -243,6 +254,21 @@ async function verifyPayment(req, res) {
       reason: `Online gateway transaction verified. Receipt: ${result.receiptNo}`,
       ipAddress: req.ip
     });
+
+    // Asynchronously broadcast to Firebase Cloud Firestore for real-time staff sync
+    syncPaymentToFirestore({
+      paymentNo: result.paymentNo,
+      receiptNo: result.receiptNo,
+      studentId: result.studentId,
+      studentName: result.studentName,
+      regNo: result.regNo,
+      rollNo: result.rollNo,
+      branch: result.branch,
+      amount: result.amount,
+      paymentMethod: req.body.paymentMethod || 'ONLINE_GATEWAY',
+      transactionId: req.body.paymentId || req.body.orderId,
+      source: 'STUDENT_PORTAL'
+    }).catch(e => console.warn('[Firebase Sync Warning]:', e.message));
 
     return success(res, result, 'Payment verified successfully. Digital receipt generated.');
   } catch (err) {
@@ -409,6 +435,17 @@ async function recordCounterPayment(req, res) {
     const paymentNo = generatePaymentNo();
     const ref = transactionRef || (method === 'CASH' ? `CTR-CASH-${Date.now().toString().slice(-6)}` : `UTR-${Date.now().toString().slice(-8)}`);
 
+    // Concurrency / Duplicate Replay Protection
+    const [recentDups] = await query(
+      `SELECT p.id, r.receipt_no FROM payments p LEFT JOIN receipts r ON r.payment_id = p.id 
+       WHERE p.student_id = ? AND p.amount = ? AND p.transaction_id = ? AND p.status = 'SUCCESS' 
+       AND p.created_at >= DATE_SUB(NOW(), INTERVAL 10 SECOND) LIMIT 1`,
+      [studentId, payAmount, ref]
+    );
+    if (recentDups && recentDups.length > 0) {
+      return error(res, `Duplicate payment detected. A transaction of ₹${payAmount} was just recorded (Receipt: ${recentDups[0].receipt_no || 'Issued'}). Please refresh to view.`, 409);
+    }
+
     // 2. Perform ACID payment and receipt creation
     const result = await withTransaction(async (connection) => {
       // Insert payment
@@ -503,6 +540,20 @@ async function recordCounterPayment(req, res) {
       // ignore
     }
 
+    // Asynchronously broadcast to Firebase Cloud Firestore for real-time staff sync
+    syncPaymentToFirestore({
+      paymentNo: result.paymentNo,
+      receiptNo: result.receiptNo,
+      studentId: studentId,
+      studentName: student[0] ? student[0].full_name : 'Student',
+      regNo: student[0] ? student[0].reg_no : '',
+      amount: payAmount,
+      paymentMethod: method,
+      transactionId: transactionRef,
+      feeCategory: feeCategory,
+      source: 'CASHIER_DESK'
+    }).catch(e => console.warn('[Firebase Sync Warning]:', e.message));
+
     return success(res, { receipt: receiptData }, 'Fast e-Receipt issued successfully.', 201);
   } catch (err) {
     console.error('recordCounterPayment error:', err);
@@ -545,10 +596,70 @@ async function getPaymentById(req, res) {
   }
 }
 
+/**
+ * Cancel / Void Official Fee Receipt
+ * POST /api/payments/receipts/:id/cancel
+ */
+async function cancelReceipt(req, res) {
+  const receiptId = req.params.id;
+  const { reason } = req.body;
+
+  if (!reason || reason.trim().length < 5) {
+    return error(res, 'A detailed official cancellation reason is mandatory.', 400);
+  }
+
+  try {
+    const [receipts] = await query(
+      `SELECT r.*, p.amount, p.student_id, p.invoice_id FROM receipts r JOIN payments p ON r.payment_id = p.id WHERE r.id = ? OR r.receipt_no = ? LIMIT 1`,
+      [receiptId, receiptId]
+    );
+
+    if (!receipts || receipts.length === 0) {
+      return error(res, 'Receipt not found.', 404);
+    }
+
+    const rec = receipts[0];
+    if (rec.status === 'CANCELLED') {
+      return error(res, 'Receipt has already been cancelled.', 400);
+    }
+
+    await query(
+      `UPDATE receipts SET status = 'CANCELLED', cancellation_reason = ?, cancelled_by = ?, cancelled_at = NOW() WHERE id = ?`,
+      ['CANCELLED', reason, req.user.id, rec.id]
+    );
+
+    await query(
+      `UPDATE invoices 
+       SET paid_amount = GREATEST(0, paid_amount - ?),
+           outstanding_amount = outstanding_amount + ?,
+           status = 'PARTIALLY_PAID',
+           updated_at = NOW()
+       WHERE id = ?`,
+      [rec.amount, rec.amount, rec.invoice_id]
+    );
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'CANCEL_RECEIPT',
+      module: 'RECEIPT',
+      recordId: rec.id,
+      reason: `Cancelled Receipt ${rec.receipt_no} for student ID ${rec.student_id}. Reason: ${reason}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, { receiptNo: rec.receipt_no, status: 'CANCELLED' }, 'Receipt cancelled and balances reversed.');
+  } catch (err) {
+    console.error('cancelReceipt error:', err);
+    return error(res, 'Failed to cancel receipt.', 500);
+  }
+}
+
 module.exports = {
   createPaymentOrder,
   verifyPayment,
   recordOfflinePayment,
   recordCounterPayment,
-  getPaymentById
+  getPaymentById,
+  cancelReceipt
 };

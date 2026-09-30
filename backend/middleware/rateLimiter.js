@@ -5,10 +5,12 @@
 
 const rateLimit = require('express-rate-limit');
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 // Strict limiter for login and password changes to block brute-force attacks
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // 10 attempts per window
+  max: isDev ? 2000 : 25, // Generous in dev/test, safe in prod
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -20,7 +22,7 @@ const authLimiter = rateLimit({
 // General limiter for public API endpoints
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: isDev ? 20000 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -33,3 +35,4 @@ module.exports = {
   authLimiter,
   apiLimiter
 };
+

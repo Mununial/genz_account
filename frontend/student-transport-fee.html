@@ -6,69 +6,13 @@
   <title>Student Transport Fee - Bhubaneswar Engineering College (BEC)</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/becReal.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: #F1F5F9;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #1E293B;
-    }
-
-    /* Top Bar matching Image 5 */
-    .bec-topbar-blue {
-      background: #0B63C5;
-      color: #ffffff;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .bec-topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .bec-menu-btn {
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      padding: 0.25rem;
-    }
-    .bec-topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-    .bec-clock-text {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #F8FAFC;
-    }
-    .btn-logout-white {
-      background: transparent;
-      color: #ffffff;
-      border: 1px solid rgba(255,255,255,0.7);
-      font-weight: 600;
-      font-size: 0.82rem;
-      padding: 0.35rem 1.1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-logout-white:hover {
-      background: rgba(255,255,255,0.15);
-    }
-
+    /* Transport Layout Enhancements */
     /* Outer Container */
     .transport-container {
       max-width: 1280px;
@@ -320,55 +264,129 @@
   </style>
 </head>
 <body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 
-  <!-- Top Blue Navbar matching Image 5 -->
-  <header class="bec-topbar-blue">
-    <div class="bec-topbar-left">
-      <button class="bec-menu-btn" onclick="toggleSidebar()" aria-label="Menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <a href="/dashboard.html" style="color: #ffffff; font-weight: 700; text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        BEC Accounts ERP
-      </a>
-      <a href="/expenses.html" style="color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-left: 1rem;">
-        Expenses
-      </a>
-      <a href="/students.html" style="color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-left: 0.5rem;">
-        Students
-      </a>
-      <a href="/receipt-desk.html" style="color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-left: 0.5rem;">
-        Fee Counter
-      </a>
-      <button onclick="openRolePasswordModal()" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; border-radius: 4px; padding: 0.25rem 0.65rem; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-        + Role and Change Password
-      </button>
-    </div>
-    <div class="bec-topbar-right">
-      <div id="topbarClock" class="bec-clock-text">Loading clock...</div>
-      <button class="btn-logout-white" onclick="auth.logout()">LOGOUT</button>
-    </div>
-  </header>
-
-  <!-- Main Screen Content -->
-  <div class="transport-container">
-    <div class="transport-card">
-      <!-- Title matching Image 5 -->
-      <h2 class="transport-title">STUDENT TRANSPORT FEE</h2>
-
-      <!-- Top Action Buttons Bar matching Image 5 -->
-      <div class="transport-actions-bar">
-        <button class="btn-action-blue" onclick="transportApp.fetchTransportRecords()">Search</button>
-        <button class="btn-action-blue" onclick="transportApp.exportToExcel()">Export to Excel</button>
-        <button class="btn-action-grey" onclick="transportApp.clearFilters()">Clear</button>
-        <button class="btn-action-red" onclick="window.location.href='/dashboard.html'">Close</button>
-        <button class="btn-action-blue" style="margin-left: auto; background: #059669;" onclick="transportApp.openAssignModal()">
-          + Assign Student Transport
-        </button>
+  <div class="app-container">
+    <!-- 1. SIDEBAR NAVIGATION -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/dashboard.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC ACCOUNTS</span>
+            <span class="brand-subtitle">Finance ERP</span>
+          </div>
+        </a>
       </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Counter Desk</div>
+        <div id="adminNavGroup">
+          <a href="/receipt-desk.html" class="nav-item" data-page="receipt-desk">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Fast e-Receipt Desk</span>
+          </a>
+
+          <div class="nav-section-title">Management &amp; Overview</div>
+          <a href="/dashboard.html" class="nav-item" data-page="dashboard">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Executive Dashboard</span>
+          </a>
+          <a href="/students.html" class="nav-item" data-page="students">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            <span>Students Directory</span>
+          </a>
+          <a href="/student-fee.html" class="nav-item" data-page="student-fee">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Student Fee Details</span>
+          </a>
+          <a href="/payment-details.html" class="nav-item" data-page="payment-details">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span>Payment Details</span>
+          </a>
+
+          <div class="nav-section-title">Transport &amp; Accounts</div>
+          <a href="/student-transport-fee.html" class="nav-item active" data-page="transport">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Student Transport Fee</span>
+          </a>
+          <a href="/expenses.html" class="nav-item" data-page="expenses">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Expenses &amp; Accounts</span>
+          </a>
+
+          <div class="nav-section-title">Registers &amp; Reports</div>
+          <a href="/receipts.html" class="nav-item" data-page="receipts">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Fee Receipts Register</span>
+          </a>
+          <a href="/invoices.html" class="nav-item" data-page="invoices">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Invoices Register</span>
+          </a>
+          <a href="/reports.html" class="nav-item" data-page="reports">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            <span>Reports &amp; Defaulters</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">BEC</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">Accounts Staff</div>
+            <div class="user-role-tag" id="userDisplayRole">ACCOUNTS</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <!-- Top Header Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="page-title" id="topbarPageTitle">Student Transport Fee</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div id="topbarClock" class="topbar-clock">Loading live clock...</div>
+          <div class="session-badge">
+            <span class="session-dot"></span>
+            Session 2026-27
+          </div>
+
+          <a href="/receipt-desk.html" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Issue e-Receipt
+          </a>
+
+          <button class="btn btn-ghost-danger btn-sm" onclick="auth.logout()" title="Exit Portal">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Screen Content -->
+      <div class="page-content" style="padding: 1.25rem 1.5rem;">
+        <div class="card" style="padding: 1.5rem;">
+          <!-- Top Action Buttons Bar -->
+          <div class="transport-actions-bar" style="margin-bottom: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <button class="btn btn-primary btn-sm" onclick="transportApp.fetchTransportRecords()">Search</button>
+            <button class="btn btn-secondary btn-sm" onclick="transportApp.exportToExcel()">Export Bus List (Excel / CSV)</button>
+            <button class="btn btn-secondary btn-sm" onclick="transportApp.clearFilters()">Clear</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='/dashboard.html'">Close</button>
+            <button class="btn btn-success btn-sm" style="margin-left: auto;" onclick="transportApp.openAssignModal()">
+              + Assign Student Transport
+            </button>
+          </div>
 
       <!-- Filters Section matching Image 5 -->
       <div class="filter-card-inner">
@@ -508,6 +526,9 @@
       </div>
     </div>
   </div>
+</div>
+</main>
+</div>
 
   <!-- Modal 1: Fast Student Picker (...) -->
   <div id="studentPickerModal" class="modal-overlay">

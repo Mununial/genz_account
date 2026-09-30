@@ -19,59 +19,63 @@
     <!-- 1. SIDEBAR NAVIGATION -->
     <aside class="app-sidebar" id="appSidebar">
       <div class="sidebar-brand">
-        <a href="/dashboard.html">
+        <a href="/dashboard.html" class="brand-link">
           <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC ACCOUNTS</span>
+            <span class="brand-subtitle">Finance ERP</span>
+          </div>
         </a>
       </div>
 
       <nav class="sidebar-nav">
         <div class="nav-section-title">Core Counter Desk</div>
         <div id="adminNavGroup">
-          <a href="/receipt-desk.html" class="nav-item" data-page="receipt-desk" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B; font-weight: 700;">
+          <a href="/receipt-desk.html" class="nav-item" data-page="receipt-desk">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Fast e-Receipt Desk
+            <span>Fast e-Receipt Desk</span>
           </a>
 
           <div class="nav-section-title">Management &amp; Overview</div>
           <a href="/dashboard.html" class="nav-item" data-page="dashboard">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Executive Dashboard
+            <span>Executive Dashboard</span>
           </a>
           <a href="/students.html" class="nav-item active" data-page="students">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
-            Students Directory &amp; Profile
+            <span>Students Directory</span>
           </a>
           <a href="/student-fee.html" class="nav-item" data-page="student-fee">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Student Fee Details
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Student Fee Details</span>
           </a>
-          <a href="/payment-details.html" class="nav-item" data-page="payment-details" style="color: #0284C7; font-weight: 600;">
+          <a href="/payment-details.html" class="nav-item" data-page="payment-details">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            Payment Details
+            <span>Payment Details</span>
           </a>
 
           <div class="nav-section-title">Transport &amp; Accounts</div>
           <a href="/student-transport-fee.html" class="nav-item" data-page="transport">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Student Transport Fee
+            <span>Student Transport Fee</span>
           </a>
           <a href="/expenses.html" class="nav-item" data-page="expenses">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            Expenses &amp; Accounts
+            <span>Expenses &amp; Accounts</span>
           </a>
 
           <div class="nav-section-title">Registers &amp; Reports</div>
           <a href="/receipts.html" class="nav-item" data-page="receipts">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Fee Receipts Register
+            <span>Fee Receipts Register</span>
           </a>
           <a href="/invoices.html" class="nav-item" data-page="invoices">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Invoices Register
+            <span>Invoices Register</span>
           </a>
           <a href="/reports.html" class="nav-item" data-page="reports">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-            Reports &amp; Defaulters
+            <span>Reports &amp; Defaulters</span>
           </a>
         </div>
       </nav>
@@ -80,11 +84,11 @@
         <div class="user-profile-badge">
           <div class="user-avatar" id="userAvatar">BEC</div>
           <div class="user-meta">
-            <div class="user-name" id="userDisplayName">Loading...</div>
+            <div class="user-name" id="userDisplayName">Accounts Staff</div>
             <div class="user-role-tag" id="userDisplayRole">ACCOUNTS</div>
           </div>
-          <button class="btn btn-icon btn-outline" onclick="auth.logout()" title="Secure Logout" style="color: #CBD5E1; border-color: rgba(255,255,255,0.2);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           </button>
         </div>
       </div>
@@ -96,24 +100,25 @@
       <header class="app-topbar">
         <div class="topbar-left">
           <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
-          <h2 class="page-title" id="topbarPageTitle">Student CMS Management Portal</h2>
+          <h1 class="page-title" id="topbarPageTitle">Students Directory &amp; Profile</h1>
         </div>
 
         <div class="topbar-right">
           <div id="topbarClock" class="topbar-clock">Loading live clock...</div>
           <div class="session-badge">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-emerald); display: inline-block;"></span>
+            <span class="session-dot"></span>
             Session 2026-27
           </div>
 
-          <a href="/receipt-desk.html" class="btn" style="background: #F59E0B; color: #1E293B; font-weight: 700; border: none; padding: 0.45rem 1rem; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35); font-size: 0.85rem;">
+          <a href="/receipt-desk.html" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Issue e-Receipt
           </a>
 
-          <button class="btn-bec-red" onclick="auth.logout()" title="Exit Portal" style="padding: 0.4rem 1rem; font-size: 0.85rem;">
-            LOGOUT
+          <button class="btn btn-ghost-danger btn-sm" onclick="auth.logout()" title="Exit Portal">
+            Logout
           </button>
         </div>
       </header>
@@ -147,7 +152,7 @@
               <span class="search-icon">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </span>
-              <input type="text" id="cmsLiveSearchInput" placeholder="Instant Search 182 Students..." oninput="studentProfile.onSearchInput(event)">
+              <input type="text" id="cmsLiveSearchInput" placeholder="Instant Search 355 Students..." oninput="studentProfile.onSearchInput(event)">
             </div>
 
             <!-- Student Selector Dropdown -->
@@ -171,7 +176,7 @@
               </button>
               <button type="button" id="btnViewDirectory" class="cms-view-pill-btn" onclick="studentProfile.setView('directory')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                Directory Table (182)
+                Directory Table (355)
               </button>
             </div>
           </div>
@@ -179,6 +184,91 @@
 
         <!-- Quick Star Student Access Chips Bar -->
         <div id="cmsQuickChipsContainer" class="cms-quick-chips-bar"></div>
+
+        <!-- STICKY FINANCIAL SUMMARY & CONTEXTUAL ACTION BANNER (REQUIREMENTS 3-13) -->
+        <div id="student360Banner" class="student-360-banner" style="display: none;">
+          <div class="student-360-top-row">
+            <div class="student-360-identity">
+              <div class="student-360-avatar-small" id="s360AvatarSlot"></div>
+              <div class="student-360-name-block">
+                <div class="student-360-full-name">
+                  <span id="s360Name">Loading...</span>
+                  <span id="s360DuesBadge" class="status-badge-due">Outstanding</span>
+                </div>
+                <div class="student-360-tags">
+                  <span><strong>Reg:</strong> <code id="s360Reg">-</code></span>
+                  <span>&bull;</span>
+                  <span><strong>Roll:</strong> <code id="s360Roll">-</code></span>
+                  <span>&bull;</span>
+                  <span id="s360Branch">-</span>
+                  <span>&bull;</span>
+                  <span id="s360Quota" class="badge" style="background: #FEF3C7; color: #92400E; font-size: 0.72rem;">Regular / General</span>
+                  <span>&bull;</span>
+                  <span id="s360OptedFacility" style="color: #0284C7; font-weight: 600;">Hostel &amp; Transport</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contextual Quick Action Buttons -->
+            <div class="student-360-actions">
+              <a href="javascript:void(0)" id="s360CollectFeeBtn" class="btn btn-primary btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                ⚡ Collect Fee
+              </a>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="studentProfile.switchTab('ledger')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+                📄 View Ledger
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="studentProfile.switchTab('receipts')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                🧾 Receipts
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="studentProfile.switchTab('exam')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                🎓 Exam Reg
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="studentProfile.switchTab('transport')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                🚌 Transport/Hostel
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="studentProfile.openRefundModal()" style="color: #D97706; border-color: #FCD34D;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                ↩ Request Refund
+              </button>
+              <button type="button" id="s360GraduateBtn" class="btn btn-sm" onclick="studentProfile.openGraduationModal()" style="background: #F3E8FF; color: #7C3AED; border: 1px solid #C4B5FD; font-weight: 700;" title="Graduate Student to Alumni with No Dues Clearance">
+                🎓 Pass Out to Alumni
+              </button>
+              <button type="button" id="btnToggleProfileSidebar" class="btn btn-secondary btn-sm" onclick="studentProfile.toggleProfileSidebar()" title="Toggle Profile Snapshot Panel (Maximize Table View)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+                <span id="btnToggleProfileText">Hide Profile ◀</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Financial KPIs Grid -->
+          <div class="student-360-kpis-grid">
+            <div class="s360-kpi-box">
+              <div class="s360-kpi-label">Total Invoiced</div>
+              <div class="s360-kpi-val" id="s360KpiInvoiced">₹0.00</div>
+            </div>
+            <div class="s360-kpi-box">
+              <div class="s360-kpi-label">Total Fee Paid</div>
+              <div class="s360-kpi-val text-paid" id="s360KpiPaid">₹0.00</div>
+            </div>
+            <div class="s360-kpi-box">
+              <div class="s360-kpi-label">Scholarships / Waivers</div>
+              <div class="s360-kpi-val text-discount" id="s360KpiDiscounts">₹0.00</div>
+            </div>
+            <div class="s360-kpi-box">
+              <div class="s360-kpi-label">Refunds &amp; Reversals</div>
+              <div class="s360-kpi-val text-refund" id="s360KpiRefunds">₹0.00</div>
+            </div>
+            <div class="s360-kpi-box" style="background: #FFF1F2; border-color: #FECDD3;">
+              <div class="s360-kpi-label" style="color: #BE123C;">Net Outstanding Dues</div>
+              <div class="s360-kpi-val text-due" id="s360KpiOutstanding">₹0.00</div>
+            </div>
+          </div>
+        </div>
 
         <!-- VIEW 1: GIFT CMS STYLE STUDENT PROFILE VIEW -->
         <div id="cmsProfileViewWrap">
@@ -191,30 +281,17 @@
               </div>
             </div>
 
-            <!-- Right Column: Quick Links & Tabbed Content (Matching Photo 2) -->
+            <!-- Right Column: Tabbed Content (Matching Photo 2) -->
             <div class="cms-main-content-column">
-              <!-- Top Quick Action Links (GIFT CMS style) -->
-              <div class="cms-top-quick-actions-bar">
-                <a href="javascript:void(0)" class="cms-quick-action-item" onclick="ui.showToast('College Internal Marks module synced with ERP.', 'info')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M9 10a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v11H9z"/></svg>
-                  College Marks
-                </a>
-                <a href="javascript:void(0)" class="cms-quick-action-item" onclick="ui.showToast('University BPUT Semester Assessment records active.', 'info')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                  University Marks
-                </a>
-                <a href="javascript:void(0)" class="cms-quick-action-item" onclick="studentProfile.switchTab('attendance')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  Campus Biometric
-                </a>
-                <a href="javascript:void(0)" class="cms-quick-action-item" onclick="window.location.href='/payment-details.html?studentId=' + (studentProfile.activeStudent ? studentProfile.activeStudent.id : '')" style="color: #0284C7; font-weight: 700;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                  Payment Details
-                </a>
-                <a href="javascript:void(0)" class="cms-quick-action-item" onclick="ui.showToast('Canteen Smart Meal Pass active for session 2026-27.', 'info')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-                  Canteen Access Log
-                </a>
+              <!-- Collapsed Banner Notification / Quick Re-open -->
+              <div id="cmsCollapsedExpandBanner" style="display: none; align-items: center; justify-content: space-between; padding: 0.55rem 0.95rem; background: #F0F9FF; border: 1px dashed #38BDF8; border-radius: 6px; font-size: 0.83rem; color: #0369A1;">
+                <span style="display: flex; align-items: center; gap: 0.4rem;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <strong>Full Width Mode Active:</strong> Profile snapshot is hidden to give maximum table visibility.
+                </span>
+                <button type="button" class="btn btn-sm btn-primary" onclick="studentProfile.toggleProfileSidebar()" style="padding: 0.25rem 0.75rem; font-size: 0.78rem;">
+                  Show Profile Card ▶
+                </button>
               </div>
 
               <!-- Tabs Container -->
@@ -222,40 +299,52 @@
                 <!-- Tab Navigation Bar with Signature Cyan Accent Line -->
                 <div class="cms-tab-bar-nav">
                   <button type="button" class="cms-tab-item-btn active" data-tab="personal" onclick="studentProfile.switchTab('personal')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     Personal
                   </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="academic" onclick="studentProfile.switchTab('academic')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                     Academic
                   </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="guardians" onclick="studentProfile.switchTab('guardians')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
                     Guardians
                   </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="address" onclick="studentProfile.switchTab('address')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     Address
                   </button>
+                  <button type="button" class="cms-tab-item-btn tab-fees-item" data-tab="fees" onclick="studentProfile.switchTab('fees')">
+                    Fee Schedule
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="ledger" onclick="studentProfile.switchTab('ledger')">
+                    Itemized Ledger
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="receipts" onclick="studentProfile.switchTab('receipts')">
+                    Receipts &amp; Payments
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="exam" onclick="studentProfile.switchTab('exam')">
+                    Exam Registration
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="transport" onclick="studentProfile.switchTab('transport')">
+                    Transport &amp; Hostel
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="concessions" onclick="studentProfile.switchTab('concessions')">
+                    Scholarships / Waivers
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="refunds" onclick="studentProfile.switchTab('refunds')">
+                    Refunds &amp; Reversals
+                  </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="documents" onclick="studentProfile.switchTab('documents')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     Documents
                   </button>
-                  <button type="button" class="cms-tab-item-btn tab-fees-item" data-tab="fees" onclick="studentProfile.switchTab('fees')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    Fees (₹1,15,000 Dues)
-                  </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="attendance" onclick="studentProfile.switchTab('attendance')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     Attendance
                   </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="health" onclick="studentProfile.switchTab('health')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                     Health
                   </button>
                   <button type="button" class="cms-tab-item-btn" data-tab="idcard" onclick="studentProfile.switchTab('idcard')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/></svg>
                     ID Card
+                  </button>
+                  <button type="button" class="cms-tab-item-btn" data-tab="audit" onclick="studentProfile.switchTab('audit')">
+                    Audit Trail
                   </button>
                 </div>
 
@@ -273,52 +362,129 @@
 
         <!-- VIEW 2: SEARCHABLE ALL STUDENTS DIRECTORY TABLE -->
         <div id="cmsDirectoryViewWrap" style="display: none;">
-          <!-- Filter Card -->
-          <div class="card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between; align-items: center;">
-              <div style="flex: 1; min-width: 280px;">
-                <input 
-                  type="text" 
-                  id="studentsSearchInput" 
-                  class="form-control" 
-                  placeholder="Search 182 students by Name, Roll No, Reg No, Phone, or Branch..."
-                  oninput="studentProfile.renderDirectoryTable()"
-                >
+          <!-- Filter Toolbar Card with Multi-Criteria & Quick Status Pills -->
+          <div class="card" style="margin-bottom: 1.25rem;">
+            <div class="card-body" style="padding: 1rem 1.25rem;">
+              <!-- Quick Filter Status Pills -->
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #475569; text-transform: uppercase;">Quick Filter:</span>
+                <div class="year-filters" style="margin: 0; display: inline-flex; gap: 0.35rem; flex-wrap: wrap;">
+                  <button type="button" class="year-filter-pill active" id="pillAllStudents" onclick="studentProfile.setDirectoryQuickFilter('ALL', this)">All Students (355)</button>
+                  <button type="button" class="year-filter-pill" id="pillAlumni" onclick="studentProfile.setDirectoryQuickFilter('ALUMNI', this)" style="background: #FAF5FF; color: #7E22CE; border-color: #D8B4FE; font-weight: 700;">🎓 Alumni / Pass Out</button>
+                  <button type="button" class="year-filter-pill" id="pillDuesOnly" onclick="studentProfile.setDirectoryQuickFilter('DUES', this)">With Dues</button>
+                  <button type="button" class="year-filter-pill" id="pillClearedOnly" onclick="studentProfile.setDirectoryQuickFilter('CLEARED', this)">Fee Cleared (Zero Dues)</button>
+                  <button type="button" class="year-filter-pill" id="pillRegPaid" onclick="studentProfile.setDirectoryQuickFilter('REG_PAID', this)">Registration Fee Paid</button>
+                  <button type="button" class="year-filter-pill" id="pillRegUnpaid" onclick="studentProfile.setDirectoryQuickFilter('REG_UNPAID', this)">Registration Fee Unpaid</button>
+                  <button type="button" class="year-filter-pill" id="pillHostel" onclick="studentProfile.setDirectoryQuickFilter('HOSTEL', this)">Hostel Opted</button>
+                  <button type="button" class="year-filter-pill" id="pillTransport" onclick="studentProfile.setDirectoryQuickFilter('TRANSPORT', this)">Transport Opted</button>
+                </div>
               </div>
-              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                <select id="studentsBranchFilter" class="form-control form-select" style="width: 200px;" onchange="studentProfile.renderDirectoryTable()">
-                  <option value="">All 8 Engineering Branches</option>
-                  <option value="1">Computer Science (CSE)</option>
-                  <option value="2">CSE (Data Science)</option>
-                  <option value="3">Agricultural Engineering</option>
-                  <option value="4">Electrical Engineering (EE)</option>
-                  <option value="5">Mechanical Engineering (ME)</option>
-                  <option value="6">Aeronautical Engineering</option>
-                  <option value="7">Civil Engineering (CE)</option>
-                  <option value="8">ECE (Electronics &amp; Comm)</option>
-                </select>
 
-                <select id="studentsDuesFilter" class="form-control form-select" style="width: 180px;" onchange="studentProfile.renderDirectoryTable()">
-                  <option value="ALL">All Accounts (182)</option>
-                  <option value="DUES_ONLY" selected>With Dues (₹1,15,000)</option>
-                  <option value="CLEARED">Fee Cleared (Zero Dues)</option>
-                </select>
+              <!-- Main Filter Dropdowns & Search Input -->
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div style="flex: 1; min-width: 250px;">
+                  <input 
+                    type="text" 
+                    id="studentsSearchInput" 
+                    class="form-control" 
+                    placeholder="Search by Name, Roll No, Reg No, Company, or Branch..."
+                    oninput="studentProfile.renderDirectoryTable()"
+                  >
+                </div>
+                <div style="display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center;">
+                  <!-- Program / Course (B.Tech: 4 yr / Diploma: 3 yr / MBA: 2 yr) -->
+                  <select id="studentsCourseFilter" class="form-control form-select" style="width: 145px; font-size: 0.82rem;" onchange="studentProfile.onCourseFilterChange()">
+                    <option value="">All Programs</option>
+                    <option value="B.Tech">B.Tech (4 Years)</option>
+                    <option value="Diploma">Diploma (3 Years)</option>
+                    <option value="MBA">MBA (2 Years)</option>
+                  </select>
 
-                <a href="/receipt-desk.html" class="btn btn-primary" style="text-decoration: none; font-weight: 600;">
-                  Fast Receipt Desk
-                </a>
+                  <!-- Academic Year (Adapts to Course) -->
+                  <select id="studentsYearFilter" class="form-control form-select" style="width: 135px; font-size: 0.82rem;" onchange="studentProfile.onYearFilterChange()">
+                    <option value="">All Years</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="Alumni">🎓 Alumni / Pass Out</option>
+                  </select>
+
+                  <!-- Academic Semester (Adapts to Course & Year) -->
+                  <select id="studentsSemesterFilter" class="form-control form-select" style="width: 135px; font-size: 0.82rem;" onchange="studentProfile.renderDirectoryTable()">
+                    <option value="">All Semesters</option>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                    <option value="3rd Semester">3rd Semester</option>
+                    <option value="4th Semester">4th Semester</option>
+                    <option value="5th Semester">5th Semester</option>
+                    <option value="6th Semester">6th Semester</option>
+                    <option value="7th Semester">7th Semester</option>
+                    <option value="8th Semester">8th Semester</option>
+                  </select>
+
+                  <!-- Academic Session -->
+                  <select id="studentsSessionFilter" class="form-control form-select" style="width: 130px; font-size: 0.82rem;" onchange="studentProfile.renderDirectoryTable()">
+                    <option value="">All Sessions</option>
+                    <option value="2026-27">2026-27 (Current)</option>
+                    <option value="2025-26">2025-26</option>
+                    <option value="2024-25">2024-25</option>
+                    <option value="2024-2027">2024-2027</option>
+                  </select>
+
+                  <!-- Branch Dropdown (Adapts to Course) -->
+                  <select id="studentsBranchFilter" class="form-control form-select" style="width: 165px; font-size: 0.82rem;" onchange="studentProfile.renderDirectoryTable()">
+                    <option value="">All Branches</option>
+                  </select>
+
+                  <!-- Payment Status (Dues vs Cleared) -->
+                  <select id="studentsDuesFilter" class="form-control form-select" style="width: 145px; font-size: 0.82rem;" onchange="studentProfile.renderDirectoryTable()">
+                    <option value="ALL">All Payment Status</option>
+                    <option value="DUES_ONLY">With Outstanding Dues</option>
+                    <option value="CLEARED">Zero Dues (Cleared)</option>
+                    <option value="ZERO_PAID">Zero Paid (Defaulters)</option>
+                  </select>
+
+                  <!-- Registration Fee Status -->
+                  <select id="studentsRegFeeFilter" class="form-control form-select" style="width: 155px; font-size: 0.82rem;" onchange="studentProfile.renderDirectoryTable()">
+                    <option value="ALL">All Reg Status</option>
+                    <option value="REG_PAID">Registration Fee Paid</option>
+                    <option value="REG_UNPAID">Registration Fee Unpaid</option>
+                  </select>
+
+                  <!-- Unified Export Buttons -->
+                  <div style="display: inline-flex; gap: 0.35rem;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="studentProfile.exportDirectoryExcel()" title="Export filtered list to Excel (CSV format with official header)">
+                      📥 Excel
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="studentProfile.exportDirectoryPDF()" title="Export official printable report with BEC Letterhead">
+                      🖨️ PDF
+                    </button>
+                    <a href="/receipt-desk.html" class="btn btn-primary btn-sm" style="text-decoration: none; font-weight: 700; white-space: nowrap;">
+                      ⚡ Fast Desk
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Students Directory Table -->
           <div class="card">
-            <div class="card-header" style="justify-content: space-between;">
+            <div class="card-header" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
               <div>
-                <div class="card-title">1st Year Engineering Cohort Directory (Reporting Database)</div>
-                <div id="studentsCountLabel" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem;">
-                  Showing 182 verified students from reporting spreadsheet
+                <div class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span>Student Master Fee &amp; Registration Register</span>
+                  <span class="badge badge-info" id="studentsLiveBadgeCount">355 Enrolled</span>
                 </div>
+                <div id="studentsCountLabel" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem;">
+                  Showing all enrolled students with live fee payment and university registration status
+                </div>
+              </div>
+              <div id="studentsDirectoryStatsBar" style="font-size: 0.82rem; color: #475569; display: flex; gap: 1rem; align-items: center;">
+                <span>Total Billed: <strong id="dirTotalBilled">₹0</strong></span>
+                <span>Collected: <strong id="dirTotalPaid" style="color: #059669;">₹0</strong></span>
+                <span>Outstanding: <strong id="dirTotalDues" style="color: #DC2626;">₹0</strong></span>
               </div>
             </div>
             <div class="card-body" style="padding: 0;">
@@ -328,16 +494,18 @@
                     <tr>
                       <th style="width: 50px; text-align: center;">Sl</th>
                       <th>Student Full Name &amp; Credentials</th>
-                      <th>Branch</th>
+                      <th>Course &amp; Branch</th>
                       <th>Category</th>
-                      <th>Annual Invoiced</th>
-                      <th>Paid Amount</th>
-                      <th>Outstanding Dues</th>
-                      <th style="text-align: right;">Action</th>
+                      <th>Fee Status</th>
+                      <th>Registration Fee</th>
+                      <th style="text-align: right;">Billed</th>
+                      <th style="text-align: right;">Paid</th>
+                      <th style="text-align: right;">Outstanding Dues</th>
+                      <th style="text-align: right; width: 140px;">Action</th>
                     </tr>
                   </thead>
                   <tbody id="studentsDirectoryTbody">
-                    <tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading students directory...</td></tr>
+                    <tr><td colspan="10" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading students directory...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -348,12 +516,198 @@
     </main>
   </div>
 
+  <!-- REFUND REQUEST MODAL -->
+  <div id="refundRequestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Initiate Student Refund Request
+        </h3>
+        <button class="modal-close" onclick="studentProfile.closeRefundModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 1rem;">
+          Refunds require approval from Accounts Manager or Super Admin before disbursement.
+        </p>
+        <form id="refundForm" onsubmit="studentProfile.submitRefundRequest(event)">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Student Name &amp; Reg No</label>
+            <input type="text" id="refundStudentInfo" class="form-control" readonly style="background: #F1F5F9; font-weight: 600;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Refund Amount (₹) *</label>
+            <input type="number" id="refundAmount" class="form-control" placeholder="e.g. 5000" min="1" step="0.01" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Fee Category / Component *</label>
+            <select id="refundFeeCategory" class="form-control form-select" required>
+              <option value="Tuition Fee">Tuition Fee</option>
+              <option value="Caution Deposit">Caution Deposit</option>
+              <option value="Hostel Fee">Hostel / Mess Fee</option>
+              <option value="Transport Fee">Transport Fee</option>
+              <option value="Excess Payment">Excess / Double Payment Adjustment</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Refund Method / Channel *</label>
+            <select id="refundMethod" class="form-control form-select" required>
+              <option value="BANK_TRANSFER">Institutional Bank NEFT/RTGS</option>
+              <option value="CHEQUE">Account Payee Cheque</option>
+              <option value="CASH">Cash Voucher (Counter Desk)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label">Detailed Justification / Official Reason *</label>
+            <textarea id="refundReason" class="form-control" rows="3" placeholder="Provide mandatory audit reason for this refund request..." required></textarea>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary" onclick="studentProfile.closeRefundModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="background: #D97706; border-color: #B45309;">
+              Submit for Maker-Checker Approval
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALUMNI GRADUATION & PASS-OUT MODAL -->
+  <div id="alumniGraduationModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #4C1D95 0%, #6D28D9 100%); color: white; border-radius: 8px 8px 0 0;">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.6rem; color: white;">
+          <span style="font-size: 1.35rem;">🎓</span>
+          Graduate Student to BEC Alumni Registry
+        </h3>
+        <button class="modal-close" style="color: white;" onclick="studentProfile.closeGraduationModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.35rem 1.5rem;">
+        <div style="background: #FAF5FF; border: 1px solid #E9D5FF; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #581C87; line-height: 1.45;">
+          <strong>Official BPUT &amp; Institutional Pass-Out Protocol:</strong>
+          Advancing this student to Alumni archives their active billing, verifies Institutional No Dues clearance across departments, and settles their refundable Caution Deposit.
+        </div>
+
+        <form id="alumniGraduationForm" onsubmit="studentProfile.submitGraduation(event)">
+          <input type="hidden" id="gradStudentId">
+
+          <!-- Student Readonly Overview -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Student Full Name</label>
+              <input type="text" id="gradStudentName" class="form-control" readonly style="background: #F8FAFC; font-weight: 700; color: #0F172A;">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Reg No &amp; Roll No</label>
+              <input type="text" id="gradStudentRoll" class="form-control" readonly style="background: #F8FAFC; font-family: monospace;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Program &amp; Branch</label>
+              <input type="text" id="gradStudentProgram" class="form-control" readonly style="background: #F8FAFC; color: #0284C7; font-weight: 600;">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Graduation / Passing Year *</label>
+              <select id="gradPassoutYear" class="form-control form-select" required>
+                <option value="2026">2026 (Current Passing Cohort)</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Academic Honors & Degree -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Degree &amp; Honours Awarded *</label>
+              <input type="text" id="gradDegreeAwarded" class="form-control" placeholder="e.g. B.Tech in CSE (First Class with Honours)" required>
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Final CGPA / Grade *</label>
+              <input type="number" id="gradFinalCgpa" class="form-control" placeholder="e.g. 8.65" step="0.01" min="4.00" max="10.00" required>
+            </div>
+          </div>
+
+          <!-- Career & Placement Track -->
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem;">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem; text-transform: uppercase;">
+              Placement &amp; Professional Career Details
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.65rem;">
+              <div>
+                <label class="form-label" style="font-size: 0.78rem;">Career Status *</label>
+                <select id="gradPlacementStatus" class="form-control form-select" required>
+                  <option value="PLACED">Campus / Corporate Placed</option>
+                  <option value="HIGHER_STUDIES">Higher Studies (M.Tech/MBA/MS)</option>
+                  <option value="ENTREPRENEUR">Entrepreneur / Startup Founder</option>
+                  <option value="GOVT_SERVICES">Civil / Defense / Govt Services</option>
+                  <option value="SEEKING">Seeking Opportunities / Preparation</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 0.78rem;">Company / Employer / University</label>
+                <input type="text" id="gradCompanyName" class="form-control" placeholder="e.g. Tata Consultancy Services (TCS)">
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div>
+                <label class="form-label" style="font-size: 0.78rem;">Current Designation / Role</label>
+                <input type="text" id="gradDesignation" class="form-control" placeholder="e.g. Systems Engineer">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 0.78rem;">Work City / Location</label>
+                <input type="text" id="gradWorkLocation" class="form-control" placeholder="e.g. Bhubaneswar / Bengaluru">
+              </div>
+            </div>
+          </div>
+
+          <!-- Institutional No Dues & Caution Deposit -->
+          <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span>✓</span> Institutional No Dues &amp; Caution Deposit Clearance
+            </div>
+            <div style="font-size: 0.78rem; color: #14532D; margin-bottom: 0.65rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <span>• Accounts: <strong>CLEARED</strong></span>
+              <span>• Library: <strong>CLEARED</strong></span>
+              <span>• Labs: <strong>CLEARED</strong></span>
+              <span>• Hostel: <strong>CLEARED</strong></span>
+              <span>• Transport: <strong>CLEARED</strong></span>
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.78rem; color: #14532D; font-weight: 700;">Caution Deposit Action (₹5,000.00)</label>
+              <select id="gradCautionDepositAction" class="form-control form-select">
+                <option value="REFUND">Direct NEFT Refund to Student Bank Account</option>
+                <option value="DONATED">Voluntary Contribution to BEC Alumni Welfare Fund</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary" onclick="studentProfile.closeGraduationModal()">Cancel</button>
+            <button type="submit" class="btn" style="background: #7C3AED; color: white; border: none; font-weight: 700; padding: 0.6rem 1.35rem; border-radius: 6px; cursor: pointer;">
+              🎓 Confirm Graduation &amp; Register Alumni
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/ui.js"></script>
   <script src="/js/navigation.js"></script>
+  <script src="/js/becExportUtils.js"></script>
   <script src="/js/studentProfile.js"></script>
+  <!-- Firebase Cloud Realtime Sync -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="/js/firebaseSync.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       navigation.init('students');

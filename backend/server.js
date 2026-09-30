@@ -138,6 +138,14 @@ app.get('/student-portal', (req, res) => {
   res.sendFile(path.join(frontendPath, 'student-portal.html'));
 });
 
+app.get('/cash-bank', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'cash-bank.html'));
+});
+
+app.get('/admin-settings', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'admin-settings.html'));
+});
+
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ success: false, message: `API endpoint '${req.originalUrl}' not found.` });

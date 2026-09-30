@@ -372,7 +372,18 @@ const transportApp = {
   },
 
   exportToExcel() {
-    window.location.href = '/api/transport/export';
+    const params = new URLSearchParams();
+    const session = document.getElementById('filterSession')?.value;
+    const semester = document.getElementById('filterSemester')?.value;
+    const pickupPoint = document.getElementById('filterPickupPoint')?.value;
+    const showUnpaid = document.getElementById('filterShowUnpaid')?.checked;
+
+    if (session) params.append('session', session);
+    if (semester) params.append('semester', semester);
+    if (pickupPoint) params.append('pickup_point', pickupPoint);
+    if (showUnpaid) params.append('unpaid_only', 'true');
+
+    window.location.href = `/api/transport/export?${params.toString()}`;
   }
 };
 

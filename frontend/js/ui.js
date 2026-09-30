@@ -217,6 +217,147 @@ const ui = {
       const lbl = labels[idx] || '';
       ctx.fillText(lbl, x + barWidth / 2, h - 10);
     });
+  },
+
+  /**
+   * Two-Step High-Risk Authorization Modal (Requirement 14)
+   * Mandatory for Refund, Fee Waiver, Receipt Reversal, Staff Deactivation
+   */
+  promptTwoStepAuth({ title, actionName = 'Confirm Action', description, onConfirm }) {
+    let existing = document.getElementById('twoStepAuthModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'twoStepAuthModal';
+    modal.className = 'modal-backdrop active';
+    modal.innerHTML = `
+      <div class="modal-card" style="max-width: 480px; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        <div class="modal-header" style="background: #0F172A; color: #FFFFFF; padding: 1rem 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span style="font-weight: 800; font-size: 1rem;">Two-Step Security Authorization</span>
+          </div>
+          <button class="modal-close-btn" onclick="document.getElementById('twoStepAuthModal').remove()" style="color: #94A3B8;">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding: 1.25rem;">
+          <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 6px; padding: 0.85rem; margin-bottom: 1rem; color: #92400E; font-size: 0.85rem;">
+            <strong>${escapeHtml(title || 'High-Risk Financial Action')}</strong>
+            <div style="margin-top: 0.25rem;">${escapeHtml(description || 'This operation modifies audit registers or financial ledgers and requires mandatory maker-checker authorization.')}</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 700; color: #1E293B;">
+              Step 1: Mandatory Audit Reason / Justification *
+            </label>
+            <textarea id="twoStepReasonInput" class="form-control" rows="2" placeholder="State official business justification (recorded in immutable audit log)..."></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700; color: #1E293B;">
+              Step 2: Account Password Re-Authentication *
+            </label>
+            <input type="password" id="twoStepPasswordInput" class="form-control" placeholder="Enter your login password to authorize">
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('twoStepAuthModal').remove()">
+              Cancel
+            </button>
+            <button type="button" id="twoStepSubmitBtn" class="btn btn-primary" style="flex: 1.5; font-weight: 700; background: #DC2626; border-color: #DC2626;">
+              ${escapeHtml(actionName)}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const reasonInput = document.getElementById('twoStepReasonInput');
+    const passInput = document.getElementById('twoStepPasswordInput');
+    const submitBtn = document.getElementById('twoStepSubmitBtn');
+    reasonInput.focus();
+
+    submitBtn.onclick = async () => {
+      const reason = reasonInput.value.trim();
+      const password = passInput.value;
+
+      if (!reason || reason.length < 5) {
+        ui.showToast('Please provide a meaningful audit justification (min 5 characters).', 'warning');
+        reasonInput.focus();
+        return;
+      }
+      if (!password) {
+        ui.showToast('Please enter your account password to authorize.', 'warning');
+        passInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-sm"></span> Verifying...';
+
+      try {
+        const verifyRes = await api.post('/auth/verify-password', { password });
+        if (verifyRes && verifyRes.success) {
+          modal.remove();
+          await onConfirm(reason);
+        } else {
+          ui.showToast(verifyRes.message || 'Authorization failed. Incorrect password.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = actionName;
+        }
+      } catch (err) {
+        ui.showToast(err.message || 'Password verification failed.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = actionName;
+      }
+    };
+  },
+
+  /**
+   * Skeletons & State Renderers (Requirement 27)
+   */
+  renderTableSkeleton(columns = 6, rows = 5) {
+    let html = '';
+    for (let i = 0; i < rows; i++) {
+      html += '<tr>';
+      for (let j = 0; j < columns; j++) {
+        const width = 50 + ((j * 17 + i * 23) % 45);
+        html += `<td style="padding: 0.85rem;"><div style="height: 14px; width: ${width}%; background: #E2E8F0; border-radius: 4px; animation: pulse 1.5s infinite ease-in-out;"></div></td>`;
+      }
+      html += '</tr>';
+    }
+    return html;
+  },
+
+  renderCardSkeleton() {
+    return `
+      <div style="padding: 1.25rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; animation: pulse 1.5s infinite ease-in-out;">
+        <div style="height: 16px; width: 40%; background: #E2E8F0; border-radius: 4px; margin-bottom: 0.75rem;"></div>
+        <div style="height: 28px; width: 60%; background: #CBD5E1; border-radius: 4px; margin-bottom: 0.5rem;"></div>
+        <div style="height: 12px; width: 80%; background: #F1F5F9; border-radius: 4px;"></div>
+      </div>
+    `;
+  },
+
+  renderEmptyState(message = 'No records found matching current criteria.', retryFn = null) {
+    return `
+      <div style="text-align: center; padding: 2.5rem 1.5rem; color: #64748B;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📂</div>
+        <div style="font-size: 0.95rem; font-weight: 600; color: #1E293B;">${escapeHtml(message)}</div>
+        ${retryFn ? `<button type="button" class="btn btn-sm btn-outline" style="margin-top: 0.75rem;" onclick="${retryFn}">Reset Filters / Retry</button>` : ''}
+      </div>
+    `;
+  },
+
+  renderErrorState(message = 'Failed to load records from server.', retryFn = null) {
+    return `
+      <div style="text-align: center; padding: 2.5rem 1.5rem; color: #DC2626;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
+        <div style="font-size: 0.95rem; font-weight: 600;">${escapeHtml(message)}</div>
+        ${retryFn ? `<button type="button" class="btn btn-sm btn-danger" style="margin-top: 0.75rem;" onclick="${retryFn}">Retry Loading</button>` : ''}
+      </div>
+    `;
   }
 };
 

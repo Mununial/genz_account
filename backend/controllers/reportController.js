@@ -61,7 +61,7 @@ async function getCollectionsReport(req, res) {
  * GET /api/reports/defaulters
  */
 async function getDefaultersReport(req, res) {
-  const { branchId, semesterId } = req.query;
+  const { branchId, semesterId, aging, amountRange } = req.query;
 
   try {
     let where = `WHERE i.status != 'CANCELLED' AND i.outstanding_amount > 0 AND i.due_date < CURDATE()`;
@@ -76,8 +76,9 @@ async function getDefaultersReport(req, res) {
       params.push(semesterId);
     }
 
-    const [defaulters] = await query(`
+    let [defaulters] = await query(`
       SELECT s.id, s.reg_no, s.full_name, s.phone, s.parent_name, s.parent_phone,
+             s.branch_id, s.current_semester_id,
              b.name AS branch_name, b.code AS branch_code, sem.label AS semester_label,
              i.invoice_no, i.total_payable, i.paid_amount, i.outstanding_amount, i.due_date,
              DATEDIFF(CURDATE(), i.due_date) AS days_overdue
@@ -88,6 +89,30 @@ async function getDefaultersReport(req, res) {
       ${where}
       ORDER BY i.outstanding_amount DESC, days_overdue DESC
     `, params);
+
+    // Apply Overdue Aging Filter (Unified Aging Calculation - Master Prompt Req 23)
+    if (aging && aging !== 'ALL') {
+      if (aging === '0-30') {
+        defaulters = defaulters.filter(d => d.days_overdue >= 0 && d.days_overdue <= 30);
+      } else if (aging === '31-60') {
+        defaulters = defaulters.filter(d => d.days_overdue >= 31 && d.days_overdue <= 60);
+      } else if (aging === '61-90') {
+        defaulters = defaulters.filter(d => d.days_overdue >= 61 && d.days_overdue <= 90);
+      } else if (aging === '90+') {
+        defaulters = defaulters.filter(d => d.days_overdue > 90);
+      }
+    }
+
+    // Apply Amount Range Filter (Master Prompt Req 22: < 10k, 10k - 50k, > 50k)
+    if (amountRange && amountRange !== 'ALL') {
+      if (amountRange === 'LT10K') {
+        defaulters = defaulters.filter(d => parseFloat(d.outstanding_amount) < 10000);
+      } else if (amountRange === '10K-50K') {
+        defaulters = defaulters.filter(d => parseFloat(d.outstanding_amount) >= 10000 && parseFloat(d.outstanding_amount) <= 50000);
+      } else if (amountRange === 'GT50K') {
+        defaulters = defaulters.filter(d => parseFloat(d.outstanding_amount) > 50000);
+      }
+    }
 
     const totalOverdue = defaulters.reduce((sum, d) => sum + parseFloat(d.outstanding_amount), 0);
 
@@ -103,7 +128,7 @@ async function getDefaultersReport(req, res) {
  * GET /api/reports/export-csv
  */
 async function exportCsv(req, res) {
-  const { type = 'collections' } = req.query;
+  const { type = 'collections', aging, amountRange, branchId } = req.query;
 
   try {
     let csvData = '';
@@ -127,8 +152,8 @@ async function exportCsv(req, res) {
         csvData += `"${r.receipt_no || ''}","${r.payment_no}","${r.reg_no}","${r.full_name}","${r.branch}","${r.amount}","${r.payment_method}","${r.transaction_id || ''}","${r.invoice_no}","${r.created_at}"\n`;
       }
     } else if (type === 'defaulters') {
-      const [rows] = await query(`
-        SELECT s.reg_no, s.full_name, s.phone, b.code AS branch, sem.label AS semester,
+      let [rows] = await query(`
+        SELECT s.id, s.reg_no, s.full_name, s.phone, s.branch_id, b.code AS branch, sem.label AS semester,
                i.invoice_no, i.total_payable, i.paid_amount, i.outstanding_amount, i.due_date,
                DATEDIFF(CURDATE(), i.due_date) AS days_overdue
         FROM invoices i
@@ -139,10 +164,36 @@ async function exportCsv(req, res) {
         ORDER BY i.outstanding_amount DESC
       `);
 
+      if (branchId) {
+        rows = rows.filter(r => String(r.branch_id) === String(branchId));
+      }
+      if (aging && aging !== 'ALL') {
+        if (aging === '0-30') rows = rows.filter(d => d.days_overdue >= 0 && d.days_overdue <= 30);
+        else if (aging === '31-60') rows = rows.filter(d => d.days_overdue >= 31 && d.days_overdue <= 60);
+        else if (aging === '61-90') rows = rows.filter(d => d.days_overdue >= 61 && d.days_overdue <= 90);
+        else if (aging === '90+') rows = rows.filter(d => d.days_overdue > 90);
+      }
+      if (amountRange && amountRange !== 'ALL') {
+        if (amountRange === 'LT10K') rows = rows.filter(d => parseFloat(d.outstanding_amount) < 10000);
+        else if (amountRange === '10K-50K') rows = rows.filter(d => parseFloat(d.outstanding_amount) >= 10000 && parseFloat(d.outstanding_amount) <= 50000);
+        else if (amountRange === 'GT50K') rows = rows.filter(d => parseFloat(d.outstanding_amount) > 50000);
+      }
+
       csvData = 'Roll No,Student Name,Phone,Branch,Semester,Invoice No,Total Billed,Paid,Outstanding,Due Date,Days Overdue\n';
       for (const r of rows) {
         csvData += `"${r.reg_no}","${r.full_name}","${r.phone || ''}","${r.branch}","${r.semester}","${r.invoice_no}","${r.total_payable}","${r.paid_amount}","${r.outstanding_amount}","${r.due_date}","${r.days_overdue}"\n`;
       }
+    } else if (type === 'registrations') {
+      const mockDb = require('../config/mockDb');
+      let rows = mockDb.examRegistrations || [];
+      if (req.query.paymentStatus && req.query.paymentStatus !== 'ALL') {
+        rows = rows.filter(r => r.payment_status === req.query.paymentStatus);
+      }
+      csvData = 'Sl No,Reg No,Roll No,Student Name,Course,Branch,Exam Name,Semester,Fee Amount,Fee Paid,Balance,Status,Admit Card,Receipt No\n';
+      rows.forEach((r, idx) => {
+        const bal = Math.max(0, (r.fee_amount || 0) - (r.fee_paid || 0));
+        csvData += `"${idx + 1}","${r.reg_no || ''}","${r.roll_no || ''}","${r.student_name || ''}","${r.course_name || 'B.Tech'}","${r.branch_code || r.branch_name || ''}","${r.exam_name || ''}","${r.semester_label || '1st Semester'}",${r.fee_amount || 0},${r.fee_paid || 0},${bal},"${r.payment_status || 'UNPAID'}","${r.admit_card_eligible ? 'ELIGIBLE' : 'BLOCKED'}","${r.receipt_no || '-'}"\n`;
+      });
     }
 
     res.setHeader('Content-Type', 'text/csv');
@@ -154,8 +205,57 @@ async function exportCsv(req, res) {
   }
 }
 
+/**
+ * Exam & University Registration Report
+ * GET /api/reports/registrations
+ */
+async function getRegistrationsReport(req, res) {
+  const { paymentStatus, branchId, search } = req.query;
+
+  try {
+    const mockDb = require('../config/mockDb');
+    let list = mockDb.examRegistrations || [];
+
+    if (paymentStatus && paymentStatus !== 'ALL') {
+      list = list.filter(r => r.payment_status === paymentStatus);
+    }
+    if (branchId) {
+      list = list.filter(r => String(r.branch_code) === String(branchId) || String(r.branch_name).toLowerCase().includes(String(branchId).toLowerCase()));
+    }
+    if (search) {
+      const q = search.toLowerCase().trim();
+      list = list.filter(r => 
+        (r.student_name && r.student_name.toLowerCase().includes(q)) ||
+        (r.reg_no && r.reg_no.toLowerCase().includes(q)) ||
+        (r.roll_no && r.roll_no.toLowerCase().includes(q))
+      );
+    }
+
+    const totalRegistrations = list.length;
+    const paidList = list.filter(r => r.payment_status === 'PAID');
+    const unpaidList = list.filter(r => r.payment_status !== 'PAID');
+    const totalFee = list.reduce((sum, r) => sum + parseFloat(r.fee_amount || 0), 0);
+    const totalPaid = list.reduce((sum, r) => sum + parseFloat(r.fee_paid || 0), 0);
+    const totalUnpaid = totalFee - totalPaid;
+
+    return success(res, {
+      totalRegistrations,
+      paidCount: paidList.length,
+      unpaidCount: unpaidList.length,
+      totalFee,
+      totalPaid,
+      totalUnpaid,
+      registrations: list
+    }, 'Exam and registration fee report generated.');
+  } catch (err) {
+    console.error('getRegistrationsReport error:', err);
+    return error(res, 'Failed to generate registration report.', 500);
+  }
+}
+
 module.exports = {
   getCollectionsReport,
   getDefaultersReport,
+  getRegistrationsReport,
   exportCsv
 };

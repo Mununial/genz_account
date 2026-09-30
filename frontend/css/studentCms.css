@@ -9,25 +9,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
-  --cms-primary: #00A3D7; /* Signature CMS Bright Cyan / Teal */
-  --cms-primary-dark: #0284C7;
-  --cms-primary-light: #E0F2FE;
-  --cms-bg-page: #F4F6F9; /* Authentic ERP Background */
+  --cms-primary: #2563EB;
+  --cms-primary-dark: #1D4ED8;
+  --cms-primary-light: #EFF6FF;
+  --cms-bg-page: #F8FAFC;
   --cms-card-bg: #FFFFFF;
-  --cms-border: #E5E9EC;
-  --cms-border-light: #F1F4F6;
-  --cms-text-dark: #1E293B;
+  --cms-border: #E2E8F0;
+  --cms-border-light: #F1F5F9;
+  --cms-text-dark: #0F172A;
   --cms-text-muted: #64748B;
   --cms-text-subtle: #94A3B8;
-  --cms-font-heading: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --cms-font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --cms-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-  font-family: var(--cms-font-body);
-  background-color: var(--cms-bg-page);
-  color: var(--cms-text-dark);
-  -webkit-font-smoothing: antialiased;
 }
 
 /* 1. TOP BREADCRUMB (Matching Photo 1) */
@@ -255,9 +248,90 @@ body {
 /* 3. MAIN CMS PROFILE CONTAINER (Grid Layout) */
 .cms-layout-grid {
   display: grid;
-  grid-template-columns: 310px 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 1.25rem;
   align-items: start;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Collapsible Profile Sidebar State */
+.cms-layout-grid.sidebar-collapsed {
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cms-layout-grid.sidebar-collapsed .cms-profile-sidebar-card,
+.cms-layout-grid.sidebar-collapsed #cmsProfileLeftCard {
+  display: none !important;
+}
+
+@media (max-width: 1200px) {
+  .cms-layout-grid {
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .cms-layout-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1rem;
+  }
+  .cms-profile-sidebar-card {
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Sidebar Top Header Bar with Close Button */
+.cms-sidebar-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0.95rem;
+  background: #F8FAFC;
+  border-bottom: 1px solid #EDF2F7;
+}
+
+.cms-sidebar-header-title {
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cms-sidebar-header-title svg {
+  color: var(--cms-primary);
+}
+
+.cms-sidebar-close-btn {
+  background: #ffffff;
+  border: 1px solid #CBD5E1;
+  color: #64748B;
+  border-radius: 5px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.cms-sidebar-close-btn:hover {
+  background: #FEE2E2;
+  border-color: #FCA5A5;
+  color: #DC2626;
 }
 
 /* LEFT COLUMN: Profile Sidebar Card */
@@ -273,7 +347,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5rem 1rem 1rem;
+  padding: 1.25rem 1rem 0.85rem;
   background: #ffffff;
   border-bottom: 1px solid #EDF2F7;
 }
@@ -301,11 +375,23 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  background: #F0F9FF;
 }
 
 .cms-avatar-inner-media svg {
   width: 100%;
   height: 100%;
+  display: block;
+}
+
+.cms-avatar-inner-media img,
+.cms-student-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
 }
 
 .cms-sidebar-student-name {
@@ -379,6 +465,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Top Quick Action Links (Photo 2) */
@@ -424,6 +514,10 @@ body {
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Horizontal Tab Bar (Photo 2) */
@@ -433,10 +527,15 @@ body {
   background: #ffffff;
   padding: 0.5rem 0.75rem 0;
   border-bottom: 2px solid var(--cms-primary); /* Signature Cyan Accent Line */
-  overflow-x: auto;
+  overflow-x: auto !important;
+  overflow-y: hidden;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .cms-tab-item-btn {
@@ -482,7 +581,9 @@ body {
 
 /* Content Area inside Tab */
 .cms-tab-content-area {
-  padding: 1.5rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cms-section-heading {
@@ -506,16 +607,21 @@ body {
 /* 4-Column Detail Table (Personal Details - Exact match to Photo 2) */
 .cms-details-grid-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
-  font-size: 0.865rem;
+  font-size: 0.85rem;
   border: 1px solid var(--cms-border);
   margin-bottom: 1.5rem;
+  table-layout: fixed;
+  box-sizing: border-box;
 }
 
 .cms-details-grid-table td {
-  padding: 0.65rem 0.95rem;
+  padding: 0.6rem 0.85rem;
   border: 1px solid var(--cms-border);
   vertical-align: middle;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .cms-details-grid-table tr:hover {
@@ -526,19 +632,56 @@ body {
   background-color: #F8FAFC;
   font-weight: 600;
   color: #475569;
-  width: 22%;
+  width: 18%;
+  white-space: normal;
 }
 
 .cms-details-grid-table td.col-data {
   color: #0F172A;
   font-weight: 500;
-  width: 28%;
+  width: 32%;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .cms-details-grid-table td.col-data-full {
   color: #0F172A;
   font-weight: 500;
-  width: 78%;
+  width: 82%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Mobile & Tablet Responsive Stacking for Details Table */
+@media (max-width: 800px) {
+  .cms-details-grid-table,
+  .cms-details-grid-table tbody,
+  .cms-details-grid-table tr,
+  .cms-details-grid-table td {
+    display: block;
+    width: 100% !important;
+  }
+  .cms-details-grid-table tr {
+    margin-bottom: 0.65rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .cms-details-grid-table td.col-lbl {
+    padding-top: 0.45rem;
+    padding-bottom: 0.2rem;
+    font-size: 0.78rem;
+    border-bottom: none;
+    background: #F8FAFC;
+    color: #64748B;
+  }
+  .cms-details-grid-table td.col-data,
+  .cms-details-grid-table td.col-data-full {
+    padding-top: 0.15rem;
+    padding-bottom: 0.55rem;
+    border-top: none;
+    font-weight: 600;
+  }
 }
 
 /* Yellow highlighted row for Category (as in Photo 2) */
@@ -783,3 +926,170 @@ body {
     text-align: center;
   }
 }
+
+/* ==============================================================================
+ * STUDENT 360 STICKY FINANCIAL KPI BANNER & ACTION BAR (REQUIREMENTS 3-13)
+ * ============================================================================== */
+.student-360-banner {
+  background: #FFFFFF;
+  border: 1px solid var(--cms-border);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  padding: 1.15rem 1.4rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.student-360-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.student-360-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.student-360-avatar-small {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #E2E8F0;
+  background: #F0F9FF;
+  flex-shrink: 0;
+}
+
+.student-360-avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.student-360-name-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-360-full-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-360-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748B;
+  flex-wrap: wrap;
+  margin-top: 0.2rem;
+}
+
+.student-360-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.student-360-kpis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #F1F5F9;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.s360-kpi-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+
+.s360-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.s360-kpi-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0F172A;
+  font-family: var(--font-mono, monospace);
+  margin-top: 0.2rem;
+}
+
+.s360-kpi-val.text-paid { color: #10B981; }
+.s360-kpi-val.text-due { color: #DC2626; }
+.s360-kpi-val.text-discount { color: #8B5CF6; }
+.s360-kpi-val.text-refund { color: #F59E0B; }
+
+.status-badge-due {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.status-badge-cleared {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #BBF7D0;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.status-badge-partial {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cms-tab-bar-nav {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+

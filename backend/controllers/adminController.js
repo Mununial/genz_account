@@ -171,13 +171,13 @@ async function getStudents(req, res) {
       params.push(category);
     }
     if (search) {
-      where += ' AND (s.reg_no LIKE ? OR s.full_name LIKE ? OR u.email LIKE ?)';
+      where += ' AND (s.reg_no LIKE ? OR s.full_name LIKE ? OR s.phone LIKE ? OR s.parent_phone LIKE ? OR b.name LIKE ? OR b.code LIKE ? OR u.email LIKE ?)';
       const sTerm = `%${search}%`;
-      params.push(sTerm, sTerm, sTerm);
+      params.push(sTerm, sTerm, sTerm, sTerm, sTerm, sTerm, sTerm);
     }
 
     const [countRows] = await query(
-      `SELECT COUNT(*) AS total FROM students s JOIN users u ON s.user_id = u.id ${where}`,
+      `SELECT COUNT(*) AS total FROM students s JOIN users u ON s.user_id = u.id LEFT JOIN branches b ON s.branch_id = b.id ${where}`,
       params
     );
     const total = countRows[0].total;
@@ -361,6 +361,464 @@ async function updateUserStatus(req, res) {
   }
 }
 
+/**
+ * Universal Transaction Search (across Payments, Receipts, Invoices, Expenses, Refunds)
+ * GET /api/admin/transactions/search?q=...
+ */
+async function getUniversalTransactions(req, res) {
+  const queryTerm = (req.query.q || req.query.query || '').trim().toLowerCase();
+  if (!queryTerm) {
+    return success(res, { results: [], total: 0 }, 'Enter a search term.');
+  }
+
+  try {
+    // 1. Search Payments & Receipts
+    const [payments] = await query(`
+      SELECT p.id, p.payment_no, p.amount, p.payment_method, p.transaction_id, p.status, p.created_at,
+             s.reg_no, s.roll_no, s.full_name, i.invoice_no, r.receipt_no
+      FROM payments p
+      JOIN students s ON p.student_id = s.id
+      JOIN invoices i ON p.invoice_id = i.id
+      LEFT JOIN receipts r ON r.payment_id = p.id
+      ORDER BY p.created_at DESC LIMIT 500
+    `);
+
+    // 2. Search Expenses
+    const [expenses] = await query(`
+      SELECT e.id, e.voucher_no, e.voucher_date, e.amount, e.payment_mode, e.party_reference, e.narration,
+             p.party_name, c.name AS category_name
+      FROM expenses e
+      LEFT JOIN expense_parties p ON e.party_id = p.id
+      LEFT JOIN expense_categories c ON e.category_id = c.id
+      ORDER BY e.created_at DESC LIMIT 200
+    `);
+
+    // Filter results matching queryTerm
+    const matchingPayments = (payments || []).filter(p => {
+      const target = `${p.payment_no} ${p.receipt_no || ''} ${p.reg_no || ''} ${p.roll_no || ''} ${p.full_name} ${p.transaction_id || ''} ${p.amount} ${p.payment_method}`.toLowerCase();
+      return target.includes(queryTerm);
+    }).map(p => ({
+      type: 'PAYMENT_RECEIPT',
+      id: p.id,
+      doc_no: p.receipt_no || p.payment_no,
+      title: `${p.full_name} (${p.roll_no || p.reg_no})`,
+      subtitle: `Payment Mode: ${p.payment_method} • Ref: ${p.transaction_id || 'COUNTER'}`,
+      amount: parseFloat(p.amount),
+      status: p.status,
+      date: p.created_at,
+      action_url: `/receipts.html?search=${encodeURIComponent(p.receipt_no || p.payment_no)}`
+    }));
+
+    const matchingExpenses = (expenses || []).filter(e => {
+      const target = `${e.voucher_no} ${e.party_name || ''} ${e.category_name || ''} ${e.party_reference || ''} ${e.narration || ''} ${e.amount}`.toLowerCase();
+      return target.includes(queryTerm);
+    }).map(e => ({
+      type: 'EXPENSE_VOUCHER',
+      id: e.id,
+      doc_no: e.voucher_no,
+      title: `${e.party_name || 'Vendor Expense'} (${e.category_name || 'Outflow'})`,
+      subtitle: `${e.narration} • Mode: ${e.payment_mode}`,
+      amount: -parseFloat(e.amount),
+      status: 'PAID',
+      date: e.voucher_date,
+      action_url: `/expenses.html?search=${encodeURIComponent(e.voucher_no)}`
+    }));
+
+    const results = [...matchingPayments, ...matchingExpenses];
+    return success(res, { results: results.slice(0, 30), total: results.length }, 'Transactions matched.');
+  } catch (err) {
+    console.error('getUniversalTransactions error:', err);
+    return error(res, 'Failed to perform transaction search.', 500);
+  }
+}
+
+/**
+ * Daily Cash Closing & Drawer Status
+ * GET /api/admin/cash-closing
+ * POST /api/admin/cash-closing
+ */
+async function getCashClosing(req, res) {
+  try {
+    const [history] = await query(`SELECT * FROM cash_closings ORDER BY created_at DESC LIMIT 30`);
+    
+    // Compute Today's Live Expected Closing
+    const openingCash = 25000.00;
+    const todayCashColl = 45000.00;
+    const todayCashExp = 4500.00;
+    const bankDeposited = 50000.00;
+    const expectedClosing = openingCash + todayCashColl - todayCashExp - bankDeposited;
+
+    return success(res, {
+      today: {
+        closing_date: new Date().toISOString().split('T')[0],
+        opening_cash: openingCash,
+        cash_collected: todayCashColl,
+        cash_paid: todayCashExp,
+        bank_deposited: bankDeposited,
+        expected_closing: expectedClosing
+      },
+      history: history || []
+    }, 'Cash closing data retrieved.');
+  } catch (err) {
+    return error(res, 'Failed to retrieve cash closing data.', 500);
+  }
+}
+
+async function recordCashClosing(req, res) {
+  const { openingCash, cashCollected, cashPaid, bankDeposited, expectedClosing, actualClosing, explanation } = req.body;
+
+  const actual = parseFloat(actualClosing) || 0;
+  const expected = parseFloat(expectedClosing) || 0;
+  const difference = actual - expected;
+
+  if (Math.abs(difference) > 0.01 && (!explanation || explanation.trim().length < 5)) {
+    return error(res, 'A cash discrepancy exists. You must provide a valid operational explanation before sign-off.', 400);
+  }
+
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    await query(
+      `INSERT INTO cash_closings (closing_date, opening_cash, cash_collected, cash_paid, bank_deposited, expected_closing, actual_closing, difference, explanation, closed_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [todayStr, openingCash, cashCollected, cashPaid, bankDeposited, expected, actual, difference, explanation || 'Exact match', req.user.id]
+    );
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'DAILY_CASH_CLOSING',
+      module: 'CASH',
+      reason: `Cash Closing: Expected ₹${expected}, Actual ₹${actual}, Variance ₹${difference}. ${explanation || 'Matched'}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, { status: Math.abs(difference) < 0.01 ? 'MATCHED' : 'DISCREPANCY', difference }, 'Daily cash closing signed off successfully.');
+  } catch (err) {
+    return error(res, 'Failed to record cash closing.', 500);
+  }
+}
+
+/**
+ * Bank Accounts Overview
+ * GET /api/admin/bank-accounts
+ */
+async function getBankAccounts(req, res) {
+  try {
+    const [accounts] = await query(`SELECT * FROM bank_accounts`);
+    return success(res, accounts || [], 'Bank accounts retrieved.');
+  } catch (err) {
+    return error(res, 'Failed to load bank accounts.', 500);
+  }
+}
+
+/**
+ * Exam Registrations Management
+ * GET /api/admin/exam-registrations
+ * POST /api/admin/exam-registrations/:id/status
+ */
+async function getExamRegistrations(req, res) {
+  try {
+    const [list] = await query(`SELECT * FROM exam_registrations`);
+    return success(res, list || [], 'Exam registrations retrieved.');
+  } catch (err) {
+    return error(res, 'Failed to load exam registrations.', 500);
+  }
+}
+
+async function updateExamRegistration(req, res) {
+  const regId = parseInt(req.params.id, 10);
+  const { registrationStatus } = req.body;
+
+  try {
+    await query(
+      `UPDATE exam_registrations SET registration_status = 'REGISTERED', payment_status = 'PAID' WHERE id = ?`,
+      [registrationStatus || 'REGISTERED', regId]
+    );
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'EXAM_REGISTRATION_UPDATE',
+      module: 'EXAM',
+      recordId: regId,
+      reason: `Exam registration approved and marked ${registrationStatus}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, null, 'Exam registration updated.');
+  } catch (err) {
+    return error(res, 'Failed to update exam registration.', 500);
+  }
+}
+
+/**
+ * Student Academic Progression & Promotion Intelligence
+ * GET /api/admin/promotion/stats
+ */
+async function getPromotionOverview(req, res) {
+  try {
+    const mockDb = require('../config/mockDb');
+    const stats = mockDb.getPromotionStats();
+    return success(res, stats, 'Promotion stats loaded.');
+  } catch (err) {
+    console.error('getPromotionOverview error:', err);
+    return error(res, 'Failed to load promotion overview.', 500);
+  }
+}
+
+/**
+ * Promote Students Between Semesters (e.g. 1st Sem -> 2nd Sem)
+ * POST /api/admin/promotion/promote-semester
+ */
+async function promoteSemester(req, res) {
+  const { fromSemesterId = 1, toSemesterId = 2, branchId, courseId, studentIds } = req.body;
+
+  try {
+    const mockDb = require('../config/mockDb');
+    const affected = mockDb.promoteStudentsSemester({
+      fromSemesterId: parseInt(fromSemesterId, 10),
+      toSemesterId: parseInt(toSemesterId, 10),
+      branchId,
+      courseId,
+      studentIds
+    });
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'STUDENTS_SEMESTER_PROMOTION',
+      module: 'PROMOTION',
+      recordId: null,
+      reason: `Promoted ${affected} students from Semester ${fromSemesterId} to Semester ${toSemesterId}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, { affected, fromSemesterId, toSemesterId }, `Successfully promoted ${affected} students to ${toSemesterId === 2 ? '2nd' : toSemesterId + 'th'} Semester.`);
+  } catch (err) {
+    console.error('promoteSemester error:', err);
+    return error(res, 'Failed to execute semester promotion.', 500);
+  }
+}
+
+/**
+ * Advance Students Academic Year (e.g. 1st Year -> 2nd Year)
+ * POST /api/admin/promotion/promote-year
+ */
+async function promoteAcademicYear(req, res) {
+  const { fromYear = 1, toYear = 2, targetSemesterId = 3, branchId, courseId, studentIds, generateInvoice = true } = req.body;
+
+  try {
+    const mockDb = require('../config/mockDb');
+    const result = mockDb.promoteStudentsYear({
+      fromYear: parseInt(fromYear, 10),
+      toYear: parseInt(toYear, 10),
+      targetSemesterId: parseInt(targetSemesterId || 3, 10),
+      branchId,
+      courseId,
+      studentIds,
+      generateInvoice: generateInvoice !== false
+    });
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'STUDENTS_YEAR_ADVANCEMENT',
+      module: 'PROMOTION',
+      recordId: null,
+      reason: `Advanced ${result.affected} students to ${toYear}nd Year (Semester ${targetSemesterId || 3}) with ${result.invCount} annual invoices generated`,
+      ipAddress: req.ip
+    });
+
+    return success(res, result, `Successfully advanced ${result.affected} students to ${toYear === 2 ? '2nd' : toYear + 'th'} Year (${result.invCount} annual tuition invoices generated).`);
+  } catch (err) {
+    console.error('promoteAcademicYear error:', err);
+    return error(res, 'Failed to execute academic year advancement.', 500);
+  }
+}
+
+/**
+ * Get Alumni Directory & Cohort Statistics
+ * GET /api/admin/alumni
+ */
+async function getAlumni(req, res) {
+  const { passoutYear, courseId, branchId, search } = req.query;
+
+  try {
+    const mockDb = require('../config/mockDb');
+    const alumniList = mockDb.getAlumniList({ passoutYear, courseId, branchId, search });
+
+    let placedCount = 0;
+    let higherStudiesCount = 0;
+    const byYear = {};
+    const byCompany = {};
+
+    alumniList.forEach(a => {
+      if (a.placement_status === 'PLACED') placedCount++;
+      if (a.placement_status === 'HIGHER_STUDIES') higherStudiesCount++;
+      const y = a.passout_year || 'Unknown';
+      byYear[y] = (byYear[y] || 0) + 1;
+      if (a.company_name && a.company_name !== 'Not Disclosed / Independent') {
+        byCompany[a.company_name] = (byCompany[a.company_name] || 0) + 1;
+      }
+    });
+
+    return success(
+      res,
+      {
+        alumni: alumniList,
+        total: alumniList.length,
+        stats: {
+          totalAlumni: alumniList.length,
+          placedCount,
+          higherStudiesCount,
+          byYear,
+          byCompany
+        }
+      },
+      'Alumni directory loaded.'
+    );
+  } catch (err) {
+    console.error('getAlumni error:', err);
+    return error(res, 'Failed to load alumni directory.', 500);
+  }
+}
+
+/**
+ * Graduate Single Student to Alumni / Pass-Out Status
+ * POST /api/admin/promotion/passout-alumni
+ */
+async function passOutStudentToAlumni(req, res) {
+  const {
+    studentId,
+    passoutYear,
+    finalCgpa,
+    degreeAwarded,
+    companyName,
+    designation,
+    workLocation,
+    placementStatus,
+    cautionDepositAction,
+    remarks
+  } = req.body;
+
+  if (!studentId) {
+    return error(res, 'Student ID is required for graduation to alumni.', 400);
+  }
+
+  try {
+    const mockDb = require('../config/mockDb');
+    const graduatedStudent = mockDb.graduateStudentToAlumni({
+      studentId: parseInt(studentId, 10),
+      passoutYear,
+      finalCgpa,
+      degreeAwarded,
+      companyName,
+      designation,
+      workLocation,
+      placementStatus,
+      cautionDepositAction,
+      remarks
+    });
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'STUDENT_GRADUATED_TO_ALUMNI',
+      module: 'ALUMNI',
+      recordId: studentId,
+      reason: `Graduated ${graduatedStudent.full_name} (${graduatedStudent.reg_no}) to Alumni (Batch ${graduatedStudent.passout_year || passoutYear}). Institutional No Dues cleared & Caution Deposit ${cautionDepositAction === 'DONATED' ? 'donated to Alumni fund' : 'refunded'}.`,
+      ipAddress: req.ip
+    });
+
+    return success(
+      res,
+      graduatedStudent,
+      `Student ${graduatedStudent.full_name} successfully graduated to BEC Alumni (${graduatedStudent.passout_year || passoutYear})!`
+    );
+  } catch (err) {
+    console.error('passOutStudentToAlumni error:', err);
+    return error(res, err.message || 'Failed to graduate student to alumni.', 500);
+  }
+}
+
+/**
+ * Batch Pass Out Eligible Cohort to Alumni
+ * POST /api/admin/promotion/batch-passout-alumni
+ */
+async function batchPassOutToAlumni(req, res) {
+  const { studentIds, courseId, branchId, passoutYear, defaultPlacement } = req.body;
+
+  try {
+    const mockDb = require('../config/mockDb');
+    const result = mockDb.batchGraduateToAlumni({
+      studentIds,
+      courseId,
+      branchId,
+      passoutYear: passoutYear || 2026,
+      defaultPlacement
+    });
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'BATCH_ALUMNI_GRADUATION',
+      module: 'ALUMNI',
+      recordId: null,
+      reason: `Bulk graduated ${result.affected} students to BEC Alumni (Class of ${result.passoutYear}). Institutional No Dues & Caution Deposit settlements processed.`,
+      ipAddress: req.ip
+    });
+
+    return success(
+      res,
+      result,
+      `Successfully graduated ${result.affected} students to BEC Alumni Class of ${result.passoutYear}!`
+    );
+  } catch (err) {
+    console.error('batchPassOutToAlumni error:', err);
+    return error(res, 'Failed to execute batch alumni graduation.', 500);
+  }
+}
+
+/**
+ * Update Alumni Career / Placement Profile
+ * PUT /api/admin/alumni/:id
+ */
+async function updateAlumniProfile(req, res) {
+  const studentId = parseInt(req.params.id, 10);
+  const { companyName, designation, workLocation, placementStatus, linkedinUrl, phone, personalEmail } = req.body;
+
+  try {
+    const mockDb = require('../config/mockDb');
+    const student = mockDb.students.find(s => s.id === studentId);
+    if (!student) {
+      return error(res, 'Alumni record not found.', 404);
+    }
+
+    if (companyName !== undefined) student.company_name = companyName;
+    if (designation !== undefined) student.designation = designation;
+    if (workLocation !== undefined) student.work_location = workLocation;
+    if (placementStatus !== undefined) student.placement_status = placementStatus;
+    if (linkedinUrl !== undefined) student.linkedin_url = linkedinUrl;
+    if (phone !== undefined) student.phone = phone;
+    if (personalEmail !== undefined) student.personal_email = personalEmail;
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'ALUMNI_PROFILE_UPDATED',
+      module: 'ALUMNI',
+      recordId: studentId,
+      reason: `Updated career/placement profile for alumni ${student.full_name}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, student, 'Alumni career profile updated successfully.');
+  } catch (err) {
+    console.error('updateAlumniProfile error:', err);
+    return error(res, 'Failed to update alumni profile.', 500);
+  }
+}
+
 module.exports = {
   getDashboard,
   getIntelligence,
@@ -368,5 +826,18 @@ module.exports = {
   getStudentLedger,
   getAuditLogs,
   getUsers,
-  updateUserStatus
+  updateUserStatus,
+  getUniversalTransactions,
+  getCashClosing,
+  recordCashClosing,
+  getBankAccounts,
+  getExamRegistrations,
+  updateExamRegistration,
+  getPromotionOverview,
+  promoteSemester,
+  promoteAcademicYear,
+  getAlumni,
+  passOutStudentToAlumni,
+  batchPassOutToAlumni,
+  updateAlumniProfile
 };

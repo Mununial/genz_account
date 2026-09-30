@@ -16,6 +16,7 @@ router.use(
 
 router.get('/collections', reportController.getCollectionsReport);
 router.get('/defaulters', reportController.getDefaultersReport);
+router.get('/registrations', reportController.getRegistrationsReport);
 router.get('/export-csv', reportController.exportCsv);
 
 module.exports = router;

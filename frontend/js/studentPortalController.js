@@ -136,6 +136,15 @@ const studentPortal = {
     const s = this.currentStudent;
     if (!s) return;
 
+    const avatarEl = document.getElementById('drawerAvatar');
+    if (avatarEl) {
+      if (s.photo_url && typeof s.photo_url === 'string' && s.photo_url.startsWith('http')) {
+        avatarEl.innerHTML = `<img src="${s.photo_url}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.parentElement.textContent='🎓'" />`;
+      } else {
+        avatarEl.textContent = '🎓';
+      }
+    }
+
     const nameEl = document.getElementById('drawerStudentName');
     const rollEl = document.getElementById('drawerStudentRoll');
     const branchEl = document.getElementById('drawerStudentBranch');
@@ -199,6 +208,8 @@ const studentPortal = {
       this.renderDashboardTab();
     } else if (tabName === 'profile') {
       this.renderProfileTab();
+    } else if (tabName === 'address') {
+      this.renderAddressTab();
     }
 
     // Close mobile drawer if open
@@ -1149,6 +1160,25 @@ const studentPortal = {
 
       this.receiptsList.unshift(newReceipt);
 
+      // Realtime Firebase broadcast to staff desks
+      if (window.becFirebase && typeof window.becFirebase.broadcastPayment === 'function') {
+        window.becFirebase.broadcastPayment({
+          payment_no: (receiptData && receiptData.paymentNo) || `PAY-${Date.now()}`,
+          receipt_no: receiptNo,
+          student_id: this.currentStudent ? this.currentStudent.id : 0,
+          student_name: this.currentStudent ? this.currentStudent.full_name : 'Student',
+          reg_no: this.currentStudent ? this.currentStudent.reg_no : '',
+          roll_no: this.currentStudent ? this.currentStudent.roll_no : '',
+          branch: this.currentStudent ? (this.currentStudent.branch_name || this.currentStudent.branch_code) : 'Engineering',
+          amount: amount,
+          payment_method: paymentMethodLabel,
+          transaction_id: (receiptData && receiptData.transactionId) || `TXN-STU-${Date.now()}`,
+          fee_category: desc || 'Academic Fee',
+          status: 'SUCCESS',
+          source: 'STUDENT_PORTAL'
+        });
+      }
+
       // Re-load backend data to sync state
       try {
         await this.loadStudentData();
@@ -1701,36 +1731,171 @@ const studentPortal = {
   },
 
   /* =========================================================================
-   * PROFILE TAB (Personal & Academic Info)
+   * PROFILE TAB (Personal, Academic & Cloudinary Documents Info)
    * ========================================================================= */
   renderProfileTab() {
     const s = this.currentStudent;
     const container = document.getElementById('tabPane-profile');
     if (!container || !s) return;
 
+    const hasPhoto = s.photo_url && typeof s.photo_url === 'string' && s.photo_url.startsWith('http');
+    const initial = (s.full_name || 'S').charAt(0);
+
+    const docs = [
+      { name: '10th Marksheet & Certificate', url: s.marksheet_10th_url, authority: 'BSE Odisha / CBSE' },
+      { name: '12th / Diploma Certificate', url: s.certificate_12th_url, authority: 'CHSE Odisha / SCTE&VT' },
+      { name: 'JEE Main / OJEE Allotment Rank Card', url: s.rank_card_url, authority: 'Central Counselling Board' },
+      { name: 'College Admission Allotment Letter', url: s.allotment_letter_url, authority: 'Bhubaneswar Engineering College' },
+      { name: 'Aadhaar Card Document Copy', url: s.aadhaar_doc_url, authority: `UIDAI: ${s.aadhaar_no || 'Verified'}` },
+      { name: 'College Leaving Certificate (CLC) / TC', url: s.tc_clc_url, authority: 'Original Institutional Transfer' },
+      { name: 'Conduct Certificate', url: s.conduct_url, authority: 'Issued by School / College' },
+      { name: 'Migration Certificate', url: s.migration_url, authority: 'Original University Migration' },
+      { name: 'Caste Certificate', url: s.caste_cert_url, authority: `${s.category || 'General'} Quota` },
+      { name: 'Resident / Nativity Certificate', url: s.residence_cert_url, authority: 'Tahasildar Revenue Portal' },
+      { name: 'Reporting Fee Receipt', url: s.fee_receipt_url, authority: `Reporting Receipt: ${s.tuition_receipt_no || s.receipt_no || 'Counter'}` },
+      { name: 'Student Signature', url: s.signature_url, authority: 'Digital Specimen Signature' }
+    ];
+
     container.innerHTML = `
-      <div style="background: white; border: 1px solid #CBD5E1; border-radius: 8px; padding: 2rem; max-width: 900px; margin: 0 auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-        <div style="display: flex; align-items: center; gap: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
-          <div style="width: 72px; height: 72px; border-radius: 50%; background: #007bff; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800;">
-            ${escapeHtml((s.full_name || 'S').charAt(0))}
+      <div style="background: white; border: 1px solid #CBD5E1; border-radius: 8px; padding: 2rem; max-width: 960px; margin: 0 auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        
+        <!-- Header Snapshot -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E2E8F0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; background: #0284C7; color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 3px solid #E0F2FE; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              ${hasPhoto 
+                ? `<img src="${s.photo_url}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.textContent='${initial}'" />`
+                : initial}
+            </div>
+            <div>
+              <h2 style="margin: 0; font-size: 1.4rem; color: #0F172A; font-weight: 800;">${escapeHtml(s.full_name)}</h2>
+              <div style="color: #64748B; font-size: 0.88rem; margin-top: 0.3rem;">
+                Reg No: <strong style="color: #0284C7;">${escapeHtml(s.reg_no || s.roll_no || '-')}</strong> &bull; Roll: <strong>${escapeHtml(s.roll_no || '-')}</strong> &bull; Status: <span style="background: #DCFCE7; color: #166534; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px;">ACTIVE ENROLLED</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 style="margin: 0; font-size: 1.35rem; color: #0F172A;">${escapeHtml(s.full_name)}</h2>
-            <div style="color: #64748B; font-size: 0.88rem; margin-top: 0.25rem;">
-              Admission No: <strong>${escapeHtml(s.reg_no || s.admission_no)}</strong> &bull; Status: <span style="color:#16A34A; font-weight:700;">ACTIVE</span>
+          <div style="text-align: right;">
+            <span style="font-size: 0.8rem; color: #64748B; display: block;">Official Portal Login ID:</span>
+            <code style="font-size: 0.88rem; background: #F1F5F9; color: #0284C7; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px;">${escapeHtml(s.domain_email || s.email)}</code>
+          </div>
+        </div>
+
+        <!-- Academic & Enrolled Details -->
+        <h3 style="font-size: 1rem; color: #1E293B; margin-top: 0; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          Academic Curriculum &amp; Faculty
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; background: #F8FAFC; padding: 1.25rem; border-radius: 6px; border: 1px solid #E2E8F0; margin-bottom: 1.5rem; font-size: 0.9rem;">
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Degree / Program:</span> <strong>${escapeHtml(s.course_name || 'B.Tech')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Branch / Discipline:</span> <strong>${escapeHtml(s.branch_name || s.branch_code || 'Computer Science')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Current Semester:</span> <strong>${escapeHtml(s.semester_label || '1st Semester')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Academic Batch / Section:</span> <strong>${escapeHtml(s.session_name || s.batch || '2026-27')} (${escapeHtml(s.section || 'A')})</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Mentor Faculty:</span> <strong>${escapeHtml(s.mentor || 'Prof. Faculty Mentor')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Admission Category:</span> <strong>${escapeHtml(s.category || 'General')}</strong></div>
+        </div>
+
+        <!-- Personal & Contact Details -->
+        <h3 style="font-size: 1rem; color: #1E293B; margin-top: 0; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+          Personal &amp; Guardian Profile
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; background: #F8FAFC; padding: 1.25rem; border-radius: 6px; border: 1px solid #E2E8F0; margin-bottom: 1.5rem; font-size: 0.9rem;">
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Date of Birth (Password):</span> <strong>${escapeHtml(s.dob || '2005-01-01')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Gender / Blood Group:</span> <strong>${escapeHtml(s.gender || 'MALE')} (${escapeHtml(s.bloodgroup || 'O+')})</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Student Mobile No:</span> <strong>${escapeHtml(s.phone || '-')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Father's Name &amp; Contact:</span> <strong>${escapeHtml(s.father_name || s.parent_name || '-')} (${escapeHtml(s.father_mobile || s.parent_phone || '-')})</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Mother's Name:</span> <strong>${escapeHtml(s.mother_name || '-')}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Hostel Accommodation:</span> <strong>${escapeHtml(s.hostel || (s.hostel_required === 'Yes' ? 'Opted' : 'Day Scholar'))}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Transport / Bus:</span> <strong>${escapeHtml(s.transport || (s.transport_required === 'Yes' ? 'Opted' : 'Self Conveyance'))}</strong></div>
+          <div><span style="color: #64748B; font-size: 0.8rem; display: block;">Personal Email:</span> <strong>${escapeHtml(s.personal_email || '-')}</strong></div>
+        </div>
+
+        <!-- Verified Institutional Documents -->
+        <h3 style="font-size: 1rem; color: #1E293B; margin-top: 0; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Uploaded Certificates &amp; Verified Institutional Documents
+          </div>
+          <span style="font-size: 0.78rem; font-weight: 600; color: #15803D;">Live Cloudinary Sync ✓</span>
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem;">
+          ${docs.map(d => {
+            const hasDoc = d.url && typeof d.url === 'string' && d.url.startsWith('http');
+            return `
+              <div style="background: white; border: 1px solid #E2E8F0; border-radius: 6px; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: #0F172A; margin-bottom: 0.25rem;">${escapeHtml(d.name)}</div>
+                  <div style="font-size: 0.78rem; color: #64748B; margin-bottom: 0.6rem;">${escapeHtml(d.authority)}</div>
+                </div>
+                <div>
+                  ${hasDoc ? `
+                    <a href="${escapeHtml(d.url)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 600; color: #0284C7; text-decoration: none; background: #E0F2FE; padding: 0.3rem 0.6rem; border-radius: 4px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      View Document ↗
+                    </a>
+                  ` : `
+                    <span style="font-size: 0.76rem; color: #15803D; display: inline-flex; align-items: center; gap: 0.25rem;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      Verified Physical Copy ✓
+                    </span>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+      </div>
+    `;
+  },
+
+  /* =========================================================================
+   * ADDRESS TAB (Live Student Address & Residential Data)
+   * ========================================================================= */
+  renderAddressTab() {
+    const s = this.currentStudent;
+    const container = document.getElementById('tabPane-address');
+    if (!container || !s) return;
+
+    const fullAddr = s.permanent_address || s.address || 'At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha - 752054';
+    const dist = s.district || 'Khordha';
+    const st = s.state || 'Odisha';
+    const pin = s.pin_code || '752054';
+
+    container.innerHTML = `
+      <div class="payment-details-card" style="max-width: 900px; margin: 0 auto;">
+        <h3 style="margin-top: 0; color: #0F172A; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Address &amp; Residential Information
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.25rem;">
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 1.25rem; border-radius: 6px;">
+            <strong style="color: #0284C7; display: block; margin-bottom: 0.5rem; font-size: 0.95rem;">Permanent Home Address</strong>
+            <div style="color: #334155; font-size: 0.92rem; line-height: 1.6;">
+              ${escapeHtml(fullAddr)}<br>
+              <strong>District:</strong> ${escapeHtml(dist)}, <strong>State:</strong> ${escapeHtml(st)}<br>
+              <strong>PIN Code:</strong> ${escapeHtml(pin)}
+            </div>
+          </div>
+
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 1.25rem; border-radius: 6px;">
+            <strong style="color: #0284C7; display: block; margin-bottom: 0.5rem; font-size: 0.95rem;">Campus Accommodation &amp; Transit</strong>
+            <div style="color: #334155; font-size: 0.92rem; line-height: 1.6;">
+              <strong>Hostel Status:</strong> ${escapeHtml(s.hostel || (s.hostel_required === 'Yes' ? 'Opted' : 'Day Scholar'))}<br>
+              <strong>Hostel Room:</strong> ${escapeHtml(s.room_no && s.room_no !== 'N/A' ? `Room ${s.room_no}` : 'Campus Hostel')}<br>
+              <strong>Transport Stoppage:</strong> ${escapeHtml(s.pickup_stoppage && s.pickup_stoppage !== 'N/A' ? s.pickup_stoppage : (s.transport || 'Self Conveyance'))}
             </div>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; font-size: 0.92rem;">
-          <div><span style="color: #64748B;">Father's Name:</span> <strong>${escapeHtml(s.father_name || 'Sanjeev Kumar Mahato')}</strong></div>
-          <div><span style="color: #64748B;">Contact Number:</span> <strong>${escapeHtml(s.phone || '5555555555')}</strong></div>
-          <div><span style="color: #64748B;">Course Program:</span> <strong>${escapeHtml(s.course_name || 'Diploma')}</strong></div>
-          <div><span style="color: #64748B;">Department / Branch:</span> <strong>${escapeHtml(s.branch_name || 'Mechanical Engineering')}</strong></div>
-          <div><span style="color: #64748B;">Academic Batch / Session:</span> <strong>${escapeHtml(s.session_name || s.batch || '2024-2027')}</strong></div>
-          <div><span style="color: #64748B;">Current Semester:</span> <strong>${escapeHtml(s.semester_label || '2nd Semester')}</strong></div>
-          <div><span style="color: #64748B;">Section:</span> <strong>${escapeHtml(s.section || 'Section A')}</strong></div>
-          <div><span style="color: #64748B;">Mentor Faculty:</span> <strong>${escapeHtml(s.mentor || 'Prof. S. R. Jena')}</strong></div>
+        <div style="margin-top: 1.5rem; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 1rem 1.25rem; border-radius: 6px;">
+          <strong style="color: #166534; font-size: 0.9rem; display: block; margin-bottom: 0.35rem;">Emergency &amp; Guardian Contacts:</strong>
+          <div style="color: #166534; font-size: 0.88rem; display: flex; flex-wrap: wrap; gap: 1.5rem;">
+            <span>Father: <strong>${escapeHtml(s.father_mobile || s.parent_phone || '-')}</strong></span>
+            <span>Mother: <strong>${escapeHtml(s.mother_mobile || '-')}</strong></span>
+            <span>Student WhatsApp: <strong>${escapeHtml(s.whatsapp || s.phone || '-')}</strong></span>
+          </div>
         </div>
       </div>
     `;

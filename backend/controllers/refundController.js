@@ -162,8 +162,63 @@ async function rejectRefund(req, res) {
   }
 }
 
+/**
+ * Initiate Refund Request
+ * POST /api/admin/refunds
+ */
+async function createRefundRequest(req, res) {
+  const { studentId, amount, reason, feeCategory, paymentMethod } = req.body;
+  const refundAmount = parseFloat(amount);
+  if (!refundAmount || refundAmount <= 0) {
+    return error(res, 'Refund amount must be greater than zero.', 400);
+  }
+  if (!reason || !reason.trim()) {
+    return error(res, 'Mandatory audit reason required for refund.', 400);
+  }
+
+  try {
+    const sId = parseInt(studentId, 10);
+    const [payments] = await query(
+      `SELECT p.id, p.invoice_id FROM payments p WHERE p.student_id = ? AND p.status = 'SUCCESS' ORDER BY p.id DESC LIMIT 1`,
+      [sId]
+    );
+
+    let paymentId = payments && payments.length > 0 ? payments[0].id : null;
+    let invoiceId = payments && payments.length > 0 ? payments[0].invoice_id : null;
+
+    if (!invoiceId) {
+      const [invoices] = await query(`SELECT id FROM invoices WHERE student_id = ? ORDER BY id DESC LIMIT 1`, [sId]);
+      if (invoices && invoices.length > 0) invoiceId = invoices[0].id;
+    }
+
+    const refundNo = `REF-${Date.now().toString().slice(-6)}`;
+    await query(
+      `INSERT INTO refunds (refund_no, payment_id, student_id, invoice_id, amount, reason, status, requested_by)
+       VALUES (?, ?, ?, ?, ?, ?, 'REQUESTED', ?)`,
+      [refundNo, paymentId || 1, sId, invoiceId || 1, refundAmount, `[${feeCategory || 'Tuition Fee'} / ${paymentMethod || 'BANK_TRANSFER'}] ${reason}`, req.user.id]
+    );
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'INITIATE_REFUND',
+      module: 'REFUND',
+      recordId: sId,
+      reason: `Refund requested for ₹${refundAmount}: ${reason}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, { refundNo }, 'Refund request submitted for Accounts Manager approval.');
+  } catch (err) {
+    console.error('createRefundRequest error:', err);
+    return error(res, 'Failed to submit refund request.', 500);
+  }
+}
+
 module.exports = {
   getRefunds,
   approveRefund,
-  rejectRefund
+  rejectRefund,
+  createRefundRequest
 };
+

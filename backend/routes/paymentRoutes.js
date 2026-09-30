@@ -24,5 +24,10 @@ router.post(
   paymentController.recordCounterPayment
 );
 router.get('/:id', paymentController.getPaymentById);
+router.post(
+  '/receipts/:id/cancel',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  paymentController.cancelReceipt
+);
 
 module.exports = router;

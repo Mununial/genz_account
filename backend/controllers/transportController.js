@@ -322,30 +322,58 @@ async function collectTransportFee(req, res) {
 }
 
 /**
- * Export Transport Data as CSV
+ * Export Transport Data as CSV / Formal Bus List
  * GET /api/transport/export
  */
 async function exportTransportCSV(req, res) {
   try {
-    const list = mockDb.studentTransports.map((t, idx) => {
+    const { session, semester, route, pickup_point, status, unpaid_only } = req.query;
+
+    let filtered = mockDb.studentTransports.map(t => {
       const student = mockDb.students.find(s => s.id === t.student_id);
+      const branch = student ? mockDb.branches.find(b => b.id === student.branch_id) : null;
+      const pp = mockDb.pickupPoints.find(p => p.id === t.pickup_point_id);
+
+      return {
+        ...t,
+        student,
+        branch,
+        pickup_point: pp ? pp.location_name : (t.pickup_point || 'Not Assigned'),
+        route_name: pp ? pp.route_name : (t.route_name || 'Route 1'),
+        status: t.balance <= 0 ? 'PAID' : (t.fees_paid > 0 ? 'PARTIAL' : 'UNPAID')
+      };
+    });
+
+    if (session) filtered = filtered.filter(t => t.session === session);
+    if (semester) filtered = filtered.filter(t => t.semester === semester);
+    if (route) filtered = filtered.filter(t => t.route_name && t.route_name.toLowerCase().includes(route.toLowerCase()));
+    if (pickup_point) filtered = filtered.filter(t => String(t.pickup_point_id) === String(pickup_point) || (t.pickup_point && t.pickup_point.toLowerCase().includes(pickup_point.toLowerCase())));
+    if (status) filtered = filtered.filter(t => t.status === status);
+    if (unpaid_only === 'true' || unpaid_only === true) filtered = filtered.filter(t => t.balance > 0);
+
+    const list = filtered.map((t, idx) => {
+      const student = t.student;
+      const branch = t.branch;
       return {
         'Sr.No': idx + 1,
         'Student Name': t.student_name || (student ? student.full_name : ''),
-        'Course': t.course || 'B.Tech',
-        'Section': t.section || 'A',
-        'Father Name': t.father_name || '',
-        'Pick Up Point': t.pickup_point || '',
-        'Route': t.route_name || '',
-        'Total Transport Fees (INR)': t.total_transport_fees,
-        'Fees Paid (INR)': t.fees_paid,
+        'Registration No': student ? student.reg_no : 'N/A',
+        'College Roll No': student ? (student.roll_no || student.reg_no) : 'N/A',
+        'Branch': branch ? branch.name : (t.department || 'Engineering'),
+        'Semester': t.semester || '1st Semester',
+        'Route': t.route_name || 'Route 1',
+        'Pickup Point': t.pickup_point || '',
+        'Fee (INR)': t.total_transport_fees,
+        'Paid (INR)': t.fees_paid,
         'Balance (INR)': t.balance,
-        'Status': t.status
+        'Status': t.status,
+        'Student Mobile': student ? (student.phone || 'N/A') : 'N/A',
+        'Guardian Mobile': student ? (student.guardian_phone || student.parent_phone || 'N/A') : 'N/A'
       };
     });
 
     if (list.length === 0) {
-      return res.status(200).send('Sr.No,Student Name,Course,Section,Father Name,Pick Up Point,Total Transport Fees,Fees Paid,Balance\n');
+      return res.status(200).send('Sr.No,Student Name,Registration No,College Roll No,Branch,Semester,Route,Pickup Point,Fee (INR),Paid (INR),Balance (INR),Status,Student Mobile,Guardian Mobile\n');
     }
 
     const headers = Object.keys(list[0]).join(',');
@@ -353,10 +381,11 @@ async function exportTransportCSV(req, res) {
     const csvContent = [headers, ...rows].join('\n');
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="BEC_Student_Transport_Fee_2026.csv"');
+    res.setHeader('Content-Disposition', `attachment; filename="BEC_Bus_List_Export_${Date.now()}.csv"`);
     return res.status(200).send(csvContent);
   } catch (err) {
-    return error(res, 'Failed to export transport data.', 500);
+    console.error('exportTransportCSV error:', err);
+    return error(res, 'Failed to export bus list.', 500);
   }
 }
 

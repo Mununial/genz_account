@@ -303,4 +303,31 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+
+  /* 3-Inch (80mm) Thermal POS Print Styles */
+  body.print-format-thermal {
+    width: 78mm !important;
+    max-width: 78mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 8.5pt !important;
+  }
+
+  body.print-format-thermal .bec-official-receipt {
+    display: none !important;
+  }
+
+  body.print-format-thermal .receipt-thermal-pos {
+    display: block !important;
+    width: 72mm !important;
+    max-width: 72mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-family: 'Courier New', Courier, monospace, monospace !important;
+    color: #000000 !important;
+    background: #FFFFFF !important;
+  }
 }
+

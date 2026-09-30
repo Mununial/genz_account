@@ -17,9 +17,7 @@ async function getProfile(req, res) {
 
   try {
     const [rows] = await query(
-      `SELECT s.id, s.reg_no, s.full_name, s.gender, s.dob, s.category,
-              s.phone, s.parent_name, s.parent_phone, s.address,
-              s.hostel_opted, s.transport_opted, s.admission_year,
+      `SELECT s.*,
               c.name AS course_name, c.code AS course_code,
               b.name AS branch_name, b.code AS branch_code,
               sem.label AS semester_label, sem.semester_number,

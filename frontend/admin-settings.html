@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration &amp; Audit Hub - Bhubaneswar Engineering College</title>
+  <meta name="description" content="Administration Console: Staff User Accounts, 8-Role RBAC Matrix, Fee Category Configuration, Academic Session Management, and Immutable Audit Log.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/becReal.css">
+  <link rel="stylesheet" href="/css/studentCms.css">
+  <style>
+    .admin-tab-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid #E2E8F0;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+    .admin-tab-btn {
+      background: none;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #64748B;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .admin-tab-btn:hover {
+      color: #2563EB;
+    }
+    .admin-tab-btn.active {
+      color: #2563EB;
+      border-bottom-color: #2563EB;
+    }
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .matrix-table th, .matrix-table td {
+      padding: 0.75rem 0.85rem;
+      border: 1px solid #E2E8F0;
+      text-align: center;
+    }
+    .matrix-table th {
+      background: #F8FAFC;
+      font-weight: 700;
+      color: #1E293B;
+    }
+    .matrix-table th:first-child, .matrix-table td:first-child {
+      text-align: left;
+    }
+    .perm-check {
+      color: #15803D;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .perm-cross {
+      color: #CBD5E1;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/dashboard.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC ACCOUNTS</span>
+            <span class="brand-subtitle">Finance ERP</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup"></div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">BEC</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">Accounts Head</div>
+            <div class="user-role-tag" id="userDisplayRole">ACCOUNTS_HEAD</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="page-title" id="topbarPageTitle">Administration &amp; System Configuration</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div id="topbarClock" class="topbar-clock">Loading live clock...</div>
+          <div class="session-badge">
+            <span class="session-dot"></span>
+            Session 2026-27
+          </div>
+
+          <a href="/receipt-desk.html" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Issue e-Receipt
+          </a>
+
+          <button class="btn btn-ghost-danger btn-sm" onclick="auth.logout()" title="Exit Portal">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content" style="padding: 1.25rem 1.5rem;">
+        <!-- Tab Navigation Bar -->
+        <div class="admin-tab-nav">
+          <button type="button" class="admin-tab-btn active" id="tabBtnUsers" onclick="adminSettings.switchTab('users')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            Users &amp; Staff Accounts
+          </button>
+          <button type="button" class="admin-tab-btn" id="tabBtnRbac" onclick="adminSettings.switchTab('rbac')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            8-Role RBAC Permissions Matrix
+          </button>
+          <button type="button" class="admin-tab-btn" id="tabBtnFees" onclick="adminSettings.switchTab('fees')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Fee Heads &amp; Categories
+          </button>
+          <button type="button" class="admin-tab-btn" id="tabBtnSessions" onclick="adminSettings.switchTab('sessions')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Academic Sessions
+          </button>
+          <button type="button" class="admin-tab-btn" id="tabBtnAudit" onclick="adminSettings.switchTab('audit')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Immutable Audit Trail
+          </button>
+        </div>
+
+        <!-- TAB 1: USERS & STAFF ACCOUNTS -->
+        <div id="sectionUsers" style="display: block;">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div>
+                <div class="card-title">Institutional Staff &amp; Operational Accounts</div>
+                <div style="font-size: 0.82rem; color: #64748B; margin-top: 0.15rem;">
+                  Manage ERP access for Accounts Officers, Cashiers, Auditors, Exam Section, and Management.
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="ui.showToast('New staff provision form active.', 'info')">
+                + Provision New Staff Account
+              </button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Staff Name &amp; Email</th>
+                      <th>Institutional Role</th>
+                      <th>Department</th>
+                      <th>Account Status</th>
+                      <th>Last Active</th>
+                      <th style="text-align: right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTableBody">
+                    <tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: #64748B;">Loading staff accounts...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: 8-ROLE RBAC PERMISSIONS MATRIX (Requirement 24) -->
+        <div id="sectionRbac" style="display: none;">
+          <div class="card" style="padding: 1.5rem;">
+            <div style="margin-bottom: 1.25rem;">
+              <h3 style="margin: 0 0 0.35rem 0; font-size: 1.15rem; color: #0F172A;">
+                Role-Based Access Control (RBAC) System Matrix
+              </h3>
+              <p style="font-size: 0.85rem; color: #64748B; margin: 0;">
+                Configured institutional boundaries across all 8 operational roles at Bhubaneswar Engineering College.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>Capability / Operational Function</th>
+                    <th>Super Admin</th>
+                    <th>Accounts Head</th>
+                    <th>Accounts Staff</th>
+                    <th>Cashier</th>
+                    <th>Auditor</th>
+                    <th>Exam Section</th>
+                    <th>Management</th>
+                    <th>Student</th>
+                  </tr>
+                </thead>
+                <tbody id="rbacMatrixTbody">
+                  <!-- Generated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: FEE HEADS & CATEGORIES CONFIGURATION (Requirement 22) -->
+        <div id="sectionFees" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div>
+                <div class="card-title">Approved Fee Heads &amp; Charge Categories (Session 2026-27)</div>
+                <div style="font-size: 0.82rem; color: #64748B; margin-top: 0.15rem;">
+                  Institutional fee components, account codes, and refundable deposit flags.
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="ui.showToast('New fee category configuration modal.', 'info')">
+                + Add Fee Head
+              </button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Fee Category / Head</th>
+                      <th>Head Code</th>
+                      <th>Annual Rate</th>
+                      <th>Classification</th>
+                      <th>Refundable</th>
+                      <th>Due Date</th>
+                      <th style="text-align: right;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="feeHeadsTbody">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: ACADEMIC SESSIONS -->
+        <div id="sectionSessions" style="display: none;">
+          <div class="card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <div>
+                <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A;">Academic Calendar Sessions</h3>
+                <p style="font-size: 0.85rem; color: #64748B; margin: 0.25rem 0 0 0;">
+                  Active academic session determines fee demand schedules, semester ledger generation, and enrollment cohort.
+                </p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="ui.showToast('Session rollover wizard requires Super Admin authorization.', 'warning')">
+                + New Academic Session
+              </button>
+            </div>
+
+            <table class="cms-fee-particulars-table">
+              <thead>
+                <tr>
+                  <th>Session Label</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Total Enrolled</th>
+                  <th>Ledger Demand Status</th>
+                  <th style="text-align: center;">Operational Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #F0FDF4;">
+                  <td><strong>Academic Session 2026-27</strong></td>
+                  <td>01-Aug-2026</td>
+                  <td>31-Jul-2027</td>
+                  <td><strong>182 Students (1st Year)</strong></td>
+                  <td><span class="badge badge-success">ACTIVE INVOICED</span></td>
+                  <td style="text-align: center;"><span class="badge badge-success" style="font-weight: 800;">CURRENT ACTIVE ✓</span></td>
+                </tr>
+                <tr>
+                  <td>Academic Session 2025-26</td>
+                  <td>01-Aug-2025</td>
+                  <td>31-Jul-2026</td>
+                  <td>174 Students</td>
+                  <td>ARCHIVED</td>
+                  <td style="text-align: center;"><span class="badge badge-neutral">CLOSED</span></td>
+                </tr>
+                <tr>
+                  <td>Academic Session 2024-25</td>
+                  <td>01-Aug-2024</td>
+                  <td>31-Jul-2025</td>
+                  <td>168 Students</td>
+                  <td>ARCHIVED</td>
+                  <td style="text-align: center;"><span class="badge badge-neutral">CLOSED</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 5: IMMUTABLE AUDIT TRAIL (Requirement 23) -->
+        <div id="sectionAudit" style="display: none;">
+          <!-- Filter Card -->
+          <div class="card" style="padding: 1.25rem; margin-bottom: 1.25rem;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+              <div style="flex: 1; min-width: 240px;">
+                <label class="form-label" style="font-size: 0.75rem;">Filter by Module</label>
+                <select id="auditModuleFilter" class="form-control form-select" onchange="adminSettings.filterAuditLogs()">
+                  <option value="">All Operational Modules</option>
+                  <option value="PAYMENT">Fee Collection &amp; Payments</option>
+                  <option value="RECEIPT">Receipt Issuance &amp; Cancellation</option>
+                  <option value="REFUND">Refunds &amp; Reversals</option>
+                  <option value="EXPENSE">Expense Vouchers &amp; Payouts</option>
+                  <option value="CASH">Daily Cash Drawer Closing</option>
+                  <option value="EXAM">BPUT Exam Registrations</option>
+                  <option value="USER">User Authentication &amp; RBAC</option>
+                </select>
+              </div>
+              <div style="flex: 1; min-width: 240px;">
+                <label class="form-label" style="font-size: 0.75rem;">Search Audit Reason / Record</label>
+                <input type="text" id="auditSearchInput" class="form-control" placeholder="Search keywords..." oninput="adminSettings.filterAuditLogs()">
+              </div>
+              <div style="display: flex; align-items: flex-end;">
+                <button class="btn btn-secondary btn-sm" onclick="adminSettings.loadAuditLogs()">
+                  🔄 Refresh Live Feed
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audit Log Stream Table -->
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div class="card-title">Immutable Security &amp; Financial Mutation Trail</div>
+              <div id="auditLogCountLabel" style="font-size: 0.8rem; color: #64748B;">Showing real-time audit records</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Audit Timestamp</th>
+                      <th>Action Trigger</th>
+                      <th>Module</th>
+                      <th>User Account</th>
+                      <th>Role</th>
+                      <th>Audit Justification / Transaction Mutation</th>
+                      <th>Origin IP</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditTableBody">
+                    <tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: #64748B;">Loading audit log entries...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script src="/js/adminSettings.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      navigation.init('admin-settings');
+      await adminSettings.init();
+    });
+  </script>
+</body>
+</html>

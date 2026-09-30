@@ -38,11 +38,55 @@ router.get(
   adminController.getStudentLedger
 );
 
+// Student Academic Progression & Promotion Endpoints
+router.get(
+  '/promotion/stats',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  adminController.getPromotionOverview
+);
+router.post(
+  '/promotion/promote-semester',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.promoteSemester
+);
+router.post(
+  '/promotion/promote-year',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.promoteAcademicYear
+);
+router.post(
+  '/promotion/passout-alumni',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.passOutStudentToAlumni
+);
+router.post(
+  '/promotion/batch-passout-alumni',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.batchPassOutToAlumni
+);
+
+// Alumni Directory & Management Endpoints
+router.get(
+  '/alumni',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  adminController.getAlumni
+);
+router.put(
+  '/alumni/:id',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.updateAlumniProfile
+);
+
 // Refunds Workflow
 router.get(
   '/refunds',
   requireRole('ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
   refundController.getRefunds
+);
+router.post(
+  '/refunds',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  refundController.createRefundRequest
 );
 router.post(
   '/refunds/:id/approve',
@@ -90,4 +134,48 @@ router.get(
 router.get('/users', requireRole('ADMIN'), adminController.getUsers);
 router.post('/users/:id/status', requireRole('ADMIN'), adminController.updateUserStatus);
 
+// Universal Transaction Search
+router.get(
+  '/transactions/search',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  adminController.getUniversalTransactions
+);
+
+// Cash Management & Daily Closing
+router.get(
+  '/cash-closing',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  adminController.getCashClosing
+);
+router.post(
+  '/cash-closing',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.recordCashClosing
+);
+
+// Bank Accounts
+router.get(
+  '/bank-accounts',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  adminController.getBankAccounts
+);
+
+// Exam Registrations
+router.get(
+  '/exam-registrations',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  adminController.getExamRegistrations
+);
+router.post(
+  '/exam-registrations/:id',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.updateExamRegistration
+);
+router.post(
+  '/exam-registrations/:id/status',
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
+  adminController.updateExamRegistration
+);
+
 module.exports = router;
+

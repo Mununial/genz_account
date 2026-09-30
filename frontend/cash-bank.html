@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash &amp; Bank Management Hub - Bhubaneswar Engineering College</title>
+  <meta name="description" content="Institutional Cash Drawer Daily Closing, Denomination Verification, Bank Master Accounts, and Reconciliation Statement for BEC Accounts Department.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/becReal.css">
+  <link rel="stylesheet" href="/css/studentCms.css">
+  <style>
+    .cb-tabs-bar {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid #E2E8F0;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+    .cb-tab-btn {
+      background: none;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #64748B;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .cb-tab-btn:hover {
+      color: #0284C7;
+    }
+    .cb-tab-btn.active {
+      color: #0284C7;
+      border-bottom-color: #0284C7;
+    }
+    .denom-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .denom-table th, .denom-table td {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #E2E8F0;
+    }
+    .denom-table th {
+      background: #F8FAFC;
+      font-weight: 700;
+      color: #334155;
+      font-size: 0.84rem;
+    }
+    .denom-table input {
+      width: 100%;
+      padding: 0.4rem 0.65rem;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-align: right;
+    }
+    .denom-table input:focus {
+      outline: none;
+      border-color: #0284C7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+    }
+    .variance-box-ok {
+      background: #DCFCE7;
+      border: 1px solid #86EFAC;
+      color: #15803D;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .variance-box-alert {
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      color: #BE123C;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .bank-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .bank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/dashboard.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC ACCOUNTS</span>
+            <span class="brand-subtitle">Finance ERP</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup"></div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">BEC</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">Accounts Staff</div>
+            <div class="user-role-tag" id="userDisplayRole">ACCOUNTS</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="page-title" id="topbarPageTitle">Cash &amp; Bank Management Hub</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div id="topbarClock" class="topbar-clock">Loading live clock...</div>
+          <div class="session-badge">
+            <span class="session-dot"></span>
+            Session 2026-27
+          </div>
+          <a href="/receipt-desk.html" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Issue e-Receipt
+          </a>
+          <button class="btn btn-ghost-danger btn-sm" onclick="auth.logout()" title="Exit Portal">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content" style="padding: 1.25rem 1.5rem;">
+        <!-- Hub Navigation Bar -->
+        <div class="cb-tabs-bar">
+          <button type="button" class="cb-tab-btn active" id="tabBtnDrawer" onclick="cashBank.switchTab('drawer')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+            Daily Cash Drawer &amp; Vault Closing
+          </button>
+          <button type="button" class="cb-tab-btn" id="tabBtnBank" onclick="cashBank.switchTab('bank')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Institutional Bank Accounts (3)
+          </button>
+          <button type="button" class="cb-tab-btn" id="tabBtnBrs" onclick="cashBank.switchTab('brs')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Bank Reconciliation Statement (BRS)
+          </button>
+        </div>
+
+        <!-- TAB 1: DAILY CASH DRAWER CLOSING & PHYSICAL DENOMINATION COUNT -->
+        <div id="sectionDrawer" style="display: block;">
+          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.5rem; align-items: start;">
+            <!-- Left: Cash Balancing Formula & Closing Form -->
+            <div class="card" style="padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A; display: flex; align-items: center; gap: 0.5rem;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                  Counter Cash Drawer Balancing (Today)
+                </h3>
+                <span class="badge badge-info" id="closingDateLabel">Today</span>
+              </div>
+
+              <!-- System Calculated Balancing Ledger -->
+              <table class="cms-fee-particulars-table" style="margin-bottom: 1.25rem;">
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600;">Opening Drawer Cash Balance</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; font-size: 0.95rem;" id="sysOpeningCash">₹25,000.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: #15803D;">+ Total Cash Collections Today (Verified Receipts)</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #15803D; font-size: 0.95rem;" id="sysCashIn">+ ₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: #BE123C;">- Total Cash Expenses &amp; Petty Payouts Today</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #BE123C; font-size: 0.95rem;" id="sysCashOut">- ₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: #D97706;">- Cash Deposited into Institutional Bank (Contra)</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #D97706; font-size: 0.95rem;" id="sysBankDeposit">- ₹0.00</td>
+                  </tr>
+                  <tr style="background: #F8FAFC; border-top: 2px solid #CBD5E1;">
+                    <td style="font-weight: 800; font-size: 1rem; color: #0F172A;">SYSTEM EXPECTED CLOSING CASH</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 900; font-size: 1.15rem; color: #0F172A;" id="sysExpectedClosing">₹25,000.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Live Physical Variance Alert Banner -->
+              <div id="varianceBanner" class="variance-box-ok" style="margin-bottom: 1.25rem;">
+                <div>
+                  <div style="font-weight: 800; font-size: 1rem;" id="varianceStatusTitle">Physical Cash Perfectly Balanced</div>
+                  <div style="font-size: 0.82rem; margin-top: 0.2rem;" id="varianceStatusSub">Zero discrepancy between physical vault currency and system transactions.</div>
+                </div>
+                <div style="font-size: 1.35rem; font-weight: 900; font-family: monospace;" id="varianceAmount">₹0.00</div>
+              </div>
+
+              <!-- Mandatory Discrepancy Note (Shown if variance != 0) -->
+              <div id="discrepancyWrap" style="display: none; margin-bottom: 1rem;">
+                <label class="form-label" style="color: #BE123C; font-weight: 700;">
+                  ⚠ Mandatory Audit Explanation for Cash Discrepancy *
+                </label>
+                <textarea id="discrepancyReason" class="form-control" rows="2" placeholder="Explain reason for cash excess / shortfall (required by Auditor & Accounts Head)..."></textarea>
+              </div>
+
+              <!-- Action Submission Button -->
+              <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button type="button" class="btn btn-secondary" onclick="cashBank.resetDenominations()">
+                  Reset Counter
+                </button>
+                <button type="button" class="btn btn-primary" onclick="cashBank.submitDailyClosing()" style="font-weight: 700;">
+                  🔒 Record Official Daily Cash Closing
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: Physical Denomination Counter (Requirement 18) -->
+            <div class="card" style="padding: 1.5rem;">
+              <h3 style="margin: 0 0 1rem 0; font-size: 1.15rem; color: #0F172A; display: flex; align-items: center; justify-content: space-between;">
+                <span>Physical Denomination Count</span>
+                <span style="font-size: 0.8rem; font-weight: 600; color: #64748B;">INR (₹)</span>
+              </h3>
+
+              <table class="denom-table">
+                <thead>
+                  <tr>
+                    <th>Denomination</th>
+                    <th style="width: 110px; text-align: center;">Notes / Count</th>
+                    <th style="text-align: right;">Total Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>₹500 Note</strong></td>
+                    <td><input type="number" id="d500" value="50" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="sub500">₹25,000.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>₹200 Note</strong></td>
+                    <td><input type="number" id="d200" value="0" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="sub200">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>₹100 Note</strong></td>
+                    <td><input type="number" id="d100" value="0" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="sub100">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>₹50 Note</strong></td>
+                    <td><input type="number" id="d50" value="0" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="sub50">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>₹20 Note</strong></td>
+                    <td><input type="number" id="d20" value="0" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="sub20">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>₹10 Note</strong></td>
+                    <td><input type="number" id="d10" value="0" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="sub10">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Coins &amp; Loose Cash</strong></td>
+                    <td><input type="number" id="dCoins" value="0" min="0" oninput="cashBank.calculatePhysicalTotal()"></td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700;" id="subCoins">₹0.00</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr style="background: #F1F5F9;">
+                    <th colspan="2" style="font-size: 0.95rem; text-align: right;">PHYSICAL COUNTED TOTAL:</th>
+                    <th style="text-align: right; font-family: monospace; font-size: 1.15rem; color: #0F172A;" id="physicalTotalLabel">₹25,000.00</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recent Daily Cash Closings History -->
+          <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+              <div class="card-title">Audit Log of Daily Cash Drawer Closings</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Closing Date</th>
+                      <th>Closed By Staff</th>
+                      <th style="text-align: right;">Opening Cash</th>
+                      <th style="text-align: right;">Cash In</th>
+                      <th style="text-align: right;">Cash Out</th>
+                      <th style="text-align: right;">Physical Count</th>
+                      <th style="text-align: center;">Variance</th>
+                      <th style="text-align: center;">Audit Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cashClosingHistoryTbody">
+                    <tr><td colspan="8" style="text-align: center; padding: 2rem; color: #64748B;">Loading cash closing history...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: INSTITUTIONAL BANK ACCOUNTS (Requirement 19) -->
+        <div id="sectionBank" style="display: none;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;" id="bankAccountsCardsWrap">
+            <!-- Dynamic bank accounts will be loaded here -->
+          </div>
+
+          <!-- Bank Transactions Register -->
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div class="card-title">Institutional Bank Accounts Direct Feed &amp; Deposit Log</div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary btn-sm" onclick="ui.showToast('Bank statements refreshed from institutional API.', 'success')">
+                  🔄 Refresh Bank Feeds
+                </button>
+              </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Value Date</th>
+                      <th>Institutional Account</th>
+                      <th>Txn Reference / UTR</th>
+                      <th>Narration / Beneficiary</th>
+                      <th style="text-align: right;">Deposit (Cr)</th>
+                      <th style="text-align: right;">Withdrawal (Dr)</th>
+                      <th style="text-align: center;">Reconciled</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bankTxnsTbody">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: BANK RECONCILIATION STATEMENT (BRS) (Requirement 20) -->
+        <div id="sectionBrs" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;">
+            <!-- Left: BRS Summary Statement -->
+            <div class="card" style="padding: 1.5rem;">
+              <h3 style="margin: 0 0 1rem 0; font-size: 1.15rem; color: #0F172A;">
+                Bank Reconciliation Statement (BRS) as on Today
+              </h3>
+              <table class="cms-fee-particulars-table">
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600;">Balance as per College ERP Ledger</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 800; font-size: 1.05rem;" id="brsErpBalance">₹42,85,600.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: #15803D;">+ Cheques / DDs deposited into bank but not credited</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #15803D;">+ ₹1,15,000.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: #BE123C;">- Cheques issued to vendors but not presented for payment</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #BE123C;">- ₹45,000.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: #D97706;">+ Direct Online Gateway student deposits in transit</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #D97706;">+ ₹28,400.00</td>
+                  </tr>
+                  <tr style="background: #F8FAFC; border-top: 2px solid #CBD5E1;">
+                    <td style="font-weight: 900; font-size: 1.05rem; color: #0F172A;">BALANCE AS PER OFFICIAL BANK PASSBOOK</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: 900; font-size: 1.2rem; color: #0284C7;" id="brsBankBalance">₹43,84,000.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+                <button class="btn btn-secondary btn-sm" onclick="window.print()">
+                  🖨 Print Official BRS Report
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: Unreconciled Items List -->
+            <div class="card" style="padding: 1.5rem;">
+              <h3 style="margin: 0 0 1rem 0; font-size: 1.15rem; color: #0F172A; display: flex; justify-content: space-between; align-items: center;">
+                <span>Unreconciled Clearing Queue</span>
+                <span class="badge badge-warning">3 Pending</span>
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="unreconciledItemsWrap">
+                <!-- Dynamically rendered -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script src="/js/cashBank.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      navigation.init('cash-bank');
+      await cashBank.init();
+    });
+  </script>
+</body>
+</html>
