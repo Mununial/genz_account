@@ -1269,6 +1269,12 @@ const studentPortal = {
             studentRegNo: s.reg_no || '',
             invoiceId: String(invoiceId || '')
           },
+          method: {
+            upi: true,
+            card: true,
+            netbanking: true,
+            wallet: true
+          },
           theme: {
             color: '#006644'
           },
@@ -3507,6 +3513,12 @@ const studentPortal = {
             notes: {
               registrationId: String(regId),
               college: 'BEC Bhubaneswar'
+            },
+            method: {
+              upi: true,
+              card: true,
+              netbanking: true,
+              wallet: true
             },
             theme: {
               color: '#006644'
