@@ -66,8 +66,9 @@ ON DUPLICATE KEY UPDATE `is_current` = VALUES(`is_current`);
 -- 5. COURSES
 INSERT INTO `courses` (`id`, `code`, `name`, `duration_years`) VALUES
 (1, 'B.TECH', 'Bachelor of Technology', 4),
-(2, 'M.TECH', 'Master of Technology', 2),
-(3, 'MBA', 'Master of Business Administration', 2)
+(2, 'DIPLOMA', 'Diploma in Engineering', 3),
+(3, 'MBA', 'Master of Business Administration', 2),
+(4, 'M.TECH', 'Master of Technology', 2)
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
 
 -- 6. BRANCHES
@@ -79,7 +80,15 @@ INSERT INTO `branches` (`id`, `course_id`, `code`, `name`) VALUES
 (5, 1, 'MECH', 'Mechanical Engineering'),
 (6, 1, 'AERO', 'Aeronautical Engineering'),
 (7, 1, 'CIVIL', 'Civil Engineering'),
-(8, 1, 'ECE', 'Electronics & Communication Engineering')
+(8, 1, 'ECE', 'Electronics & Communication Engineering'),
+(9, 1, 'FOOD', 'Food Engineering'),
+(12, 3, 'MBA_FIN', 'MBA Finance'),
+(13, 3, 'MBA_MKT', 'MBA Marketing'),
+(14, 3, 'MBA_HR', 'MBA Human Resource'),
+(15, 3, 'MBA_AGRI', 'MBA Agri-Business'),
+(16, 2, 'DIP_CIVIL', 'Diploma Civil Engineering'),
+(17, 2, 'DIP_MECH', 'Diploma Mechanical Engineering'),
+(18, 2, 'DIP_EE', 'Diploma Electrical Engineering')
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
 
 -- 7. SEMESTERS

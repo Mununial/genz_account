@@ -185,6 +185,7 @@ async function getStudents(req, res) {
     const dataParams = [...params, parseInt(limit, 10), parseInt(offset, 10)];
     const [students] = await query(
       `SELECT s.id, s.reg_no, s.roll_no, s.full_name, s.gender, s.dob, s.category, s.admission_year, s.phone,
+              s.photo_url,
               b.name AS branch_name, b.code AS branch_code,
               sem.label AS semester_label, u.email, u.is_active,
               COALESCE(SUM(i.total_payable), 0) AS total_billed,
@@ -196,7 +197,7 @@ async function getStudents(req, res) {
        JOIN semesters sem ON s.current_semester_id = sem.id
        LEFT JOIN invoices i ON i.student_id = s.id AND i.status != 'CANCELLED'
        ${where}
-       GROUP BY s.id, s.reg_no, s.roll_no, s.full_name, s.gender, s.dob, s.category, s.admission_year, s.phone, b.name, b.code, sem.label, u.email, u.is_active
+       GROUP BY s.id, s.reg_no, s.roll_no, s.full_name, s.gender, s.dob, s.category, s.admission_year, s.phone, s.photo_url, b.name, b.code, sem.label, u.email, u.is_active
        ORDER BY s.id ASC
        LIMIT ? OFFSET ?`,
       dataParams
@@ -317,24 +318,224 @@ async function getAuditLogs(req, res) {
 /**
  * User Accounts Management
  * GET /api/admin/users
- * POST /api/admin/users/:id/status
+/**
+ * MASTER CONTROL MANAGEMENT (Roles, Users, Credentials, Profiles)
  */
+async function getRoles(req, res) {
+  try {
+    const [roles] = await query(`SELECT * FROM roles ORDER BY id ASC`);
+    return success(res, roles, 'Roles loaded.');
+  } catch (err) {
+    return error(res, 'Failed to load roles.', 500);
+  }
+}
+
 async function getUsers(req, res) {
   try {
+    const { search, role_id, role_name, limit = 500, page = 1 } = req.query;
+    let where = 'WHERE 1=1';
+    const params = [];
+
+    if (role_id) {
+      where += ' AND u.role_id = ?';
+      params.push(parseInt(role_id, 10));
+    } else if (role_name) {
+      where += ' AND r.name = ?';
+      params.push(role_name);
+    }
+
+    if (search) {
+      const term = `%${search.trim().toLowerCase()}%`;
+      where += ' AND (LOWER(u.email) LIKE ? OR LOWER(s.full_name) LIKE ? OR LOWER(st.full_name) LIKE ? OR LOWER(s.reg_no) LIKE ? OR LOWER(s.roll_no) LIKE ?)';
+      params.push(term, term, term, term, term);
+    }
+
     const [users] = await query(`
       SELECT u.id, u.email, u.role_id, u.is_active, u.last_login_at, u.created_at,
              r.name AS role_name,
-             COALESCE(s.full_name, st.full_name, 'System') AS full_name
+             COALESCE(s.full_name, st.full_name, 'System') AS full_name,
+             COALESCE(s.reg_no, st.staff_code, '') AS code,
+             COALESCE(s.roll_no, '') AS roll_no,
+             COALESCE(st.department, b.name, '') AS department,
+             COALESCE(s.phone, st.phone, '') AS phone,
+             s.id AS student_id,
+             st.id AS staff_id
+      FROM users u
+      JOIN roles r ON u.role_id = r.id
+      LEFT JOIN students s ON s.user_id = u.id
+      LEFT JOIN branches b ON s.branch_id = b.id
+      LEFT JOIN staff st ON st.user_id = u.id
+      ${where}
+      ORDER BY u.id ASC
+      LIMIT ? OFFSET ?
+    `, [...params, parseInt(limit, 10), (parseInt(page, 10) - 1) * parseInt(limit, 10)]);
+
+    const [countRows] = await query(`
+      SELECT COUNT(*) AS total
       FROM users u
       JOIN roles r ON u.role_id = r.id
       LEFT JOIN students s ON s.user_id = u.id
       LEFT JOIN staff st ON st.user_id = u.id
-      ORDER BY u.id ASC
-    `);
+      ${where}
+    `, params);
 
-    return success(res, users, 'Users retrieved.');
+    return success(res, {
+      users,
+      total: countRows[0].total,
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10)
+    }, 'Users retrieved.');
   } catch (err) {
+    console.error('getUsers error:', err);
     return error(res, 'Failed to load users.', 500);
+  }
+}
+
+async function createUser(req, res) {
+  const { email, password, role_id, full_name, department, phone } = req.body;
+
+  if (!email || !password || !role_id) {
+    return error(res, 'Email, password, and role are required.', 400);
+  }
+
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const [existing] = await query(`SELECT id FROM users WHERE email = ? LIMIT 1`, [cleanEmail]);
+    if (existing.length > 0) {
+      return error(res, 'A user account with this email already exists.', 409);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const [insertResult] = await query(
+      `INSERT INTO users (email, password_hash, role_id, is_active, must_change_password)
+       VALUES (?, ?, ?, 1, 0)`,
+      [cleanEmail, passwordHash, parseInt(role_id, 10)]
+    );
+    const newUserId = insertResult.insertId;
+
+    if (parseInt(role_id, 10) !== 1) {
+      const staffCode = `STF-${newUserId.toString().padStart(4, '0')}`;
+      await query(
+        `INSERT INTO staff (user_id, staff_code, full_name, department, phone)
+         VALUES (?, ?, ?, ?, ?)`,
+        [newUserId, staffCode, full_name || cleanEmail.split('@')[0], department || 'Operations', phone || '']
+      );
+    }
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'USER_CREATED',
+      module: 'USER_MANAGEMENT',
+      recordId: newUserId,
+      reason: `Created user ${cleanEmail} with role ID ${role_id}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, { id: newUserId, email: cleanEmail }, 'User account created successfully.', 201);
+  } catch (err) {
+    console.error('createUser error:', err);
+    return error(res, 'Failed to create user account.', 500);
+  }
+}
+
+async function updateUser(req, res) {
+  const userId = parseInt(req.params.id, 10);
+  const { email, role_id, is_active, full_name, department, phone, password } = req.body;
+
+  try {
+    const [uRows] = await query(`SELECT * FROM users WHERE id = ? LIMIT 1`, [userId]);
+    if (!uRows.length) return error(res, 'User not found.', 404);
+
+    let updateFields = [];
+    let updateParams = [];
+
+    if (email) {
+      updateFields.push('email = ?');
+      updateParams.push(email.trim().toLowerCase());
+    }
+    if (role_id !== undefined) {
+      updateFields.push('role_id = ?');
+      updateParams.push(parseInt(role_id, 10));
+    }
+    if (is_active !== undefined) {
+      updateFields.push('is_active = ?');
+      updateParams.push(is_active ? 1 : 0);
+    }
+    if (password && password.trim()) {
+      const hash = await bcrypt.hash(password.trim(), 10);
+      updateFields.push('password_hash = ?');
+      updateParams.push(hash);
+    }
+
+    if (updateFields.length > 0) {
+      updateFields.push('updated_at = NOW()');
+      updateParams.push(userId);
+      await query(`UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`, updateParams);
+    }
+
+    // Update staff profile if exists
+    const [stRows] = await query(`SELECT id FROM staff WHERE user_id = ? LIMIT 1`, [userId]);
+    if (stRows.length > 0) {
+      await query(
+        `UPDATE staff SET full_name = COALESCE(?, full_name), department = COALESCE(?, department), phone = COALESCE(?, phone), updated_at = NOW() WHERE user_id = ?`,
+        [full_name, department, phone, userId]
+      );
+    }
+
+    // Update student profile if exists
+    const [sRows] = await query(`SELECT id FROM students WHERE user_id = ? LIMIT 1`, [userId]);
+    if (sRows.length > 0) {
+      await query(
+        `UPDATE students SET full_name = COALESCE(?, full_name), phone = COALESCE(?, phone), updated_at = NOW() WHERE user_id = ?`,
+        [full_name, phone, userId]
+      );
+    }
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'USER_UPDATED',
+      module: 'USER_MANAGEMENT',
+      recordId: userId,
+      reason: `Updated user account details (ID: ${userId})`,
+      ipAddress: req.ip
+    });
+
+    return success(res, null, 'User updated successfully.');
+  } catch (err) {
+    console.error('updateUser error:', err);
+    return error(res, 'Failed to update user.', 500);
+  }
+}
+
+async function changeUserPassword(req, res) {
+  const userId = parseInt(req.params.id, 10);
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.trim().length < 3) {
+    return error(res, 'Password must be at least 3 characters long.', 400);
+  }
+
+  try {
+    const hash = await bcrypt.hash(newPassword.trim(), 10);
+    const [result] = await query(`UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?`, [hash, userId]);
+    if (result.affectedRows === 0) return error(res, 'User not found.', 404);
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'PASSWORD_RESET',
+      module: 'USER_MANAGEMENT',
+      recordId: userId,
+      reason: `Administrator reset password for User ID ${userId}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, null, `Password successfully changed to "${newPassword.trim()}".`);
+  } catch (err) {
+    console.error('changeUserPassword error:', err);
+    return error(res, 'Failed to reset password.', 500);
   }
 }
 
@@ -358,6 +559,93 @@ async function updateUserStatus(req, res) {
     return success(res, null, 'User status updated.');
   } catch (err) {
     return error(res, 'Failed to update user status.', 500);
+  }
+}
+
+async function changeStudentPassword(req, res) {
+  const studentId = parseInt(req.params.id, 10);
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.trim().length < 3) {
+    return error(res, 'Password must be at least 3 characters long.', 400);
+  }
+
+  try {
+    const [st] = await query(`SELECT user_id, full_name, reg_no FROM students WHERE id = ? LIMIT 1`, [studentId]);
+    if (!st.length) return error(res, 'Student not found.', 404);
+
+    const hash = await bcrypt.hash(newPassword.trim(), 10);
+    await query(`UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?`, [hash, st[0].user_id]);
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'STUDENT_PASSWORD_RESET',
+      module: 'STUDENT_MANAGEMENT',
+      recordId: studentId,
+      reason: `Reset password for Student ${st[0].full_name} (${st[0].reg_no})`,
+      ipAddress: req.ip
+    });
+
+    return success(res, null, `Password updated for ${st[0].full_name}. New password: ${newPassword.trim()}`);
+  } catch (err) {
+    console.error('changeStudentPassword error:', err);
+    return error(res, 'Failed to update student password.', 500);
+  }
+}
+
+async function updateStudentProfile(req, res) {
+  const studentId = parseInt(req.params.id, 10);
+  const { full_name, reg_no, roll_no, phone, email, current_semester_id, branch_id, password } = req.body;
+
+  try {
+    const [st] = await query(`SELECT user_id FROM students WHERE id = ? LIMIT 1`, [studentId]);
+    if (!st.length) return error(res, 'Student not found.', 404);
+
+    await query(
+      `UPDATE students SET 
+         full_name = COALESCE(?, full_name),
+         reg_no = COALESCE(?, reg_no),
+         roll_no = COALESCE(?, roll_no),
+         phone = COALESCE(?, phone),
+         current_semester_id = COALESCE(?, current_semester_id),
+         branch_id = COALESCE(?, branch_id),
+         updated_at = NOW()
+       WHERE id = ?`,
+      [full_name, reg_no, roll_no, phone, current_semester_id, branch_id, studentId]
+    );
+
+    if (email || password) {
+      let uFields = [];
+      let uParams = [];
+      if (email) {
+        uFields.push('email = ?');
+        uParams.push(email.trim().toLowerCase());
+      }
+      if (password && password.trim()) {
+        const hash = await bcrypt.hash(password.trim(), 10);
+        uFields.push('password_hash = ?');
+        uParams.push(hash);
+      }
+      uFields.push('updated_at = NOW()');
+      uParams.push(st[0].user_id);
+      await query(`UPDATE users SET ${uFields.join(', ')} WHERE id = ?`, uParams);
+    }
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'STUDENT_PROFILE_UPDATED',
+      module: 'STUDENT_MANAGEMENT',
+      recordId: studentId,
+      reason: `Updated master profile for student #${studentId}`,
+      ipAddress: req.ip
+    });
+
+    return success(res, null, 'Student profile updated successfully.');
+  } catch (err) {
+    console.error('updateStudentProfile error:', err);
+    return error(res, 'Failed to update student profile.', 500);
   }
 }
 
@@ -827,6 +1115,12 @@ module.exports = {
   getAuditLogs,
   getUsers,
   updateUserStatus,
+  getRoles,
+  createUser,
+  updateUser,
+  changeUserPassword,
+  changeStudentPassword,
+  updateStudentProfile,
   getUniversalTransactions,
   getCashClosing,
   recordCashClosing,

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Control Console - Bhubaneswar Engineering College</title>
+  <meta name="description" content="Super Admin Master Control Console: Edit All Roles, IDs, Passwords, Student Credentials, Registration Windows, and System Permissions.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/becReal.css">
+  <link rel="stylesheet" href="/css/studentCms.css">
+  <style>
+    .master-tab-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid #E2E8F0;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+    .master-tab-btn {
+      background: none;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #64748B;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .master-tab-btn:hover {
+      color: #1E40AF;
+    }
+    .master-tab-btn.active {
+      color: #1E40AF;
+      border-bottom-color: #1E40AF;
+      background: #EFF6FF;
+      border-radius: 6px 6px 0 0;
+    }
+    .master-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .master-stat-card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .master-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .action-btn-group {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/master-control.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC MASTER ADMIN</span>
+            <span class="brand-subtitle">System Control Console</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup"></div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">⚡</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">Super Administrator</div>
+            <div class="user-role-tag" id="userDisplayRole">MASTER_ADMIN</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="page-title" style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              <span>⚡ Master Control Console</span>
+              <span class="badge" style="background: #FEF3C7; color: #92400E; font-size: 0.75rem; border: 1px solid #FCD34D;">Total System Access</span>
+            </h1>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
+              Edit All Roles, IDs, Passwords, Permissions, and Registration Windows on Live Database
+            </div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div id="topbarClock" class="topbar-clock">Loading live clock...</div>
+          <div class="session-badge">
+            <span class="session-dot"></span>
+            Hostinger Live MySQL
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="masterControl.openNewUserModal()">
+            + Provision New User
+          </button>
+          <button class="btn btn-ghost-danger btn-sm" onclick="auth.logout()" title="Exit Portal">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content" style="padding: 1.25rem 1.5rem;">
+        <!-- KPI Quick Stats Grid -->
+        <div class="master-stats-grid">
+          <div class="master-stat-card">
+            <div class="master-stat-icon" style="background: #EFF6FF; color: #2563EB;">👥</div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Total Registered Users</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: #0F172A;" id="statTotalUsers">370</div>
+              <div style="font-size: 0.75rem; color: #64748B;">Staff &amp; Students Cohort</div>
+            </div>
+          </div>
+          <div class="master-stat-card">
+            <div class="master-stat-icon" style="background: #F3E8FF; color: #9333EA;">🛡️</div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Configured Roles</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: #0F172A;" id="statTotalRoles">8 Roles</div>
+              <div style="font-size: 0.75rem; color: #64748B;">RBAC Granular Hierarchy</div>
+            </div>
+          </div>
+          <div class="master-stat-card">
+            <div class="master-stat-icon" style="background: #ECFDF5; color: #059669;">🎓</div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Total Real Students</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: #059669;" id="statTotalStudents">354</div>
+              <div style="font-size: 0.75rem; color: #64748B;">All Active in Live DB</div>
+            </div>
+          </div>
+          <div class="master-stat-card">
+            <div class="master-stat-icon" style="background: #FEF3C7; color: #D97706;">🗄️</div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Hostinger MySQL DB</div>
+              <div style="font-size: 1.15rem; font-weight: 800; color: #0F172A;">CONNECTED</div>
+              <div style="font-size: 0.75rem; color: #059669;">srv1334.hstgr.io</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Tabs Nav -->
+        <div class="master-tab-nav">
+          <button type="button" class="master-tab-btn active" id="tabBtnUsers" onclick="masterControl.switchTab('users')">
+            👥 System Users &amp; Roles Master
+          </button>
+          <button type="button" class="master-tab-btn" id="tabBtnStudents" onclick="masterControl.switchTab('students')">
+            🎓 Student Credentials &amp; Profiles
+          </button>
+          <button type="button" class="master-tab-btn" id="tabBtnWindows" onclick="masterControl.switchTab('windows')">
+            📅 Semester Registration Windows
+          </button>
+          <button type="button" class="master-tab-btn" id="tabBtnRbac" onclick="masterControl.switchTab('rbac')">
+            🛡️ RBAC Permissions Matrix
+          </button>
+          <button type="button" class="master-tab-btn" id="tabBtnAudit" onclick="masterControl.switchTab('audit')">
+            📋 Live Audit Trail
+          </button>
+        </div>
+
+        <!-- TAB 1: USERS & ROLES MASTER -->
+        <div id="sectionUsers" style="display: block;">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <div class="card-title">User Accounts Master Control</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                  View, edit, change passwords, and toggle active status for any staff or administrative account.
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <!-- Filter by Role -->
+                <select id="userRoleFilter" class="form-control form-select" style="width: auto; min-width: 170px;" onchange="masterControl.loadUsers()">
+                  <option value="">All Roles</option>
+                  <option value="ADMIN">Super Admin (ADMIN)</option>
+                  <option value="ACCOUNTS_HEAD">Accounts Head</option>
+                  <option value="ACCOUNTS_STAFF">Accounts Staff</option>
+                  <option value="CASHIER">Cashier</option>
+                  <option value="EXAM_CELL">Exam Section</option>
+                  <option value="HOD">Head of Department (HOD)</option>
+                  <option value="DIRECTOR">Director / Principal</option>
+                  <option value="AUDITOR_READ_ONLY">Auditor</option>
+                  <option value="STUDENT">Student Cohort</option>
+                </select>
+                <!-- Search Box -->
+                <input type="text" id="userSearchInput" class="form-control" placeholder="Search by Name, Email, or ID..." style="width: 250px;" oninput="masterControl.debounceSearchUsers()">
+                <button class="btn btn-primary btn-sm" onclick="masterControl.openNewUserModal()">
+                  + Add User
+                </button>
+              </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">ID</th>
+                      <th>User &amp; Email</th>
+                      <th>Assigned Role</th>
+                      <th>Department / Code</th>
+                      <th>Account Status</th>
+                      <th>Last Login</th>
+                      <th style="text-align: right; width: 220px;">Master Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersMasterTbody">
+                    <tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);"><span class="spinner"></span> Loading users from live database...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: STUDENT CREDENTIALS & PROFILE MASTER -->
+        <div id="sectionStudents" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <div class="card-title">Student Credentials &amp; Profile Master</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                  Search any student, inspect their login email &amp; credentials, edit their profile, or set a new custom password.
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" id="studentSearchInput" class="form-control" placeholder="Search by Roll No, Reg No, or Name..." style="width: 320px;" oninput="masterControl.debounceSearchStudents()">
+              </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">ID</th>
+                      <th>Roll No / Reg No</th>
+                      <th>Student Full Name</th>
+                      <th>Branch &amp; Semester</th>
+                      <th>Login Email</th>
+                      <th>DOB (Passcode)</th>
+                      <th style="text-align: right; width: 200px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="studentsMasterTbody">
+                    <tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);"><span class="spinner"></span> Loading student credentials...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: SEMESTER REGISTRATION WINDOWS -->
+        <div id="sectionWindows" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div>
+                <div class="card-title">Semester Registration Master Windows (Sem 1 to 8)</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                  Turn ON or LOCK registration windows for each semester. When locked, students cannot apply for that semester.
+                </div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="masterControl.loadWindows()">
+                Refresh Windows
+              </button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Semester</th>
+                      <th>Academic Year</th>
+                      <th>Window Status</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>Late Fine</th>
+                      <th style="text-align: right;">Master Toggle</th>
+                    </tr>
+                  </thead>
+                  <tbody id="windowsMasterTbody">
+                    <tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);"><span class="spinner"></span> Loading registration windows...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: RBAC MATRIX -->
+        <div id="sectionRbac" style="display: none;">
+          <div class="card" style="padding: 1.5rem;">
+            <div style="margin-bottom: 1.25rem;">
+              <h3 style="margin: 0 0 0.35rem 0; font-size: 1.15rem; color: #0F172A;">
+                8-Role Institutional RBAC Permissions Matrix
+              </h3>
+              <p style="font-size: 0.85rem; color: #64748B; margin: 0;">
+                Pre-configured operational authority for Bhubaneswar Engineering College roles.
+              </p>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Operational Capability</th>
+                    <th>Super Admin</th>
+                    <th>Accounts Head</th>
+                    <th>Accounts Staff</th>
+                    <th>Cashier</th>
+                    <th>Exam Cell</th>
+                    <th>HOD</th>
+                    <th>Director</th>
+                    <th>Auditor</th>
+                  </tr>
+                </thead>
+                <tbody id="rbacMatrixTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: AUDIT TRAIL -->
+        <div id="sectionAudit" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div class="card-title">Immutable Security &amp; Change Audit Trail</div>
+              <button class="btn btn-outline btn-sm" onclick="masterControl.loadAuditLogs()">Refresh Audit</button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Actor &amp; Role</th>
+                      <th>Action</th>
+                      <th>Module</th>
+                      <th>Details &amp; Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditMasterTbody">
+                    <tr><td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading audit logs...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: EDIT USER & ROLE -->
+  <div id="editUserModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title">Edit User Account &amp; Role</div>
+        <button class="modal-close-btn" onclick="ui.closeModal('editUserModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label class="form-label" for="editUserFullName">Full Name</label>
+          <input type="text" id="editUserFullName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editUserEmail">Email Address (Login ID)</label>
+          <input type="email" id="editUserEmail" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editUserRole">System Role</label>
+          <select id="editUserRole" class="form-control form-select" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editUserDepartment">Department / Office</label>
+          <input type="text" id="editUserDepartment" class="form-control" placeholder="e.g. Accounts & Finance, Mechanical Engg">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editUserPhone">Contact Phone</label>
+          <input type="text" id="editUserPhone" class="form-control" placeholder="+91-...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editUserActive">Account Status</label>
+          <select id="editUserActive" class="form-control form-select">
+            <option value="1">Active (Can Login)</option>
+            <option value="0">Deactivated (Blocked)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="ui.closeModal('editUserModal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="masterControl.submitEditUser()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: INSTANT PASSWORD CHANGER -->
+  <div id="changePasswordModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header" style="background: #1E3A8A; color: #fff;">
+        <div class="modal-title" style="color: #fff;">🔑 Set New User Password</div>
+        <button class="modal-close-btn" onclick="ui.closeModal('changePasswordModal')" style="color: #fff;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem;">
+        <input type="hidden" id="pwdUserId">
+        <input type="hidden" id="pwdIsStudent" value="0">
+        <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.8rem; color: #1E40AF; font-weight: 700;">Target Account:</div>
+          <div style="font-size: 1.05rem; font-weight: 800; color: #0F172A;" id="pwdTargetUserName">-</div>
+          <div style="font-size: 0.82rem; color: #475569;" id="pwdTargetUserEmail">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newCustomPassword">Type New Password Directly</label>
+          <div style="position: relative;">
+            <input type="text" id="newCustomPassword" class="form-control" placeholder="e.g. 123456, Admin@2026, Pass@123" style="font-family: monospace; font-size: 1.1rem; font-weight: 700; padding-right: 80px;" required>
+            <button type="button" class="btn btn-sm btn-outline" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;" onclick="document.getElementById('newCustomPassword').value = '123456'">Set 123456</button>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            This will immediately update the database password hash with bcrypt. The user can log in with this new password right away.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="ui.closeModal('changePasswordModal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="masterControl.submitChangePassword()" style="background: #1E40AF;">Update Password Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PROVISION NEW USER -->
+  <div id="newUserModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title">Provision New User Account</div>
+        <button class="modal-close-btn" onclick="ui.closeModal('newUserModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="newFullName">Staff / User Full Name</label>
+          <input type="text" id="newFullName" class="form-control" placeholder="e.g. Dr. Rajesh Kumar Mohapatra" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newEmail">Institutional Email (Login Username)</label>
+          <input type="email" id="newEmail" class="form-control" placeholder="e.g. rajesh.mohapatra@bec.ac.in" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newPassword">Password</label>
+          <input type="text" id="newPassword" class="form-control" placeholder="e.g. 123456, Staff@BEC2026!" value="123456" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newRole">System Role</label>
+          <select id="newRole" class="form-control form-select" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newDepartment">Department</label>
+          <input type="text" id="newDepartment" class="form-control" placeholder="e.g. Computer Science, Accounts Office">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newPhone">Phone Number</label>
+          <input type="text" id="newPhone" class="form-control" placeholder="+91-...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="ui.closeModal('newUserModal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="masterControl.submitNewUser()">Create Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT STUDENT PROFILE -->
+  <div id="editStudentModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <div class="modal-title">Edit Student Master Record</div>
+        <button class="modal-close-btn" onclick="ui.closeModal('editStudentModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editStudentId">
+        <div class="form-group">
+          <label class="form-label" for="editStudentFullName">Student Full Name</label>
+          <input type="text" id="editStudentFullName" class="form-control" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="editStudentRegNo">Registration No</label>
+            <input type="text" id="editStudentRegNo" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editStudentRollNo">Roll No</label>
+            <input type="text" id="editStudentRollNo" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editStudentEmail">Login Email</label>
+          <input type="email" id="editStudentEmail" class="form-control" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="editStudentBranch">Branch</label>
+            <select id="editStudentBranch" class="form-control form-select"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editStudentSemester">Current Semester</label>
+            <select id="editStudentSemester" class="form-control form-select">
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+              <option value="3">3rd Semester</option>
+              <option value="4">4th Semester</option>
+              <option value="5">5th Semester</option>
+              <option value="6">6th Semester</option>
+              <option value="7">7th Semester</option>
+              <option value="8">8th Semester</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editStudentPhone">Phone Number</label>
+          <input type="text" id="editStudentPhone" class="form-control">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="ui.closeModal('editStudentModal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="masterControl.submitEditStudent()">Save Student Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script src="/js/masterControl.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      navigation.init('master-control');
+      masterControl.init();
+    });
+  </script>
+</body>
+</html>

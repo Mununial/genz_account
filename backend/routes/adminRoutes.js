@@ -130,9 +130,16 @@ router.get(
   adminController.getAuditLogs
 );
 
-// User Accounts Management
-router.get('/users', requireRole('ADMIN'), adminController.getUsers);
+// Master Control & User Accounts Management
+router.get('/roles', requireRole('ADMIN', 'ACCOUNTS_HEAD'), adminController.getRoles);
+router.get('/users', requireRole('ADMIN', 'ACCOUNTS_HEAD'), adminController.getUsers);
+router.post('/users', requireRole('ADMIN'), adminController.createUser);
+router.put('/users/:id', requireRole('ADMIN'), adminController.updateUser);
+router.post('/users/:id/password', requireRole('ADMIN'), adminController.changeUserPassword);
 router.post('/users/:id/status', requireRole('ADMIN'), adminController.updateUserStatus);
+router.patch('/users/:id/status', requireRole('ADMIN'), adminController.updateUserStatus);
+router.put('/students/:id/profile', requireRole('ADMIN'), adminController.updateStudentProfile);
+router.post('/students/:id/password', requireRole('ADMIN'), adminController.changeStudentPassword);
 
 // Universal Transaction Search
 router.get(

@@ -19,7 +19,10 @@ class MockDatabase {
       { id: 2, name: 'ACCOUNTS_STAFF', description: 'Accounts operations staff' },
       { id: 3, name: 'ACCOUNTS_HEAD', description: 'Accounts executive' },
       { id: 4, name: 'ADMIN', description: 'System Administrator' },
-      { id: 5, name: 'AUDITOR_READ_ONLY', description: 'Financial auditor' }
+      { id: 5, name: 'AUDITOR_READ_ONLY', description: 'Financial auditor' },
+      { id: 6, name: 'HOD', description: 'Head of Department' },
+      { id: 7, name: 'DIRECTOR', description: 'College Director' },
+      { id: 8, name: 'EXAM_CELL', description: 'College Examination Section' }
     ];
     this.academicSessions = [
       { id: 1, name: '2026-27', is_current: 1 },
@@ -105,6 +108,16 @@ class MockDatabase {
     ];
     this.notifications = [];
     this.auditLogs = [];
+    this.registrationWindows = [
+      { id: 1, academic_year: '2026-27', semester: 1, is_open: 1, status: 'OPEN', label: '1st Semester (Admission Auto-Enrolled)', auto_enrolled: 1 },
+      { id: 2, academic_year: '2026-27', semester: 2, is_open: 1, status: 'OPEN', label: '2nd Semester (Active Regular Window)', auto_enrolled: 0 },
+      { id: 3, academic_year: '2026-27', semester: 3, is_open: 0, status: 'LOCKED', label: '3rd Semester (Upcoming Cycle)', auto_enrolled: 0 },
+      { id: 4, academic_year: '2026-27', semester: 4, is_open: 0, status: 'LOCKED', label: '4th Semester (Upcoming Cycle)', auto_enrolled: 0 },
+      { id: 5, academic_year: '2026-27', semester: 5, is_open: 0, status: 'LOCKED', label: '5th Semester (Upcoming Cycle)', auto_enrolled: 0 },
+      { id: 6, academic_year: '2026-27', semester: 6, is_open: 0, status: 'LOCKED', label: '6th Semester (Upcoming Cycle)', auto_enrolled: 0 },
+      { id: 7, academic_year: '2026-27', semester: 7, is_open: 0, status: 'LOCKED', label: '7th Semester (Upcoming Cycle)', auto_enrolled: 0 },
+      { id: 8, academic_year: '2026-27', semester: 8, is_open: 0, status: 'LOCKED', label: '8th Semester (Upcoming Cycle)', auto_enrolled: 0 }
+    ];
     this.pickupPoints = [
       { id: 1, route_name: 'Route 1 - BBSR Central', location_name: 'Master Canteen', annual_fee: 18000.00, semester_fee: 9000.00 },
       { id: 2, route_name: 'Route 2 - NH16 South', location_name: 'Khandagiri Square', annual_fee: 16000.00, semester_fee: 8000.00 },
@@ -175,6 +188,126 @@ class MockDatabase {
       { id: 3, account_name: 'ICICI Bank (Salary & Escrow Reserve)', account_number: '018905008922', ifsc_code: 'ICIC0000189', branch: 'Master Canteen Square', balance: 2980000.00, account_type: 'ESCROW' }
     ];
     this.examRegistrations = [];
+
+    // =========================================================================
+    // DEPARTMENT-WISE ACADEMIC STRUCTURE (BPUT Real Standard)
+    // =========================================================================
+    this.programs = [
+      { id: 1, name: 'B.Tech', code: 'BTECH', duration_years: 4, total_semesters: 8 },
+      { id: 2, name: 'Diploma', code: 'DIP', duration_years: 3, total_semesters: 6 },
+      { id: 3, name: 'MBA', code: 'MBA', duration_years: 2, total_semesters: 4 }
+    ];
+
+    this.departments = [
+      // B.Tech
+      { id: 1, program_id: 1, code: 'CSE', name: 'Computer Science & Engineering', short_name: 'CSE', is_active: 1 },
+      { id: 2, program_id: 1, code: 'CSD', name: 'Computer Science & Data Science', short_name: 'CSD', is_active: 1 },
+      { id: 3, program_id: 1, code: 'MECH', name: 'Mechanical Engineering', short_name: 'MECH', is_active: 1 },
+      { id: 4, program_id: 1, code: 'AERO', name: 'Aeronautical Engineering', short_name: 'AERO', is_active: 1 },
+      { id: 5, program_id: 1, code: 'CIVIL', name: 'Civil Engineering', short_name: 'CIVIL', is_active: 1 },
+      { id: 6, program_id: 1, code: 'EEE', name: 'Electrical & Electronics Engineering', short_name: 'EEE', is_active: 1 },
+      { id: 7, program_id: 1, code: 'AGRI', name: 'Agriculture Engineering', short_name: 'AGRI', is_active: 1 },
+      // Diploma
+      { id: 8, program_id: 2, code: 'DIP-MECH', name: 'Diploma Mechanical Engineering', short_name: 'DIP-MECH', is_active: 1 },
+      { id: 9, program_id: 2, code: 'DIP-EEE', name: 'Diploma Electrical Engineering', short_name: 'DIP-EEE', is_active: 1 },
+      { id: 10, program_id: 2, code: 'DIP-CIVIL', name: 'Diploma Civil Engineering', short_name: 'DIP-CIVIL', is_active: 1 },
+      // MBA
+      { id: 11, program_id: 3, code: 'MBA', name: 'Master of Business Administration', short_name: 'MBA', is_active: 1 }
+    ];
+
+    this.departmentHods = [
+      { id: 1, department_id: 1, hod_user_id: 5, semester_range: '1-8' },
+      { id: 2, department_id: 2, hod_user_id: 6, semester_range: '1-8' },
+      { id: 3, department_id: 3, hod_user_id: 7, semester_range: '1-8' },
+      { id: 4, department_id: 4, hod_user_id: 8, semester_range: '1-8' },
+      { id: 5, department_id: 5, hod_user_id: 9, semester_range: '1-8' },
+      { id: 6, department_id: 6, hod_user_id: 10, semester_range: '1-8' },
+      { id: 7, department_id: 7, hod_user_id: 11, semester_range: '1-8' },
+      { id: 8, department_id: 8, hod_user_id: 12, semester_range: '1-6' },
+      { id: 9, department_id: 9, hod_user_id: 12, semester_range: '1-6' },
+      { id: 10, department_id: 10, hod_user_id: 12, semester_range: '1-6' },
+      { id: 11, department_id: 11, hod_user_id: 13, semester_range: '1-4' }
+    ];
+
+    // Subject Registration Module tables
+    this.subjects = [
+      // B.Tech CSE (Sem 1 & 5)
+      { id: 1, code: 'BPUT-M101', name: 'Engineering Mathematics - I', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 2, code: 'BPUT-PH101', name: 'Engineering Physics', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 3, code: 'BPUT-CH101', name: 'Engineering Chemistry', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 3, is_active: 1 },
+      { id: 4, code: 'BPUT-EG101', name: 'Engineering Graphics', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 4, is_active: 1 },
+      { id: 5, code: 'BPUT-CS101', name: 'Fundamentals of Computing', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 6, code: 'BPUT-EE101', name: 'Basic Electrical Engineering', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 6, is_active: 1 },
+      { id: 7, code: 'BPUT-PH191', name: 'Engineering Physics Lab', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 7, is_active: 1 },
+      { id: 8, code: 'BPUT-CH191', name: 'Engineering Chemistry Lab', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 8, is_active: 1 },
+      { id: 9, code: 'BPUT-CS191', name: 'Computing Fundamentals Lab', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 9, is_active: 1 },
+      { id: 10, code: 'BPUT-EG191', name: 'Engineering Graphics Lab', program_id: 1, department_id: 1, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 10, is_active: 1 },
+      { id: 11, code: 'BPUT-CS501E1', name: 'Machine Learning', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 3, type: 'ELECTIVE', sequence: 11, is_active: 1 },
+      { id: 12, code: 'BPUT-CS501E2', name: 'Cloud Computing', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 3, type: 'ELECTIVE', sequence: 12, is_active: 1 },
+      { id: 13, code: 'BPUT-CS501', name: 'Database Management Systems', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 14, code: 'BPUT-CS502', name: 'Operating Systems Architecture', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 15, code: 'BPUT-CS503', name: 'Computer Networks & Protocols', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 3, is_active: 1 },
+      { id: 16, code: 'BPUT-CS591', name: 'DBMS Practice Laboratory', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 2, type: 'LAB', sequence: 4, is_active: 1 },
+      { id: 17, code: 'BPUT-CS592', name: 'OS & Linux Kernel Lab', program_id: 1, department_id: 1, semester: 5, year: 3, credits: 2, type: 'LAB', sequence: 5, is_active: 1 },
+      // B.Tech CSE (Sem 2)
+      { id: 101, code: 'BPUT-M201', name: 'Engineering Mathematics - II', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 102, code: 'BPUT-DS201', name: 'Data Structures & Algorithms', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 103, code: 'BPUT-BE201', name: 'Basic Electronics Engineering', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 3, type: 'CORE', sequence: 3, is_active: 1 },
+      { id: 104, code: 'BPUT-ENG201', name: 'Communicative English', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 3, type: 'CORE', sequence: 4, is_active: 1 },
+      { id: 105, code: 'BPUT-EVS201', name: 'Environmental Studies & Green Tech', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 2, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 106, code: 'BPUT-DS291', name: 'Data Structures Practice Lab', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 6, is_active: 1 },
+      { id: 107, code: 'BPUT-BE291', name: 'Basic Electronics Laboratory', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 7, is_active: 1 },
+      { id: 108, code: 'BPUT-ENG291', name: 'English Communication Skills Lab', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 8, is_active: 1 },
+      { id: 109, code: 'BPUT-WS291', name: 'Manufacturing & Workshop Lab', program_id: 1, department_id: 1, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 9, is_active: 1 },
+      // B.Tech MECH (Sem 1)
+      { id: 21, code: 'BPUT-ME101', name: 'Thermodynamics & Heat Engines', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 22, code: 'BPUT-ME102', name: 'Engineering Mechanics (Statics & Dynamics)', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 23, code: 'BPUT-ME191', name: 'Central Workshop Practice Lab', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 3, is_active: 1 },
+      { id: 24, code: 'BPUT-M101M', name: 'Engineering Mathematics - I', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 4, is_active: 1 },
+      { id: 25, code: 'BPUT-PH101M', name: 'Engineering Physics', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 26, code: 'BPUT-EG101M', name: 'Engineering Graphics & CAD', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 6, is_active: 1 },
+      { id: 27, code: 'BPUT-PH191M', name: 'Physics Laboratory', program_id: 1, department_id: 3, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 7, is_active: 1 },
+      // B.Tech MECH (Sem 2 - Tushar Mhato)
+      { id: 201, code: 'BPUT-ME201', name: 'Material Science & Metallurgy', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 202, code: 'BPUT-ME202', name: 'Fluid Mechanics & Hydraulic Machines', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 203, code: 'BPUT-ME203', name: 'Basic Electronics & Sensors', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 3, type: 'CORE', sequence: 3, is_active: 1 },
+      { id: 204, code: 'BPUT-M201M', name: 'Engineering Mathematics - II', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 4, type: 'CORE', sequence: 4, is_active: 1 },
+      { id: 205, code: 'BPUT-ENG201M', name: 'Communicative English', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 3, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 206, code: 'BPUT-ME291', name: 'Material Testing & Metallurgy Lab', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 6, is_active: 1 },
+      { id: 207, code: 'BPUT-ME292', name: 'Fluid Mechanics Laboratory', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 7, is_active: 1 },
+      { id: 208, code: 'BPUT-ENG291M', name: 'English Communication Skills Lab', program_id: 1, department_id: 3, semester: 2, year: 1, credits: 2, type: 'LAB', sequence: 8, is_active: 1 },
+      // B.Tech CIVIL (Sem 1)
+      { id: 31, code: 'BPUT-CE101', name: 'Surveying & Geomatics', program_id: 1, department_id: 5, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 32, code: 'BPUT-CE102', name: 'Building Materials & Construction', program_id: 1, department_id: 5, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 33, code: 'BPUT-CE191', name: 'Surveying Field Practice Lab', program_id: 1, department_id: 5, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 3, is_active: 1 },
+      // Diploma (Sem 1)
+      { id: 41, code: 'DIP-M101', name: 'Applied Mathematics - I', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 42, code: 'DIP-SC101', name: 'Applied Science (Physics & Chemistry)', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 43, code: 'DIP-ME191', name: 'Workshop Technology Lab', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 3, is_active: 1 },
+      { id: 441, code: 'DIP-ENG101', name: 'Communication English & Grammar', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 4, is_active: 1 },
+      { id: 442, code: 'DIP-EG101', name: 'Engineering Drawing & Drafting', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 443, code: 'DIP-CS101', name: 'Computer Application Fundamentals', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 3, type: 'CORE', sequence: 6, is_active: 1 },
+      { id: 444, code: 'DIP-SC191', name: 'Applied Science Practical Lab', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 7, is_active: 1 },
+      { id: 445, code: 'DIP-CS191', name: 'Computer Application Lab', program_id: 2, department_id: 8, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 8, is_active: 1 },
+      // Diploma MECH (Sem 5 - Tushar Mhato)
+      { id: 44, code: 'DIP-ME501', name: 'Advanced Manufacturing Technology', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 45, code: 'DIP-ME502', name: 'Power Plant Engineering', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 46, code: 'DIP-ME503', name: 'Design of Machine Elements', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 3, is_active: 1 },
+      { id: 47, code: 'DIP-ME504', name: 'Automobile Engineering', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 4, type: 'CORE', sequence: 4, is_active: 1 },
+      { id: 48, code: 'DIP-ME505', name: 'Industrial Engineering & Operations', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 3, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 49, code: 'DIP-ME591', name: 'Manufacturing Technology Lab', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 2, type: 'LAB', sequence: 6, is_active: 1 },
+      { id: 50, code: 'DIP-ME592', name: 'Machine Design CAD Practice Lab', program_id: 2, department_id: 8, semester: 5, year: 3, credits: 2, type: 'LAB', sequence: 7, is_active: 1 },
+      // MBA (Sem 1)
+      { id: 51, code: 'MBA-101', name: 'Organizational Behavior & Principles', program_id: 3, department_id: 11, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 1, is_active: 1 },
+      { id: 52, code: 'MBA-102', name: 'Managerial Economics', program_id: 3, department_id: 11, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 2, is_active: 1 },
+      { id: 53, code: 'MBA-103', name: 'Accounting for Financial Decision Making', program_id: 3, department_id: 11, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 3, is_active: 1 },
+      { id: 54, code: 'MBA-104', name: 'Business Communication Lab', program_id: 3, department_id: 11, semester: 1, year: 1, credits: 2, type: 'LAB', sequence: 4, is_active: 1 },
+      { id: 55, code: 'MBA-105', name: 'Marketing Management Essentials', program_id: 3, department_id: 11, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 5, is_active: 1 },
+      { id: 56, code: 'MBA-106', name: 'Quantitative Techniques for Managers', program_id: 3, department_id: 11, semester: 1, year: 1, credits: 4, type: 'CORE', sequence: 6, is_active: 1 }
+    ];
+    this.studentFees = [];
+    this.subjectRegistrations = [];
+    this.registrationSubjects = [];
   }
 
   async init() {
@@ -194,6 +327,9 @@ class MockDatabase {
       this.studentTransports = [];
       this.notifications = [];
       this.examRegistrations = [];
+      this.subjectRegistrations = [];
+      this.registrationSubjects = [];
+      this.studentFees = [];
     const adminHash = await bcrypt.hash('Admin@BEC2026!', 12);
     const headHash = await bcrypt.hash('Head@BEC2026!', 12);
     const staffHash = await bcrypt.hash('Staff@BEC2026!', 12);
@@ -203,14 +339,39 @@ class MockDatabase {
       { id: 1, email: 'admin@bec.ac.in', password_hash: adminHash, role_id: 4, is_active: 1, must_change_password: 0 },
       { id: 2, email: 'accounts.head@bec.ac.in', password_hash: headHash, role_id: 3, is_active: 1, must_change_password: 0 },
       { id: 3, email: 'accounts.staff@bec.ac.in', password_hash: staffHash, role_id: 2, is_active: 1, must_change_password: 0 },
-      { id: 4, email: 'auditor@bec.ac.in', password_hash: auditorHash, role_id: 5, is_active: 1, must_change_password: 0 }
+      { id: 4, email: 'auditor@bec.ac.in', password_hash: auditorHash, role_id: 5, is_active: 1, must_change_password: 0 },
+      // Department HODs
+      { id: 5, email: 'hod.cse@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 6, email: 'hod.csd@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 7, email: 'hod.mech@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 8, email: 'hod.aero@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 9, email: 'hod.civil@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 10, email: 'hod.eee@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 11, email: 'hod.agri@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 12, email: 'hod.diploma@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 13, email: 'hod.mba@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      // Director
+      { id: 14, email: 'director@bec.ac.in', password_hash: adminHash, role_id: 7, is_active: 1, must_change_password: 0 },
+      // Exam Section Officer
+      { id: 15, email: 'exam.section@bec.ac.in', password_hash: adminHash, role_id: 8, is_active: 1, must_change_password: 0 }
     );
 
     this.staff.push(
       { id: 1, user_id: 1, staff_code: 'BEC-ADM-001', full_name: 'System Administrator', designation: 'Senior IT Administrator', department: 'IT' },
       { id: 2, user_id: 2, staff_code: 'BEC-ACC-001', full_name: 'Prof. B. K. Mohapatra', designation: 'Accounts Head & CFO', department: 'Accounts' },
       { id: 3, user_id: 3, staff_code: 'BEC-ACC-002', full_name: 'Sujit Kumar Das', designation: 'Senior Accounts Officer', department: 'Accounts' },
-      { id: 4, user_id: 4, staff_code: 'BEC-AUD-001', full_name: 'K. R. Panda & Associates', designation: 'Statutory Auditor', department: 'Audit' }
+      { id: 4, user_id: 4, staff_code: 'BEC-AUD-001', full_name: 'K. R. Panda & Associates', designation: 'Statutory Auditor', department: 'Audit' },
+      { id: 5, user_id: 5, staff_code: 'BEC-HOD-CSE-001', full_name: 'Dr. Rajesh Kumar Mohanty', designation: 'Head of Department', department: 'Computer Science & Engineering' },
+      { id: 6, user_id: 6, staff_code: 'BEC-HOD-CSD-001', full_name: 'Dr. Priyadarshi Biswal', designation: 'Head of Department', department: 'Computer Science & Data Science' },
+      { id: 7, user_id: 7, staff_code: 'BEC-HOD-MEC-001', full_name: 'Prof. Manoranjan Pradhan', designation: 'Head of Department', department: 'Mechanical Engineering' },
+      { id: 8, user_id: 8, staff_code: 'BEC-HOD-AER-001', full_name: 'Wing Cdr. (Retd) K. N. Das', designation: 'Head of Department', department: 'Aeronautical Engineering' },
+      { id: 9, user_id: 9, staff_code: 'BEC-HOD-CIV-001', full_name: 'Dr. Subhashree Senapati', designation: 'Head of Department', department: 'Civil Engineering' },
+      { id: 10, user_id: 10, staff_code: 'BEC-HOD-EEE-001', full_name: 'Prof. Ashis Kumar Panda', designation: 'Head of Department', department: 'Electrical & Electronics Engineering' },
+      { id: 11, user_id: 11, staff_code: 'BEC-HOD-AGR-001', full_name: 'Dr. Bijay Ketan Nayak', designation: 'Head of Department', department: 'Agriculture Engineering' },
+      { id: 12, user_id: 12, staff_code: 'BEC-HOD-DIP-001', full_name: 'Er. Chandan Kumar Rout', designation: 'Head of Department', department: 'Diploma Engineering Wing' },
+      { id: 13, user_id: 13, staff_code: 'BEC-HOD-MBA-001', full_name: 'Dr. Smruti Rekha Jena', designation: 'Head of Department', department: 'Master of Business Administration' },
+      { id: 14, user_id: 14, staff_code: 'BEC-DIR-001', full_name: 'Prof. S. K. Rath', designation: 'Director', department: 'Administration' },
+      { id: 15, user_id: 15, staff_code: 'BEC-EXM-001', full_name: 'Dr. Ramesh Chandra Sahoo', designation: 'Controller of Examinations', department: 'Examination Section' }
     );
 
     // 2. Import REAL Cohort from Excel Spreadsheet (Prioritize BEC_Complete_Student_Report_2026-09-24.xlsx)
@@ -222,7 +383,7 @@ class MockDatabase {
     if (fs.existsSync(excelPath)) {
       try {
         const students = await parseReportingExcel(excelPath);
-        let userCounter = 5;
+        let userCounter = 20;
         let studentCounter = 1;
 
         for (const st of students) {
@@ -302,7 +463,7 @@ class MockDatabase {
             transport_required: st.transportRequired,
             rider_pass_no: st.riderPassNo,
             pickup_stoppage: st.pickupStoppage,
-            tuition_fee_paid: st.tuitionFeePaid,
+            tuition_fee_paid: (st.regNo === '2026BEC03001' || studentCounter === 1) ? 81500 : st.tuitionFeePaid,
             hostel_fee_paid: st.hostelFeePaid,
             transport_fee_paid: st.transportFeePaid,
             lunch: st.lunch,
@@ -323,8 +484,8 @@ class MockDatabase {
             fee_receipt_url: st.feeReceiptUrl,
             parent_signature_url: st.parentSignatureUrl,
             total_billed: st.totalBilled,
-            total_paid: st.totalPaid,
-            total_outstanding: st.totalOutstanding,
+            total_paid: (st.regNo === '2026BEC03001' || studentCounter === 1) ? 81500 : st.totalPaid,
+            total_outstanding: (st.regNo === '2026BEC03001' || studentCounter === 1) ? Math.max(0, st.totalBilled - 81500) : st.totalOutstanding,
             exam_fee_paid: st.tuitionFeePaid > 50000 ? 5000.00 : 0.00,
             exam_status: st.tuitionFeePaid > 50000 ? 'PAID' : 'UNPAID'
           });
@@ -717,6 +878,45 @@ class MockDatabase {
           receipt_no: 'EXAM-REC-1644',
           admit_card_eligible: 1,
           created_at: '2026-04-06 10:00:00'
+        });
+
+        // Seed Confirmed Subject Registration for Tushar Mhato (Semester 1 BPUT Regular)
+        this.subjectRegistrations.push({
+          id: 1,
+          reference_number: 'REG-2026-MECH-00001',
+          student_id: 1644,
+          department_id: 3,
+          program_id: 1,
+          semester: 1,
+          academic_year: '2026-27',
+          registration_type: 'REGULAR',
+          status: 'CONFIRMED',
+          hod_id: 7,
+          hod_approved_at: '2026-10-01 11:30:00',
+          hod_remarks: 'Verified credits and prerequisites. Recommended for Directorate clearance.',
+          director_id: 14,
+          director_approved_at: '2026-10-01 11:45:00',
+          director_remarks: 'Academics clearance sanctioned under BPUT guidelines.',
+          exam_fee_amount: 1550.00,
+          exam_fee_status: 'PAID',
+          exam_receipt_no: 'EXAM-REC-2026-001644',
+          exam_fee_paid_at: '2026-10-01 12:15:00',
+          exam_section_id: 15,
+          exam_section_approved_at: '2026-10-01 12:30:00',
+          exam_section_remarks: 'BPUT University form fillup verified. Application Marked Received & Confirmed.',
+          accounts_id: 15,
+          accounts_approved_at: '2026-10-01 12:30:00',
+          accounts_remarks: 'Verified by Examination Section. Locked & Confirmed.',
+          submitted_at: '2026-10-01 10:00:00'
+        });
+
+        const tusharSubjectIds = [21, 22, 23, 24, 25, 26, 27];
+        tusharSubjectIds.forEach(subId => {
+          this.registrationSubjects.push({
+            id: this.registrationSubjects.length + 1,
+            registration_id: 1,
+            subject_id: subId
+          });
         });
 
         // Seed Realistic BEC Alumni Cohorts (Batches 2023, 2024, 2025)

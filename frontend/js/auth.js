@@ -8,9 +8,12 @@ const auth = {
 
   async checkAuth() {
     const token = api.getToken();
+    const isMasterRoute = window.location.pathname.includes('master');
+    const fallbackLogin = isMasterRoute ? '/master-login.html' : '/login.html';
+
     if (!token) {
       if (!window.location.pathname.includes('login')) {
-        window.location.href = '/login.html';
+        window.location.href = fallbackLogin;
       }
       return null;
     }
@@ -23,7 +26,7 @@ const auth = {
     } catch (err) {
       api.clearToken();
       if (!window.location.pathname.includes('login')) {
-        window.location.href = '/login.html';
+        window.location.href = fallbackLogin;
       }
       return null;
     }

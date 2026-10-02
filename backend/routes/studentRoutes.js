@@ -23,5 +23,7 @@ router.get('/receipts', studentController.getReceipts);
 router.get('/receipts/:id', studentController.getReceiptById);
 router.post('/requests', studentController.submitRequest);
 router.get('/notifications', studentController.getNotifications);
+router.get('/health', studentController.getHealth);
+router.post('/health', studentController.updateHealth);
 
 module.exports = router;

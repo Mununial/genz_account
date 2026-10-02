@@ -825,6 +825,14 @@
   justify-content: center;
 }
 
+.cms-id-photo-slot .cms-student-avatar-img,
+.cms-id-photo-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 .cms-id-meta-slot {
   flex: 1;
   font-size: 0.835rem;

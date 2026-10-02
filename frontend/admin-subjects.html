@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BPUT Subject Catalog Management - Bhubaneswar Engineering College</title>
+  <meta name="description" content="Manage BPUT syllabus subjects, branch mappings, credits and types.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/becReal.css">
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- 1. SIDEBAR -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/dashboard.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC ACCOUNTS</span>
+            <span class="brand-subtitle">Finance ERP</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup">
+          <!-- Populated by navigation.js -->
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">ADM</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">System Admin</div>
+            <div class="user-role-tag" id="userDisplayRole">ADMIN</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <!-- Top Header Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="topbar-title-wrap">
+            <div class="topbar-clock" id="topbarClock"></div>
+          </div>
+        </div>
+        <div class="topbar-right" style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-sm btn-secondary" onclick="adminSubjects.openBulkModal()" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #475569; color: #fff; border: none; font-weight: 600;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Bulk CSV Import
+          </button>
+          <button class="btn btn-sm btn-primary" onclick="adminSubjects.openAddModal()" style="background:#0B63C5;border:none;font-weight:600;">
+            + Add New Subject
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page-content" style="padding: 1.5rem;">
+        <!-- Header -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="background: linear-gradient(135deg, #0B63C5, #1D4ED8); width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div>
+              <h1 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #0F172A;">BPUT Subject Catalog</h1>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #64748B;">Manage syllabus curricula across all Programs (B.Tech, Diploma, MBA) &amp; 11 Departments</p>
+            </div>
+          </div>
+          <div>
+            <span id="totalSubjectsCount" style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; font-size: 0.9rem; padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid #BFDBFE;">0 Subjects</span>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:0.85rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:#64748B;display:block;margin-bottom:2px;">Program</label>
+              <select id="filterProgram" onchange="adminSubjects.onProgramFilterChange()" style="padding:0.35rem 0.65rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+                <option value="">All Programs</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:#64748B;display:block;margin-bottom:2px;">Department</label>
+              <select id="filterDepartment" onchange="adminSubjects.loadSubjects()" style="padding:0.35rem 0.65rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+                <option value="">All Departments</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:#64748B;display:block;margin-bottom:2px;">Semester</label>
+              <select id="filterSemester" onchange="adminSubjects.loadSubjects()" style="padding:0.35rem 0.65rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+                <option value="">All Semesters</option>
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:#64748B;display:block;margin-bottom:2px;">Type</label>
+              <select id="filterType" onchange="adminSubjects.loadSubjects()" style="padding:0.35rem 0.65rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+                <option value="">All Types</option>
+                <option value="CORE">CORE (Theory)</option>
+                <option value="LAB">LAB (Practical)</option>
+                <option value="ELECTIVE">ELECTIVE</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:#64748B;display:block;margin-bottom:2px;">Search</label>
+              <input type="text" id="filterSearch" oninput="adminSubjects.onSearchInput()" placeholder="Search code, name..." style="padding:0.35rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;width:200px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Subjects Table -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+              <thead>
+                <tr style="background: #F8FAFC; color: #475569; text-align: left; border-bottom: 1px solid #E2E8F0;">
+                  <th style="padding: 10px 12px; width: 120px;">Code</th>
+                  <th style="padding: 10px 12px;">Subject Name</th>
+                  <th style="padding: 10px 12px; width: 110px;">Program</th>
+                  <th style="padding: 10px 12px; width: 140px;">Department</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 80px;">Semester</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 70px;">Credits</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 90px;">Type</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 80px;">Status</th>
+                  <th style="padding: 10px 12px; text-align: right; width: 130px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="subjectListBody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Subject Modal -->
+  <div id="subjectModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 620px; width: 92%;">
+      <div class="modal-header" style="background: #0B63C5; color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+        <div class="modal-title" style="color: #fff; font-weight: 700; font-size: 1rem;" id="modalSubTitle">Add BPUT Subject</div>
+        <button class="bec-modal-close-icon" onclick="ui.closeModal('subjectModal')" style="color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem;">
+        <input type="hidden" id="modalSubjectId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Program *</label>
+            <select id="subProgram" onchange="adminSubjects.onModalProgramChange()" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Department *</label>
+            <select id="subDepartment" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Subject Code *</label>
+            <input type="text" id="subCode" placeholder="e.g. BPUT-CSE301" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+          </div>
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Sequence Order</label>
+            <input type="number" id="subSequence" min="1" max="99" value="1" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+          </div>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Subject Name *</label>
+          <input type="text" id="subName" placeholder="e.g. Data Structures & Algorithms" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Semester *</label>
+            <select id="subSemester" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+              <option value="1">1st Sem</option>
+              <option value="2">2nd Sem</option>
+              <option value="3">3rd Sem</option>
+              <option value="4">4th Sem</option>
+              <option value="5">5th Sem</option>
+              <option value="6">6th Sem</option>
+              <option value="7">7th Sem</option>
+              <option value="8">8th Sem</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Credits *</label>
+            <input type="number" id="subCredits" min="1" max="10" value="3" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+          </div>
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Subject Type</label>
+            <select id="subType" style="width:100%;padding:0.5rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;">
+              <option value="CORE">CORE (Theory)</option>
+              <option value="LAB">LAB (Practical)</option>
+              <option value="ELECTIVE">ELECTIVE</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.85rem 1.25rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="ui.closeModal('subjectModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="adminSubjects.saveSubject()" style="background: #0B63C5; border-color: #0B63C5; font-weight:700;">Save Subject</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk CSV Import Modal -->
+  <div id="bulkImportModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 680px; width: 94%;">
+      <div class="modal-header" style="background: #1E293B; color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+        <div class="modal-title" style="color: #fff; font-weight: 700; font-size: 1rem;">Bulk Import Syllabus Subjects (CSV)</div>
+        <button class="bec-modal-close-icon" onclick="ui.closeModal('bulkImportModal')" style="color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.85rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.82rem; color: #334155;">
+          <strong>CSV Format Header:</strong><br>
+          <code style="background: #EFF6FF; color: #0B63C5; padding: 2px 6px; border-radius: 4px; display: block; margin-top: 4px;">code,name,program_code,department_code,semester,credits,type,sequence</code>
+          <div style="margin-top: 0.5rem; color: #64748B;">
+            Example: <code>BPUT-CSE301,Data Structures &amp; Algorithms,BTECH,CSE,3,4,CORE,1</code>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <button onclick="adminSubjects.insertSampleCsv()" style="background: none; border: 1px solid #CBD5E1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0B63C5; font-weight: 600;">
+              Paste Sample 5-Row CSV Template
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Or Upload CSV File</label>
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" onchange="adminSubjects.handleFileUpload(event)" style="font-size:0.85rem;">
+        </div>
+
+        <div>
+          <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.35rem;">Paste CSV Data Content</label>
+          <textarea id="bulkCsvTextarea" rows="7" style="width: 100%; font-family: monospace; font-size: 0.82rem; padding: 0.6rem; border: 1px solid #CBD5E1; border-radius: 6px;" placeholder="code,name,program_code,department_code,semester,credits,type,sequence&#10;BPUT-CSE301,Data Structures,BTECH,CSE,3,4,CORE,1"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.85rem 1.25rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="ui.closeModal('bulkImportModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="adminSubjects.submitBulkImport()" style="background: #0B63C5; border-color: #0B63C5; font-weight:700;">
+          Import Subjects →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script src="/js/adminSubjects.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      navigation.init('admin-subjects');
+      await adminSubjects.init();
+    });
+  </script>
+</body>
+</html>

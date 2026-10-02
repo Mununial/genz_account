@@ -42,12 +42,13 @@
   --info-bg: #F0F9FF;
   --info-border: #BAE6FD;
 
-  /* Sidebar Tokens */
-  --bg-sidebar: #0F172A;
-  --sidebar-text: #94A3B8;
-  --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-active-bg: rgba(37, 99, 235, 0.16);
-  --sidebar-active-text: #FFFFFF;
+  /* Sidebar Tokens (Light White & Royal Blue Theme) */
+  --bg-sidebar: #FFFFFF;
+  --sidebar-text: #475569;
+  --sidebar-hover: #F0F7FF;
+  --sidebar-hover-text: #1D4ED8;
+  --sidebar-active-bg: #EFF6FF;
+  --sidebar-active-text: #1D4ED8;
   --sidebar-active-border: #2563EB;
 
   /* Backward Compatibility Aliases */
@@ -142,7 +143,8 @@ a:hover {
   left: 0;
   z-index: 100;
   transition: transform var(--transition-normal);
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid var(--border);
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.03);
 }
 
 .sidebar-brand {
@@ -150,7 +152,8 @@ a:hover {
   padding: 0 1.25rem;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid var(--border);
+  background: #FFFFFF;
 }
 
 .brand-link {
@@ -158,12 +161,17 @@ a:hover {
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
-  color: #FFFFFF;
+  color: #0F172A;
 }
 
 .sidebar-logo {
-  height: 32px;
-  width: auto;
+  height: 36px;
+  width: 36px;
+  min-width: 36px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 1px;
 }
 
 .brand-text {
@@ -173,16 +181,16 @@ a:hover {
 
 .brand-title {
   font-size: 0.88rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.04em;
-  color: #FFFFFF;
+  color: #0F172A;
   line-height: 1.2;
 }
 
 .brand-subtitle {
   font-size: 0.72rem;
-  color: #64748B;
-  font-weight: 500;
+  color: #2563EB;
+  font-weight: 600;
 }
 
 .sidebar-nav {
@@ -192,6 +200,21 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  background: #FFFFFF;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 999px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
 }
 
 /* Section Group Titles */
@@ -199,7 +222,7 @@ a:hover {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #64748B;
+  color: #94A3B8;
   padding: 0.85rem 0.65rem 0.3rem;
   font-weight: 700;
 }
@@ -214,7 +237,7 @@ a:hover {
   align-items: center;
   gap: 0.65rem;
   padding: 0.52rem 0.75rem;
-  color: #94A3B8;
+  color: #475569;
   font-size: 0.85rem;
   font-weight: 500;
   border-radius: var(--radius-md);
@@ -225,16 +248,22 @@ a:hover {
 }
 
 .nav-item:hover {
-  background: var(--sidebar-hover);
-  color: #FFFFFF;
+  background: #F0F7FF;
+  color: #1D4ED8;
+}
+.nav-item:hover .nav-icon {
+  stroke: #1D4ED8;
 }
 
-/* Active Navigation State: Subtle blue background, white text, blue accent line */
+/* Active Navigation State: Light soft blue background, royal blue text & icon, solid blue left bar */
 .nav-item.active {
-  background: var(--sidebar-active-bg) !important;
-  color: var(--sidebar-active-text) !important;
-  border-left: 3px solid var(--sidebar-active-border) !important;
-  font-weight: 600 !important;
+  background: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border-left: 3px solid #2563EB !important;
+  font-weight: 700 !important;
+}
+.nav-item.active .nav-icon {
+  stroke: #2563EB !important;
 }
 
 .nav-icon {
@@ -246,13 +275,14 @@ a:hover {
   stroke-linejoin: round;
   fill: none;
   flex-shrink: 0;
+  transition: stroke var(--transition-fast);
 }
 
 /* Sidebar Footer (Profile & Logout) */
 .sidebar-footer {
   padding: 0.75rem 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--border);
+  background: #F8FAFC;
 }
 
 .user-profile-badge {
@@ -265,15 +295,16 @@ a:hover {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-full);
-  background: #1E293B;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 0.78rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1.5px solid #DBEAFE;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
 }
 
 .user-meta {
@@ -283,8 +314,8 @@ a:hover {
 
 .user-name {
   font-size: 0.82rem;
-  font-weight: 600;
-  color: #FFFFFF;
+  font-weight: 700;
+  color: #0F172A;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -293,8 +324,8 @@ a:hover {
 
 .user-role-tag {
   font-size: 0.68rem;
-  color: #64748B;
-  font-weight: 600;
+  color: #2563EB;
+  font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }

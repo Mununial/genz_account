@@ -11,6 +11,10 @@ const adminSettings = {
   allAuditLogs: [],
 
   async init() {
+    const params = new URLSearchParams(window.location.search);
+    const initialTab = params.get('tab') || 'users';
+    this.switchTab(initialTab);
+
     await this.loadUsers();
     this.renderRbacMatrix();
     this.renderFeeHeads();
@@ -39,15 +43,18 @@ const adminSettings = {
 
     try {
       const res = await api.get('/admin/users');
-      this.users = res?.data || [
-        { id: 1, email: 'admin@bec.edu.in', role: 'ADMIN', department: 'Executive Management', is_active: 1, last_login: 'Today, 09:42 AM' },
-        { id: 2, email: 'head.accounts@bec.edu.in', role: 'ACCOUNTS_HEAD', department: 'Accounts & Finance', is_active: 1, last_login: 'Today, 09:15 AM' },
-        { id: 3, email: 'staff.accounts@bec.edu.in', role: 'ACCOUNTS_STAFF', department: 'Accounts Counter', is_active: 1, last_login: 'Today, 08:50 AM' },
-        { id: 4, email: 'cashier@bec.edu.in', role: 'CASHIER', department: 'Cash Drawer Desk', is_active: 1, last_login: 'Today, 09:00 AM' },
-        { id: 5, email: 'auditor@bec.edu.in', role: 'AUDITOR', department: 'External Statutory Audit', is_active: 1, last_login: 'Yesterday, 04:30 PM' },
-        { id: 6, email: 'exam.cell@bec.edu.in', role: 'EXAM_CELL', department: 'BPUT Examination Cell', is_active: 1, last_login: 'Today, 10:12 AM' },
-        { id: 7, email: 'director@bec.edu.in', role: 'MANAGEMENT', department: 'Governing Council', is_active: 1, last_login: '21-Sep-2026' }
-      ];
+      const data = res?.data;
+      this.users = (data && data.users) ? data.users : (Array.isArray(data) ? data : (Array.isArray(res) ? res : []));
+
+      if (this.users.length === 0) {
+        this.users = [
+          { id: 1, email: 'admin@bec.ac.in', full_name: 'Ayush Mallick', role_name: 'ADMIN', department: 'Central IT & Administration', is_active: 1, last_login_at: 'Today, 09:42 AM' },
+          { id: 2, email: 'accounts.head@bec.ac.in', full_name: 'Harihara Parida', role_name: 'ACCOUNTS_HEAD', department: 'Finance & Accounts', is_active: 1, last_login_at: 'Today, 09:15 AM' },
+          { id: 19, email: 'director@bec.ac.in', full_name: 'Dr. B.N. Biswal', role_name: 'DIRECTOR', department: 'Directorate', is_active: 1, last_login_at: 'Today, 08:50 AM' },
+          { id: 20, email: 'exam.section@bec.ac.in', full_name: 'Mr. Manoj Kumar Pati', role_name: 'EXAM_CELL', department: 'Examination Section', is_active: 1, last_login_at: 'Today, 09:00 AM' },
+          { id: 10, email: 'hod.cse@bec.ac.in', full_name: 'Anita Behera', role_name: 'HOD', department: 'CSE & Data Science', is_active: 1, last_login_at: 'Yesterday, 04:30 PM' }
+        ];
+      }
 
       this.renderUsersTable();
     } catch (e) {
@@ -59,43 +66,53 @@ const adminSettings = {
     const tbody = document.getElementById('usersTableBody');
     if (!tbody) return;
 
+    if (!Array.isArray(this.users) || this.users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #64748B;">No institutional staff records found.</td></tr>';
+      return;
+    }
+
     tbody.innerHTML = this.users.map(u => {
+      const roleName = u.role_name || u.role || 'STAFF';
       const roleColor = {
         ADMIN: '#9333EA',
         ACCOUNTS_HEAD: '#2563EB',
         ACCOUNTS_STAFF: '#0284C7',
         CASHIER: '#10B981',
         AUDITOR: '#D97706',
+        AUDITOR_READ_ONLY: '#D97706',
         EXAM_CELL: '#4F46E5',
-        MANAGEMENT: '#475569',
+        DIRECTOR: '#7C3AED',
+        HOD: '#EA580C',
         STUDENT: '#64748B'
-      }[u.role] || '#64748B';
+      }[roleName] || '#64748B';
+
+      const displayName = u.full_name || (u.email ? u.email.split('@')[0].replace('.', ' ').toUpperCase() : 'STAFF MEMBER');
 
       return `
         <tr>
           <td>
-            <strong>${escapeHtml(u.email.split('@')[0].replace('.', ' ').toUpperCase())}</strong>
-            <br><code style="font-size: 0.78rem; color: #64748B;">${escapeHtml(u.email)}</code>
+            <strong>${escapeHtml(displayName)}</strong>
+            <br><code style="font-size: 0.78rem; color: #64748B;">${escapeHtml(u.email || '')}</code>
           </td>
           <td>
             <span class="badge" style="background: ${roleColor}15; color: ${roleColor}; font-weight: 700; border: 1px solid ${roleColor}40;">
-              ${escapeHtml(u.role)}
+              ${escapeHtml(roleName)}
             </span>
           </td>
-          <td>${escapeHtml(u.department || 'Accounts Department')}</td>
+          <td>${escapeHtml(u.department || 'Institutional Staff')}</td>
           <td>
             <span class="badge ${u.is_active ? 'badge-success' : 'badge-danger'}">
               ${u.is_active ? 'ACTIVE' : 'DEACTIVATED'}
             </span>
           </td>
-          <td><small>${escapeHtml(u.last_login || 'Recent')}</small></td>
+          <td><small>${escapeHtml(u.last_login_at || u.last_login || 'Active Session')}</small></td>
           <td style="text-align: right; white-space: nowrap;">
             <button class="btn btn-sm ${u.is_active ? 'btn-ghost-danger' : 'btn-secondary'}" onclick="adminSettings.toggleUserStatus(${u.id}, ${u.is_active ? 0 : 1})">
               ${u.is_active ? 'Deactivate' : 'Activate'}
             </button>
-            <button class="btn btn-sm btn-secondary" onclick="ui.showToast('Password reset link dispatched.', 'info')" style="margin-left: 4px;">
-              Reset Key
-            </button>
+            <a class="btn btn-sm btn-secondary" href="/master-control.html" style="margin-left: 4px; text-decoration: none;">
+              ⚡ Edit in Master
+            </a>
           </td>
         </tr>
       `;
@@ -104,7 +121,7 @@ const adminSettings = {
 
   async toggleUserStatus(userId, newStatus) {
     try {
-      await api.patch(`/admin/users/${userId}/status`, { isActive: newStatus });
+      await api.post(`/admin/users/${userId}/status`, { isActive: newStatus });
       ui.showToast(`User status updated to ${newStatus ? 'ACTIVE' : 'DEACTIVATED'}.`, 'success');
       const u = this.users.find(usr => usr.id === userId);
       if (u) u.is_active = newStatus;

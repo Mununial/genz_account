@@ -83,15 +83,44 @@ const becRealFee = {
     });
   },
 
-  restoreRecentReceipts() {
+  async restoreRecentReceipts() {
     try {
       const saved = sessionStorage.getItem('bec_recent_receipts');
       if (saved) {
         this.recentReceipts = JSON.parse(saved);
-        this.renderRecentReceipts();
       }
     } catch (e) {
       console.warn('Recent receipts restore notice:', e.message);
+    }
+
+    // Always render immediately so it doesn't get stuck on loading message
+    this.renderRecentReceipts();
+
+    // If no session receipts in memory, load recent server collections
+    if (!this.recentReceipts || this.recentReceipts.length === 0) {
+      try {
+        const res = await api.get('/reports/collections');
+        const list = (res && res.data && (res.data.recentPayments || res.data.collections)) || [];
+        if (list.length > 0) {
+          this.recentReceipts = list.slice(0, 10).map(p => ({
+            id: p.id,
+            receiptNo: p.receipt_no || p.payment_no || `REC-${p.id}`,
+            studentId: p.student_id,
+            studentName: p.student_name || p.full_name || 'Student',
+            rollNo: p.roll_no || p.reg_no || '',
+            regNo: p.reg_no || '',
+            branch: p.branch_name || p.branch_code || 'Engineering',
+            amount: parseFloat(p.amount || 0),
+            mode: p.payment_method || 'CASH',
+            category: p.fee_category || 'Semester Academic & Tuition Fee',
+            refNo: p.transaction_id || 'COUNTER',
+            timestamp: p.payment_date || p.created_at ? new Date(p.payment_date || p.created_at).toLocaleTimeString('en-IN') : 'Today'
+          }));
+          this.renderRecentReceipts();
+        }
+      } catch (err) {
+        console.warn('Could not fetch server receipts for counterfoil stream:', err);
+      }
     }
   },
 
@@ -150,21 +179,27 @@ const becRealFee = {
     const container = document.getElementById('fastQuickPicksContainer');
     if (!container) return;
 
-    const cache = this.allStudentsCache || [];
+    let cache = this.allStudentsCache || [];
+    if (this.fastYearFilter && this.fastYearFilter !== 'ALL') {
+      cache = cache.filter(s => {
+        const yr = (s.academic_year || '').trim();
+        const adm = parseInt(s.admission_year, 10);
+        if (this.fastYearFilter === '1ST') return yr === '1st Year' || (adm === 2026 && yr !== '2nd Year');
+        if (this.fastYearFilter === '2ND') return yr === '2nd Year' || adm === 2025;
+        if (this.fastYearFilter === '3RD') return yr === '3rd Year' || (adm === 2024 && yr !== '2nd Year');
+        if (this.fastYearFilter === '4TH') return yr === '4th Year' || adm === 2023;
+        return true;
+      });
+    }
+
     let picks = [];
     if (cache.length > 0) {
-      // Pick first 6 real students across branches
       for (const st of cache) {
-        if (picks.length >= 6) break;
+        if (picks.length >= 8) break;
         if (!picks.includes(st)) picks.push(st);
       }
     } else {
-      picks = [
-        { id: 1, full_name: 'Barsha Priyadarshini Sahoo', roll_no: 'BEC-26-001', reg_no: '2026BEC01001', branch_code: 'CSE', admission_year: 2026, total_outstanding: 115000 },
-        { id: 2, full_name: 'Shradhasuman Pradhan', roll_no: 'BEC-26-002', reg_no: '2026BEC01002', branch_code: 'CSE', admission_year: 2026, total_outstanding: 115000 },
-        { id: 4, full_name: 'Om Prakash Sahoo', roll_no: 'BEC-26-004', reg_no: '2026BEC02004', branch_code: 'CSE_DS', admission_year: 2026, total_outstanding: 115000 },
-        { id: 83, full_name: 'Rajkishore Parida', roll_no: 'BEC-26-083', reg_no: '2026BEC03083', branch_code: 'AGRI', admission_year: 2026, total_outstanding: 115000 }
-      ];
+      picks = (this.allStudentsCache || []).slice(0, 8);
     }
 
     container.innerHTML = picks.map(s => {
@@ -1812,6 +1847,7 @@ const becRealFee = {
     this.fastYearFilter = year;
     document.querySelectorAll('.year-filter-pill').forEach(p => p.classList.remove('active'));
     if (btn) btn.classList.add('active');
+    this.renderQuickPicks();
     this.onFastSearchInput();
   },
 

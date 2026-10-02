@@ -26,6 +26,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const transportRoutes = require('./routes/transportRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
+const registrationRoutes = require('./routes/registrationRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -92,6 +93,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/transport', transportRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/registration', registrationRoutes);
 
 // 7. HTML Page Routes & Fallbacks
 app.get('/login', (req, res) => {
@@ -144,6 +146,14 @@ app.get('/cash-bank', (req, res) => {
 
 app.get('/admin-settings', (req, res) => {
   res.sendFile(path.join(frontendPath, 'admin-settings.html'));
+});
+
+app.get('/master-login', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'master-login.html'));
+});
+
+app.get('/master-control', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'master-control.html'));
 });
 
 app.get('*', (req, res, next) => {

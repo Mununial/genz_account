@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examination Section &mdash; BPUT Subject &amp; Semester Registration | BEC</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .window-card {
+      background: #ffffff;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .window-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
+    }
+    .sub-item-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 0.74rem;
+      margin: 2px;
+      color: #1E293B;
+    }
+    .sub-item-badge.backlog {
+      background: #FEF2F2;
+      border-color: #FECACA;
+      color: #B91C1C;
+    }
+    .badge-open {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .badge-locked {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FCA5A5;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .badge-admission {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- 1. SIDEBAR -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/exam-registrations.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC EXAMINATION</span>
+            <span class="brand-subtitle">University Exam Cell</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup">
+          <!-- Populated by navigation.js -->
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">EXM</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">Exam Section</div>
+            <div class="user-role-tag" id="userDisplayRole">EXAM CELL</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <!-- Top Header Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="topbar-title-wrap">
+            <div class="topbar-clock" id="topbarClock"></div>
+          </div>
+        </div>
+        <div class="topbar-right" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-sm btn-secondary" onclick="examRegistrations.showSubjectSummaryModal()" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #0B63C5; color: #fff; border: none; font-weight: 600;">
+            📊 Subject Enrolled Counts
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="examRegistrations.exportExcel('ALL')" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #006644; color: #fff; border: none; font-weight: 600;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download BPUT List (Excel)
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="examRegistrations.loadQueue()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page-content" style="padding: 1.5rem;">
+        <!-- Page Header Card -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="background: linear-gradient(135deg, #006644, #16A34A); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0, 102, 68, 0.2);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <h1 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #0F172A;">College Examination Section &mdash; BPUT Exam Cell</h1>
+                <span style="background: #DCFCE7; color: #15803D; font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 1px solid #86EFAC;">Official University Desk</span>
+              </div>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.86rem; color: #64748B;">
+                Master Registration Windows, Candidate Subject Enrolment Verification &amp; Official University Form Fillup Confirmation
+              </p>
+            </div>
+          </div>
+          <div>
+            <span id="examPendingCountBadge" style="background: #FEF3C7; color: #92400E; font-weight: 700; font-size: 0.88rem; padding: 0.5rem 1.25rem; border-radius: 20px; border: 1px solid #FCD34D;">
+              0 Ready to Receive &amp; Confirm
+            </span>
+          </div>
+        </div>
+
+        <!-- Master Year-Wise Registration Windows Panel -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h2 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A; display: flex; align-items: center; gap: 0.5rem;">
+                <span>⚙️ Academic Year Registration Windows &mdash; Master Switches</span>
+              </h2>
+              <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: #64748B;">
+                Exam Section can toggle registration window per semester. Students cannot register for next semester unless previous semester is confirmed and target semester is OPEN.
+              </p>
+            </div>
+            <div style="font-size: 0.78rem; color: #475569; background: #F1F5F9; padding: 4px 10px; border-radius: 6px;">
+              Semester 1 is permanently registered during Admission onboarding.
+            </div>
+          </div>
+
+          <!-- Windows Grid (4 Academic Years) -->
+          <div id="registrationWindowsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            <!-- Rendered by examRegistrations.renderWindows() -->
+            <div style="color: #64748B; font-size: 0.85rem; padding: 1rem;">Loading registration windows...</div>
+          </div>
+        </div>
+
+        <!-- Stats Cards Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase;">Total Applications</div>
+            <div id="statExamTotal" style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #B45309; text-transform: uppercase;">Exam Fee Paid (Ready to Confirm)</div>
+            <div id="statExamPending" style="font-size: 1.6rem; font-weight: 800; color: #B45309; margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #15803D; text-transform: uppercase;">Received &amp; University Confirmed</div>
+            <div id="statExamConfirmed" style="font-size: 1.6rem; font-weight: 800; color: #15803D; margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #1D4ED8; text-transform: uppercase;">Director Cleared (Fee Pending)</div>
+            <div id="statExamAwaitingFee" style="font-size: 1.6rem; font-weight: 800; color: #1D4ED8; margin-top: 0.25rem;">0</div>
+          </div>
+        </div>
+
+        <!-- Filter Controls Bar -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.85rem 1.25rem; margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Academic Year</label>
+              <select id="filterYear" onchange="examRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                <option value="">All Academic Years</option>
+                <option value="1">1st Year (Sem 1 &amp; 2)</option>
+                <option value="2">2nd Year (Sem 3 &amp; 4)</option>
+                <option value="3">3rd Year (Sem 5 &amp; 6)</option>
+                <option value="4">4th Year (Sem 7 &amp; 8)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Program</label>
+              <select id="filterProgram" onchange="examRegistrations.onProgramChange()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Programs</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Branch / Dept</label>
+              <select id="filterDepartment" onchange="examRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Departments</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Semester</label>
+              <select id="filterSemester" onchange="examRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Semesters</option>
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Queue Filter</label>
+              <select id="filterStatus" onchange="examRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #0F172A;">
+                <option value="ALL" selected>All Applications (Confirmed &amp; Pipeline)</option>
+                <option value="EXAM_FEE_PAID">Exam Fee Paid (Ready to Receive)</option>
+                <option value="CONFIRMED">Received &amp; Confirmed</option>
+                <option value="DIRECTOR_APPROVED">Director Cleared (Fee Pending)</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Search Candidate / Subject</label>
+              <input type="text" id="filterSearch" oninput="examRegistrations.onSearchInput()" placeholder="Search name, roll, ref, subject..." style="padding: 0.35rem 0.75rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; width: 220px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Candidate Registration Table Card -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="padding: 0.85rem 1.25rem; border-bottom: 1px solid #E2E8F0; background: #F8FAFC; display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #0F172A;">BPUT University Examination Candidate Verification &amp; Subject Register</div>
+            <div style="font-size: 0.8rem; color: #64748B;" id="tableResultCount">Showing 0 records</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem;">
+              <thead>
+                <tr style="background: #F8FAFC; color: #475569; text-align: left; border-bottom: 1px solid #E2E8F0;">
+                  <th style="padding: 10px 12px; width: 130px;">Ref / Date</th>
+                  <th style="padding: 10px 12px; width: 120px;">Year &amp; Branch</th>
+                  <th style="padding: 10px 12px;">Candidate Name &amp; Roll</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 75px;">Semester</th>
+                  <th style="padding: 10px 12px; min-width: 250px;">Registered Subjects (Complete Details)</th>
+                  <th style="padding: 10px 12px; width: 160px;">Clearances</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 130px;">BPUT Exam Fee</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 125px;">Status</th>
+                  <th style="padding: 10px 12px; text-align: right; width: 150px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="examPendingListBody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail & Registration Slip Modal -->
+  <div id="examDetailModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #ffffff; border-radius: 12px; width: 100%; max-width: 920px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+      <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; background: #F8FAFC;">
+        <div style="font-weight: 700; font-size: 1.05rem; color: #0F172A;" id="modalTitle">Candidate Verification Detail</div>
+        <button onclick="examRegistrations.closeDetailModal()" style="background: transparent; border: none; font-size: 1.25rem; color: #64748B; cursor: pointer;">&times;</button>
+      </div>
+      <div style="padding: 1.5rem;" id="modalBody">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Subject Wise Summary Modal -->
+  <div id="subjectSummaryModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #ffffff; border-radius: 12px; width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+      <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; background: #006644; color: #fff;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800;">BPUT Subject Enrollment Register</h3>
+          <p style="margin: 2px 0 0 0; font-size: 0.78rem; opacity: 0.9;">Total Candidate Counts per Subject &amp; Branch for Exam Hall &amp; Paper Planning</p>
+        </div>
+        <button onclick="document.getElementById('subjectSummaryModal').style.display='none'" style="background: rgba(255,255,255,0.2); border: none; font-size: 1.1rem; color: #fff; border-radius: 50%; width: 28px; height: 28px; cursor: pointer;">&times;</button>
+      </div>
+      <div style="padding: 1.25rem 1.5rem;" id="subjectSummaryBody">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script src="/js/examRegistrations.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sb = document.getElementById('appSidebar');
+      const bd = document.getElementById('sidebarBackdrop');
+      if (sb) sb.classList.toggle('active');
+      if (bd) bd.classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await examRegistrations.init();
+    });
+  </script>
+</body>
+</html>

@@ -400,6 +400,114 @@ async function getNotifications(req, res) {
   }
 }
 
+/**
+ * Get Student Health & Medical Record
+ * GET /api/student/health
+ */
+async function getHealth(req, res) {
+  const studentId = req.user.studentId;
+
+  try {
+    const [rows] = await query(
+      `SELECT shr.*, s.full_name, s.roll_no, s.reg_no, s.phone, s.parent_name, s.parent_phone
+       FROM students s
+       LEFT JOIN student_health_records shr ON s.id = shr.student_id
+       WHERE s.id = ? LIMIT 1`,
+      [studentId]
+    );
+
+    if (rows.length === 0) {
+      return error(res, 'Student not found.', 404);
+    }
+
+    const data = rows[0];
+    const result = {
+      blood_group: data.blood_group || 'B+',
+      medical_conditions: data.medical_conditions || '',
+      allergies: data.allergies || '',
+      emergency_contact_name: data.emergency_contact_name || data.parent_name || '',
+      emergency_contact_phone: data.emergency_contact_phone || data.parent_phone || data.phone || '',
+      emergency_contact_relation: data.emergency_contact_relation || 'Parent / Guardian',
+      vaccination_status: data.vaccination_status || 'Fully Vaccinated',
+      special_medical_needs: data.special_medical_needs || '',
+      medical_fitness_status: data.medical_fitness_status || 'Certified Fit',
+      insurance_policy_no: data.insurance_policy_no || ('BPUT-STU-MED-' + (data.reg_no || studentId)),
+      emergency_health_center: 'BEC Campus Health Center: 108 / 0674-2970000',
+      last_updated_at: data.updated_at || data.created_at || new Date()
+    };
+
+    return success(res, result, 'Student health record retrieved.');
+  } catch (err) {
+    console.error('getHealth error:', err);
+    return error(res, 'Unable to load health record.', 500);
+  }
+}
+
+/**
+ * Update Student Health & Medical Record
+ * POST /api/student/health
+ */
+async function updateHealth(req, res) {
+  const studentId = req.user.studentId;
+  const {
+    blood_group,
+    medical_conditions,
+    allergies,
+    emergency_contact_name,
+    emergency_contact_phone,
+    emergency_contact_relation,
+    vaccination_status,
+    special_medical_needs,
+    insurance_policy_no
+  } = req.body;
+
+  try {
+    await query(
+      `INSERT INTO student_health_records (
+        student_id, blood_group, medical_conditions, allergies,
+        emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+        vaccination_status, special_medical_needs, insurance_policy_no
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        blood_group = VALUES(blood_group),
+        medical_conditions = VALUES(medical_conditions),
+        allergies = VALUES(allergies),
+        emergency_contact_name = VALUES(emergency_contact_name),
+        emergency_contact_phone = VALUES(emergency_contact_phone),
+        emergency_contact_relation = VALUES(emergency_contact_relation),
+        vaccination_status = VALUES(vaccination_status),
+        special_medical_needs = VALUES(special_medical_needs),
+        insurance_policy_no = VALUES(insurance_policy_no),
+        updated_at = CURRENT_TIMESTAMP`,
+      [
+        studentId,
+        blood_group || 'B+',
+        medical_conditions || '',
+        allergies || '',
+        emergency_contact_name || '',
+        emergency_contact_phone || '',
+        emergency_contact_relation || 'Parent',
+        vaccination_status || 'Fully Vaccinated',
+        special_medical_needs || '',
+        insurance_policy_no || ''
+      ]
+    );
+
+    await logAudit(
+      req.user.id,
+      'STUDENT_HEALTH_UPDATE',
+      'STUDENT',
+      studentId,
+      { blood_group, vaccination_status, emergency_contact_phone }
+    );
+
+    return success(res, null, 'Health & Medical details successfully updated.');
+  } catch (err) {
+    console.error('updateHealth error:', err);
+    return error(res, 'Failed to update health record.', 500);
+  }
+}
+
 module.exports = {
   getProfile,
   getDashboard,
@@ -410,5 +518,7 @@ module.exports = {
   getReceipts,
   getReceiptById,
   submitRequest,
-  getNotifications
+  getNotifications,
+  getHealth,
+  updateHealth
 };

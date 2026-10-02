@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Director Subject Registration Approvals - Bhubaneswar Engineering College</title>
+  <meta name="description" content="Director Academic Approvals for BPUT Subject Registrations.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/becReal.css">
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- 1. SIDEBAR -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/director-registrations.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="BEC Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">BEC DIRECTORATE</span>
+            <span class="brand-subtitle">Executive Academic Office</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup">
+          <!-- Populated by navigation.js -->
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">DIR</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">College Director</div>
+            <div class="user-role-tag" id="userDisplayRole">DIRECTOR</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <!-- Top Header Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="topbar-title-wrap">
+            <div class="topbar-clock" id="topbarClock"></div>
+          </div>
+        </div>
+        <div class="topbar-right" style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-sm btn-secondary" onclick="directorRegistrations.exportExcel()" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #006644; color: #fff; border: none; font-weight: 600;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Excel
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="directorRegistrations.loadQueue()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page-content" style="padding: 1.5rem;">
+        <!-- Page Header Card -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="background: linear-gradient(135deg, #1E3A8A, #1D4ED8); width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <h1 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #0F172A;">Director — All Departments</h1>
+                <span style="background: #EFF6FF; color: #1D4ED8; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #BFDBFE;">Academic Year: 2026-27</span>
+              </div>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #64748B;">Level 2 Approval Authority — Institutional executive clearance across all 11 departments</p>
+            </div>
+          </div>
+          <div>
+            <span id="directorPendingCountBadge" style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; font-size: 0.85rem; padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid #BFDBFE;">0 Forwarded</span>
+          </div>
+        </div>
+
+        <!-- Global Stats Dashboard (Status + Department Chips) -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <!-- Top Row: Status Counters -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.75rem 1rem;">
+              <span style="font-size: 0.75rem; color: #64748B; text-transform: uppercase; font-weight: 700;">Total Registrations</span>
+              <div id="statDirTotal" style="font-size: 1.5rem; font-weight: 800; color: #0F172A;">0</div>
+            </div>
+            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 0.75rem 1rem;">
+              <span style="font-size: 0.75rem; color: #1D4ED8; text-transform: uppercase; font-weight: 700;">HOD Forwarded (Awaiting)</span>
+              <div id="statDirForwarded" style="font-size: 1.5rem; font-weight: 800; color: #1D4ED8;">0</div>
+            </div>
+            <div style="background: #EEF2FF; border: 1px solid #C7D2FE; border-radius: 8px; padding: 0.75rem 1rem;">
+              <span style="font-size: 0.75rem; color: #4338CA; text-transform: uppercase; font-weight: 700;">Director Approved</span>
+              <div id="statDirApproved" style="font-size: 1.5rem; font-weight: 800; color: #4338CA;">0</div>
+            </div>
+            <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 0.75rem 1rem;">
+              <span style="font-size: 0.75rem; color: #15803D; text-transform: uppercase; font-weight: 700;">Accounts Confirmed</span>
+              <div id="statDirConfirmed" style="font-size: 1.5rem; font-weight: 800; color: #15803D;">0</div>
+            </div>
+          </div>
+
+          <!-- Middle Row: Department Filter Chips -->
+          <div style="border-top: 1px solid #E2E8F0; padding-top: 0.85rem;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+              <span>Department Breakdown</span>
+              <span style="font-size: 0.72rem; color: #64748B; font-weight: 500;">Click a department to filter</span>
+            </div>
+            <div id="deptChipsContainer" style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-Filter Bar -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.85rem 1.25rem; margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Program</label>
+              <select id="filterProgram" onchange="directorRegistrations.onProgramChange()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Programs</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Department</label>
+              <select id="filterDepartment" onchange="directorRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Departments</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Semester</label>
+              <select id="filterSemester" onchange="directorRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Semesters</option>
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Status</label>
+              <select id="filterStatus" onchange="directorRegistrations.loadQueue()" style="padding: 0.35rem 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Statuses</option>
+                <option value="HOD_FORWARDED" selected>Awaiting Review (HOD_FORWARDED)</option>
+                <option value="DIRECTOR_APPROVED">Approved by Director</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="SUBMITTED">Pending HOD Review</option>
+                <option value="DIRECTOR_REJECTED">Director Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 2px;">Search</label>
+              <input type="text" id="filterSearch" oninput="directorRegistrations.onSearchInput()" placeholder="Search student, roll, ref..." style="padding: 0.35rem 0.75rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; width: 220px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Card -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="padding: 0.85rem 1.25rem; border-bottom: 1px solid #E2E8F0; background: #F8FAFC; display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #0F172A;">Subject Registrations — Directorate Review Queue</div>
+            <div style="font-size: 0.8rem; color: #64748B;" id="tableResultCount">Showing 0 records</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+              <thead>
+                <tr style="background: #F8FAFC; color: #475569; text-align: left; border-bottom: 1px solid #E2E8F0;">
+                  <th style="padding: 10px 12px; width: 140px;">Reference No</th>
+                  <th style="padding: 10px 12px;">Program / Dept</th>
+                  <th style="padding: 10px 12px;">Student Details</th>
+                  <th style="padding: 10px 12px; width: 105px;">Roll No</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 70px;">Semester</th>
+                  <th style="padding: 10px 12px;">HOD Endorsement</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 80px;">Credits</th>
+                  <th style="padding: 10px 12px; text-align: center; width: 130px;">Status</th>
+                  <th style="padding: 10px 12px; text-align: right; width: 160px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="directorPendingListBody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="directorReviewModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 920px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="background: #1E3A8A; color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div class="modal-title" style="color: #fff; font-weight: 700; font-size: 1rem;" id="modalDirectorTitle">Director Academic Review</div>
+        <button class="bec-modal-close-icon" onclick="ui.closeModal('directorReviewModal')" style="color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="modalDirectorBody" style="padding: 1.5rem; overflow-y: auto;">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Rejection Modal -->
+  <div id="directorRejectModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px; width: 92%;">
+      <div class="modal-header" style="background: #DC2626; color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+        <div class="modal-title" style="color: #fff; font-weight: 700; font-size: 1rem;">Reject Subject Registration</div>
+        <button class="bec-modal-close-icon" onclick="ui.closeModal('directorRejectModal')" style="color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <div style="font-size: 0.88rem; color: #334155; margin-bottom: 0.75rem;">
+          Please state the official reason for rejecting this subject registration application. The student and department HOD will be notified.
+        </div>
+        <textarea id="directorRejectReason" rows="3" style="width: 100%; padding: 0.6rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;" placeholder="e.g., Attendance shortfall in pre-requisites. Contact Academic Head."></textarea>
+      </div>
+      <div class="modal-footer" style="padding: 0.75rem 1.25rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="ui.closeModal('directorRejectModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="directorRegistrations.confirmReject()" style="background: #DC2626; border-color: #DC2626; font-weight: 700;">Confirm Rejection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script src="/js/directorRegistrations.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      navigation.init('director-registrations');
+      await directorRegistrations.init();
+    });
+  </script>
+</body>
+</html>

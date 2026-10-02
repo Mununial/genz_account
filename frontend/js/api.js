@@ -7,6 +7,14 @@ const API_BASE = '/api';
 
 const api = {
   getToken() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const qToken = urlParams.get('token');
+      if (qToken) {
+        localStorage.setItem('bec_auth_token', qToken);
+        return qToken;
+      }
+    } catch (e) {}
     return sessionStorage.getItem('bec_auth_token') || localStorage.getItem('bec_auth_token');
   },
 

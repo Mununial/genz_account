@@ -23,7 +23,9 @@ const dbConfig = {
   queueLimit: parseInt(process.env.DB_QUEUE_LIMIT, 10) || 0,
   timezone: '+05:30',
   dateStrings: true,
-  multipleStatements: true
+  multipleStatements: true,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000
 };
 
 let pool = null;
@@ -57,6 +59,14 @@ async function query(sql, params = []) {
         return await p.query(sql, params);
       }
     } catch (err) {
+      if (err.code === 'ECONNRESET' || err.code === 'PROTOCOL_CONNECTION_LOST') {
+        try {
+          const p = getPool();
+          if (p) return await p.query(sql, params);
+        } catch (retryErr) {
+          err = retryErr;
+        }
+      }
       if (err.code === 'ECONNREFUSED' || err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ER_BAD_DB_ERROR') {
         if (!useSimulationMode) {
           console.warn(`[Database Notice] MySQL server (${dbConfig.host}:${dbConfig.port}) not reachable (${err.code}).`);
@@ -1352,9 +1362,561 @@ function executeMockQuery(sql, params) {
     return [{ affectedRows: 1 }];
   }
 
+  // ── Subject Registration Module Mock Handlers ─────────────────────────────
+
+  // SELECT programs
+  if (/FROM programs/i.test(cleanSql)) {
+    return [[...mockDb.programs]];
+  }
+
+  // SELECT departments
+  if (/FROM departments/i.test(cleanSql)) {
+    let depts = (mockDb.departments || []).map(d => {
+      const prog = (mockDb.programs || []).find(p => p.id === d.program_id) || {};
+      return { ...d, program_name: prog.name || '' };
+    });
+    if (/code\s*=\s*\?|short_name\s*=\s*\?/i.test(cleanSql)) {
+      const codeParam = String(params[0] || '').toUpperCase();
+      depts = depts.filter(d => d.code === codeParam || d.short_name === codeParam);
+    }
+    if (/program_id\s*=\s*\?/i.test(cleanSql)) {
+      const pid = parseInt(params.find(p => Number.isInteger(p) && p > 0));
+      if (pid) depts = depts.filter(d => d.program_id === pid);
+    }
+    if (/WHERE\s+id\s*=\s*\?|WHERE\s+\w+\.id\s*=\s*\?/i.test(cleanSql)) {
+      const did = parseInt(params[0]);
+      depts = depts.filter(d => d.id === did);
+    }
+    return [depts];
+  }
+
+  // SELECT department_hods
+  if (/FROM department_hods/i.test(cleanSql)) {
+    let dhs = (mockDb.departmentHods || []).map(dh => {
+      const dept = (mockDb.departments || []).find(d => d.id === dh.department_id) || {};
+      const hodUser = (mockDb.users || []).find(u => u.id === dh.hod_user_id) || {};
+      const hodStaff = (mockDb.staff || []).find(st => st.user_id === dh.hod_user_id) || {};
+      return {
+        ...dh,
+        department_name: dept.name || '',
+        department_code: dept.code || '',
+        program_id: dept.program_id || 1,
+        hod_email: hodUser.email || '',
+        hod_name: hodStaff.full_name || ''
+      };
+    });
+    if (/department_id=\?|department_id = \?/i.test(cleanSql)) {
+      const did = parseInt(params[0]);
+      dhs = dhs.filter(dh => dh.department_id === did);
+    }
+    if (/hod_user_id=\?|hod_user_id = \?/i.test(cleanSql)) {
+      const uid = parseInt(params[0]);
+      dhs = dhs.filter(dh => dh.hod_user_id === uid);
+    }
+    return [dhs];
+  }
+
+  // SELECT subjects
+  if (/FROM subjects/i.test(cleanSql)) {
+    let results = (mockDb.subjects || []).map(s => {
+      const dept = (mockDb.departments || []).find(d => d.id === s.department_id) || {};
+      const prog = (mockDb.programs || []).find(p => p.id === s.program_id) || {};
+      return {
+        ...s,
+        department_name: dept.name || '',
+        department_code: dept.code || '',
+        program_name: prog.name || ''
+      };
+    });
+
+    if (cleanSql.includes('is_active=1') || cleanSql.includes("is_active = 1")) {
+      results = results.filter(s => s.is_active === 1);
+    }
+    const whereMatches = [...cleanSql.matchAll(/(\w+)\s*=\s*\?/g)];
+    const paramMap = {};
+    whereMatches.forEach((m, idx) => {
+      paramMap[m[1].toLowerCase()] = params[idx];
+    });
+
+    if (paramMap.department_id !== undefined) {
+      const did = parseInt(paramMap.department_id);
+      if (did) results = results.filter(s => s.department_id === did);
+    }
+    if (paramMap.program_id !== undefined) {
+      const pid = parseInt(paramMap.program_id);
+      if (pid) results = results.filter(s => s.program_id === pid);
+    }
+    if (paramMap.semester !== undefined) {
+      const sem = parseInt(paramMap.semester);
+      if (sem) results = results.filter(s => s.semester === sem);
+    }
+    if (paramMap.type !== undefined) {
+      const type = String(paramMap.type);
+      if (type) results = results.filter(s => s.type === type);
+    }
+    if (paramMap.branch !== undefined || paramMap.department_code !== undefined) {
+      const branch = String(paramMap.branch || paramMap.department_code);
+      if (branch && branch !== 'ALL') results = results.filter(s => s.department_code === branch || s.branch === branch || s.branch === 'ALL');
+    }
+    if (cleanSql.includes('ORDER BY semester,type,name') || cleanSql.includes('ORDER BY type,name') || cleanSql.includes('ORDER BY sequence')) {
+      results.sort((a,b) => (a.sequence || 0) - (b.sequence || 0) || a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
+    }
+    if (/WHERE id IN/i.test(cleanSql)) {
+      const ids = params.map(p => parseInt(p));
+      results = results.filter(s => ids.includes(s.id));
+    }
+    if (/WHERE id = \?/i.test(cleanSql) && params.length === 1) {
+      results = results.filter(s => s.id === parseInt(params[0]));
+    }
+    return [results];
+  }
+
+  // INSERT INTO subjects
+  if (/INSERT INTO subjects/i.test(cleanSql)) {
+    const newId = mockDb.subjects.length ? Math.max(...mockDb.subjects.map(s=>s.id)) + 1 : 1;
+    // Check if department-structured insert
+    if (params.length >= 8) {
+      const [code, name, program_id, department_id, semester, year, credits, type, sequence] = params;
+      if (mockDb.subjects.find(s => s.code === code)) throw Object.assign(new Error('Duplicate code'), { code: 'ER_DUP_ENTRY' });
+      mockDb.subjects.push({
+        id: newId,
+        code,
+        name,
+        program_id: parseInt(program_id) || 1,
+        department_id: parseInt(department_id) || 1,
+        semester: parseInt(semester),
+        year: parseInt(year) || Math.ceil(parseInt(semester) / 2),
+        credits: parseInt(credits),
+        type: type || 'CORE',
+        sequence: parseInt(sequence) || 0,
+        is_active: 1,
+        created_at: new Date().toISOString()
+      });
+    } else {
+      const [code, name, branch, semester, year, credits, type] = params;
+      if (mockDb.subjects.find(s => s.code === code)) throw Object.assign(new Error('Duplicate'), { code: 'ER_DUP_ENTRY' });
+      mockDb.subjects.push({ id: newId, code, name, branch: branch||'ALL', semester: parseInt(semester), year: parseInt(year)||1, credits: parseInt(credits), type: type||'CORE', program_id: 1, department_id: 1, is_active: 1, created_at: new Date().toISOString() });
+    }
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
+  // UPDATE subjects
+  if (/UPDATE subjects/i.test(cleanSql)) {
+    const id = parseInt(params[params.length-1]);
+    const sub = mockDb.subjects.find(s => s.id === id);
+    if (sub) {
+      if (params[0]) sub.code = params[0];
+      if (params[1]) sub.name = params[1];
+      if (params[2]) sub.branch = params[2];
+      if (params[3]) sub.semester = parseInt(params[3]);
+      if (params[4]) sub.year = parseInt(params[4]);
+      if (params[5]) sub.credits = parseInt(params[5]);
+      if (params[6]) sub.type = params[6];
+      if (params[7] !== undefined) sub.is_active = params[7] ? 1 : 0;
+    }
+    return [{ affectedRows: 1 }];
+  }
+
+  // SELECT student_fees
+  if (/FROM student_fees/i.test(cleanSql)) {
+    let feeRows = [...mockDb.studentFees];
+    if (/WHERE.*student_id=\?|WHERE.*student_id = \?/i.test(cleanSql)) {
+      const sid = parseInt(params[0]);
+      feeRows = feeRows.filter(f => f.student_id === sid);
+    }
+    if (cleanSql.includes("academic_year='2026-27'") || cleanSql.includes("academic_year = '2026-27'")) {
+      feeRows = feeRows.filter(f => f.academic_year === '2026-27');
+    }
+    // If no fee record found, build from student data
+    if (feeRows.length === 0 && params[0]) {
+      const sid = parseInt(params[0]);
+      const stu = mockDb.students.find(s => s.id === sid);
+      if (stu) {
+        const stuReceipts = (mockDb.receipts || []).filter(r => r.student_id === sid);
+        const rcPaid = stuReceipts.reduce((s, r) => s + parseFloat(r.amount || r.receipt_amount || 0), 0);
+        const stuPayments = (mockDb.payments || []).filter(p => p.student_id === sid && (p.status === 'SUCCESS' || !p.status));
+        const pPaid = stuPayments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+        const stuInvoices = (mockDb.invoices || []).filter(i => i.student_id === sid);
+        const invPaid = stuInvoices.reduce((s, i) => s + parseFloat(i.paid_amount || 0), 0);
+        const stuPaid = parseFloat(stu.total_paid || stu.tuition_fee_paid || 0);
+
+        const totalPaid = Math.max(rcPaid, pPaid, invPaid, stuPaid);
+        const hostelPaid = parseFloat(stu.hostel_fee_paid || 0);
+        feeRows = [{ id: sid, student_id: sid, roll_number: stu.reg_no||'', category: (stu.category||'General').toUpperCase(), is_hosteller: stu.hostel_opted||0, total_fee: 115000, total_paid: totalPaid, hostel_paid: hostelPaid, tuition_paid: totalPaid, exam_fees_paid: 0, backlog_fees_paid: 0, scholarship_amount: 0, academic_year: '2026-27' }];
+      }
+    }
+    return [feeRows];
+  }
+
+  // INSERT INTO student_fees
+  if (/INSERT INTO student_fees/i.test(cleanSql)) {
+    const newId = mockDb.studentFees.length ? Math.max(...mockDb.studentFees.map(f=>f.id)) + 1 : 1;
+    const record = { id: newId, student_id: params[0], roll_number: params[1], category: params[2], is_hosteller: params[3], total_fee: params[4], total_paid: params[5], tuition_paid: params[6], hostel_paid: params[7], exam_fees_paid: params[8], backlog_fees_paid: params[9], scholarship_amount: params[10], academic_year: params[11] };
+    const existing = mockDb.studentFees.findIndex(f => f.student_id === record.student_id && f.academic_year === record.academic_year);
+    if (existing >= 0) {
+      mockDb.studentFees[existing] = { ...mockDb.studentFees[existing], ...record, id: mockDb.studentFees[existing].id };
+    } else {
+      mockDb.studentFees.push(record);
+    }
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
+  // SELECT subject_registrations
+  if (!cleanSql.toUpperCase().startsWith('DELETE') && /FROM subject_registrations/i.test(cleanSql)) {
+    let regs = mockDb.subjectRegistrations.map(r => {
+      const stu = mockDb.students.find(s => s.id === r.student_id) || {};
+      const dept = mockDb.departments.find(d => d.id === r.department_id) || mockDb.departments.find(d => d.code === stu.branch_code) || mockDb.departments[0];
+      const prog = mockDb.programs.find(p => p.id === r.program_id) || mockDb.programs.find(p => p.id === dept.program_id) || mockDb.programs[0];
+      const br = mockDb.branches.find(b => b.id === stu.branch_id) || {};
+      const sem = mockDb.semesters.find(sm => sm.semester_number === r.semester) || {};
+      const hodStaff = mockDb.staff.find(st => st.user_id === r.hod_id);
+      const dirStaff = mockDb.staff.find(st => st.user_id === r.director_id);
+      const accStaff = mockDb.staff.find(st => st.user_id === r.accounts_id);
+      const examStaff = mockDb.staff.find(st => st.user_id === r.exam_section_id) || accStaff || mockDb.staff.find(st => st.user_id === 15);
+
+      // Fee metrics calculation
+      const stuPaid = parseFloat(stu.total_paid || 0);
+      const feeRequired = prog.id === 1 ? 115000 : (prog.id === 2 ? 60000 : 150000);
+      const feePaidPercent = Math.min(100, Math.round((stuPaid / feeRequired) * 100));
+
+      return {
+        ...r,
+        full_name: stu.full_name || '',
+        reg_no: stu.reg_no || '',
+        program_id: prog.id,
+        program_name: prog.name,
+        program_code: prog.code,
+        department_id: dept.id,
+        department_name: dept.name,
+        department_code: dept.code,
+        branch_name: br.name || dept.name,
+        branch_code: dept.code,
+        semester_label: sem.label || `Semester ${r.semester}`,
+        student_category: stu.category || 'General',
+        hostel_opted: stu.hostel_opted || 0,
+        fee_paid_percent: feePaidPercent,
+        total_paid: stuPaid,
+        total_required: feeRequired,
+        hod_name: hodStaff?.full_name || null,
+        director_name: dirStaff?.full_name || null,
+        accounts_name: accStaff?.full_name || null,
+        exam_section_name: examStaff?.full_name || 'Dr. Ramesh Chandra Sahoo',
+        exam_fee_amount: r.exam_fee_amount || 1550.00,
+        exam_fee_status: r.exam_fee_status || (r.status === 'CONFIRMED' || r.status === 'EXAM_FEE_PAID' ? 'PAID' : 'PENDING'),
+        exam_receipt_no: r.exam_receipt_no || (r.status === 'CONFIRMED' ? `EXAM-REC-${r.id}` : null)
+      };
+    });
+
+    // Filter by student_id and/or id with proper parameter index detection
+    const idPos = cleanSql.search(/\b(?:sr\.)?id\s*=\s*\?/i);
+    const sidPos = cleanSql.search(/\b(?:sr\.)?student_id\s*=\s*\?/i);
+
+    if (idPos !== -1 && sidPos !== -1) {
+      if (idPos < sidPos) {
+        const regId = parseInt(params[0]);
+        const sid = parseInt(params[1]);
+        if (regId) regs = regs.filter(r => r.id === regId);
+        if (sid) regs = regs.filter(r => r.student_id === sid);
+      } else {
+        const sid = parseInt(params[0]);
+        const regId = parseInt(params[1]);
+        if (sid) regs = regs.filter(r => r.student_id === sid);
+        if (regId) regs = regs.filter(r => r.id === regId);
+      }
+    } else {
+      if (sidPos !== -1) {
+        const sid = parseInt(params[0]);
+        if (sid) regs = regs.filter(r => r.student_id === sid);
+      }
+      if (idPos !== -1) {
+        const regId = parseInt(params[0]);
+        if (regId) regs = regs.filter(r => r.id === regId);
+      }
+    }
+
+    if (/(?:sr\.)?department_id\s*=\s*\?/i.test(cleanSql)) {
+      const did = parseInt(params.find(p => Number.isInteger(p) && p > 0));
+      if (did) regs = regs.filter(r => r.department_id === did);
+    }
+    if (/(?:sr\.)?program_id\s*=\s*\?/i.test(cleanSql)) {
+      const pid = parseInt(params.find(p => Number.isInteger(p) && p > 0));
+      if (pid) regs = regs.filter(r => r.program_id === pid);
+    }
+    if (/(?:sr\.)?status\s*=\s*\?/i.test(cleanSql)) {
+      const stParam = params.find(p => typeof p === 'string' && ['SUBMITTED','HOD_FORWARDED','DIRECTOR_APPROVED','EXAM_FEE_PAID','CONFIRMED','REJECTED','HOD_REVERTED','DIRECTOR_REJECTED'].includes(p));
+      if (stParam) regs = regs.filter(r => r.status === stParam);
+    } else if (/(?:sr\.)?status\s+IN\s*\(([^)]+)\)/i.test(cleanSql)) {
+      const inClause = cleanSql.match(/(?:sr\.)?status\s+IN\s*\(([^)]+)\)/i)[1];
+      const allowed = inClause.split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+      regs = regs.filter(r => allowed.includes(r.status));
+    } else {
+      if (/status\s*=\s*'SUBMITTED'/i.test(cleanSql)) regs = regs.filter(r => r.status === 'SUBMITTED');
+      if (/status\s*=\s*'HOD_FORWARDED'/i.test(cleanSql)) regs = regs.filter(r => r.status === 'HOD_FORWARDED');
+      if (/status\s*=\s*'DIRECTOR_APPROVED'/i.test(cleanSql)) regs = regs.filter(r => r.status === 'DIRECTOR_APPROVED');
+      if (/status\s*=\s*'EXAM_FEE_PAID'/i.test(cleanSql)) regs = regs.filter(r => r.status === 'EXAM_FEE_PAID');
+      if (/status\s*=\s*'CONFIRMED'/i.test(cleanSql)) regs = regs.filter(r => r.status === 'CONFIRMED');
+    }
+
+    // Handle NOT IN clause
+    if (/status NOT IN/i.test(cleanSql)) {
+      const excludes = ['REJECTED','HOD_REVERTED','DIRECTOR_REJECTED'];
+      regs = regs.filter(r => !excludes.includes(r.status));
+    }
+    // Filter by sem, type, academic_year from params
+    if (/academic_year\s*=\s*['"]?([^'"\s]+)['"]?/i.test(cleanSql)) {
+      const yrMatch = cleanSql.match(/academic_year\s*=\s*['"]([^'"]+)['"]/i);
+      const yr = yrMatch ? yrMatch[1] : params.find(p => typeof p === 'string' && p.includes('-'));
+      if (yr) regs = regs.filter(r => r.academic_year === yr);
+    }
+    if (/registration_type\s*=\s*['"]?(\w+)['"]?/i.test(cleanSql) || /registration_type\s*=\s*\?/i.test(cleanSql)) {
+      const rtMatch = cleanSql.match(/registration_type\s*=\s*['"](\w+)['"]/i);
+      const rt = rtMatch ? rtMatch[1] : params.find(p => p === 'REGULAR' || p === 'BACKLOG');
+      if (rt) regs = regs.filter(r => r.registration_type === rt);
+    }
+    if (/(?:sr\.)?semester\s*=\s*\?/i.test(cleanSql) && !/semester_label/i.test(cleanSql)) {
+      let sem = null;
+      if (/(?:sr\.)?student_id\s*=\s*\?/i.test(cleanSql) && params.length >= 2) {
+        sem = parseInt(params[1]);
+      } else {
+        sem = params.find(p => Number.isInteger(p) || (!isNaN(parseInt(p)) && p < 10));
+      }
+      if (sem) regs = regs.filter(r => r.semester === parseInt(sem));
+    } else if (/(?:sr\.)?semester\s+IN\s*\(\s*\?\s*,\s*\?\s*\)/i.test(cleanSql)) {
+      const semParams = params.filter(p => Number.isInteger(p) && p >= 1 && p <= 8);
+      if (semParams.length >= 2) {
+        regs = regs.filter(r => semParams.includes(r.semester));
+      }
+    }
+
+    if (/LIKE \?/i.test(cleanSql)) {
+      const terms = params.filter(p => typeof p === 'string' && p.startsWith('%') && p.endsWith('%'));
+      if (terms.length) {
+        const raw = terms[0].replace(/^%|%$/g, '').toLowerCase();
+        if (raw) {
+          regs = regs.filter(r =>
+            (r.full_name && r.full_name.toLowerCase().includes(raw)) ||
+            (r.roll_number && r.roll_number.toLowerCase().includes(raw)) ||
+            (r.reg_no && r.reg_no.toLowerCase().includes(raw)) ||
+            (r.reference_number && r.reference_number.toLowerCase().includes(raw))
+          );
+        }
+      }
+    }
+    regs.sort((a,b) => b.id - a.id);
+    return [regs];
+  }
+
+  // INSERT INTO subject_registrations
+  if (/INSERT INTO subject_registrations/i.test(cleanSql)) {
+    const newId = mockDb.subjectRegistrations.length ? Math.max(...mockDb.subjectRegistrations.map(r=>r.id)) + 1 : 1;
+    
+    // Parse column names and value tokens from INSERT statement
+    const colMatch = cleanSql.match(/INSERT\s+INTO\s+subject_registrations\s*\(([^)]+)\)/i);
+    const colNames = colMatch ? colMatch[1].split(',').map(c => c.trim().toLowerCase()) : [];
+    const valMatch = cleanSql.match(/VALUES\s*\(([^)]+)\)/i);
+    const valTokens = valMatch ? valMatch[1].split(',').map(v => v.trim()) : [];
+
+    const row = { academic_year: '2026-27', registration_type: 'REGULAR', status: 'SUBMITTED' };
+    let pIdx = 0;
+    colNames.forEach((col, idx) => {
+      const token = valTokens[idx];
+      if (token === '?') {
+        if (params[pIdx] !== undefined) row[col] = params[pIdx++];
+      } else if (token) {
+        row[col] = token.replace(/^['"]|['"]$/g, '');
+      }
+    });
+
+    const student_id = parseInt(row.student_id);
+    const stu = mockDb.students.find(s => s.id === student_id) || {};
+    const resolvedDeptId = parseInt(row.department_id) || (stu.branch_id === 5 ? 3 : (stu.branch_id === 7 ? 5 : 1));
+    const dept = mockDb.departments.find(d => d.id === resolvedDeptId) || mockDb.departments[0];
+    const resolvedProgId = parseInt(row.program_id) || dept.program_id;
+    const refNum = row.reference_number || `REG-2026-${dept.code}-${String(newId).padStart(5, '0')}`;
+
+    const reg = {
+      id: newId,
+      reference_number: refNum,
+      student_id: student_id,
+      roll_number: row.roll_number || stu.reg_no || '',
+      program_id: resolvedProgId,
+      department_id: resolvedDeptId,
+      semester: parseInt(row.semester) || 1,
+      academic_year: row.academic_year || '2026-27',
+      registration_type: row.registration_type || 'REGULAR',
+      total_credits: parseInt(row.total_credits) || 0,
+      status: row.status || 'SUBMITTED',
+      submitted_at: new Date().toISOString(),
+      hod_id: null,
+      hod_action_at: null,
+      hod_remarks: null,
+      director_id: null,
+      director_action_at: null,
+      director_remarks: null,
+      accounts_id: null,
+      accounts_action_at: null,
+      accounts_remarks: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    mockDb.subjectRegistrations.push(reg);
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
+  // UPDATE subject_registrations
+  if (/UPDATE subject_registrations/i.test(cleanSql)) {
+    const regId = parseInt(params[params.length-1]);
+    const reg = mockDb.subjectRegistrations.find(r => r.id === regId);
+    if (reg) {
+      if (/status\s*=\s*'HOD_FORWARDED'/i.test(cleanSql)) { reg.status = 'HOD_FORWARDED'; reg.hod_id = parseInt(params[0]); reg.hod_remarks = params[1] || null; reg.hod_action_at = new Date().toISOString(); }
+      else if (/status\s*=\s*'HOD_REVERTED'/i.test(cleanSql)) { reg.status = 'HOD_REVERTED'; reg.hod_id = parseInt(params[0]); reg.hod_remarks = params[1]; reg.hod_action_at = new Date().toISOString(); }
+      else if (/status\s*=\s*'DIRECTOR_APPROVED'/i.test(cleanSql)) { reg.status = 'DIRECTOR_APPROVED'; reg.director_id = parseInt(params[0]); reg.director_remarks = params[1] || null; reg.director_action_at = new Date().toISOString(); }
+      else if (/status\s*=\s*'DIRECTOR_REJECTED'/i.test(cleanSql)) { reg.status = 'DIRECTOR_REJECTED'; reg.director_id = parseInt(params[0]); reg.director_remarks = params[1]; reg.director_action_at = new Date().toISOString(); }
+      else if (/status\s*=\s*'EXAM_FEE_PAID'/i.test(cleanSql)) {
+        reg.status = 'EXAM_FEE_PAID';
+        reg.exam_fee_amount = parseFloat(params[0]) || 1550;
+        reg.exam_fee_status = 'PAID';
+        reg.exam_receipt_no = params[1] || `EXAM-REC-${reg.id}`;
+        reg.exam_fee_paid_at = new Date().toISOString();
+      }
+      else if (/status\s*=\s*'CONFIRMED'/i.test(cleanSql)) {
+        reg.status = 'CONFIRMED';
+        const offId = parseInt(params[0]) || 15;
+        reg.exam_section_id = offId;
+        reg.exam_section_remarks = params[1] || 'Verified and marked Received by College Examination Section';
+        reg.exam_section_action_at = new Date().toISOString();
+        reg.accounts_id = offId;
+        reg.accounts_remarks = reg.exam_section_remarks;
+        reg.accounts_action_at = reg.exam_section_action_at;
+      }
+      reg.updated_at = new Date().toISOString();
+    }
+    return [{ affectedRows: 1 }];
+  }
+
+  // SELECT registration_subjects
+  if (!cleanSql.toUpperCase().startsWith('DELETE') && /FROM registration_subjects/i.test(cleanSql)) {
+    let rSubs = mockDb.registrationSubjects;
+    if (/WHERE rs\.registration_id=\?|WHERE registration_id=\?/i.test(cleanSql) || params[0]) {
+      const rid = parseInt(params[0]);
+      rSubs = rSubs.filter(rs => rs.registration_id === rid);
+    }
+    // JOIN subjects
+    const enriched = rSubs.map(rs => {
+      const sub = mockDb.subjects.find(s => s.id === rs.subject_id) || {};
+      return { ...sub, ...rs };
+    });
+    if (/COUNT\(\*\)/i.test(cleanSql)) {
+      const tc = enriched.reduce((s, rs) => s + (rs.credits || 0), 0);
+      return [[{ cnt: enriched.length, tc, total_credits: tc }]];
+    }
+    return [enriched];
+  }
+
+  // INSERT INTO registration_subjects
+  if (/INSERT INTO registration_subjects/i.test(cleanSql)) {
+    const newId = mockDb.registrationSubjects.length ? Math.max(...mockDb.registrationSubjects.map(rs=>rs.id)) + 1 : 1;
+    const [registration_id, subject_id, is_backlog] = params;
+    mockDb.registrationSubjects.push({ id: newId, registration_id: parseInt(registration_id), subject_id: parseInt(subject_id), is_backlog: parseInt(is_backlog), created_at: new Date().toISOString() });
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
+  // INSERT INTO notifications (registration module)
+  if (/INSERT INTO notifications/i.test(cleanSql) && /REGISTRATION/i.test(cleanSql)) {
+    const newId = mockDb.notifications.length ? Math.max(...mockDb.notifications.map(n=>n.id||0)) + 1 : 1;
+    mockDb.notifications.push({ id: newId, user_id: params[0]||null, title: params[1]||'', message: params[2]||'', category: 'REGISTRATION', is_read: 0, created_at: new Date().toISOString() });
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
+  // SELECT scholarships for registration eligibility
+  if (/FROM scholarships.*WHERE student_id=\?/i.test(cleanSql) || /FROM scholarships.*WHERE.*student_id = \?/i.test(cleanSql)) {
+    const sid = parseInt(params[0]);
+    // No scholarship records in mock — return 0
+    return [[{ sch: 0, total_scholarship: 0 }]];
+  }
+
+  // DELETE registration tables
+  if (/DELETE FROM subject_registrations/i.test(cleanSql)) {
+    mockDb.subjectRegistrations = [];
+    return [{ affectedRows: 1 }];
+  }
+  if (/DELETE FROM registration_subjects/i.test(cleanSql)) {
+    mockDb.registrationSubjects = [];
+    return [{ affectedRows: 1 }];
+  }
+
+  // SELECT registration_windows
+  if (/FROM registration_windows/i.test(cleanSql)) {
+    let windows = [...(mockDb.registrationWindows || [])];
+    if (/WHERE.*semester\s*=\s*\?/i.test(cleanSql)) {
+      const sem = parseInt(params[0]);
+      windows = windows.filter(w => w.semester === sem);
+    }
+    return [windows];
+  }
+
+  // UPDATE registration_windows
+  if (/UPDATE registration_windows/i.test(cleanSql)) {
+    const semMatch = cleanSql.match(/WHERE.*semester\s*=\s*(\d+|\?)/i);
+    let targetSem = null;
+    if (semMatch) {
+      targetSem = semMatch[1] === '?' ? parseInt(params[params.length - 1]) : parseInt(semMatch[1]);
+    }
+    const win = (mockDb.registrationWindows || []).find(w => w.semester === targetSem);
+    if (win) {
+      if (/is_open\s*=\s*\?/i.test(cleanSql) || /is_open\s*=\s*(\d+)/i.test(cleanSql)) {
+        const isOpenVal = params[0] !== undefined ? (parseInt(params[0]) ? 1 : 0) : (cleanSql.includes('is_open = 1') ? 1 : 0);
+        win.is_open = isOpenVal;
+        win.status = isOpenVal ? 'OPEN' : 'LOCKED';
+      }
+    }
+    return [{ affectedRows: 1 }];
+  }
+
+  // INSERT INTO receipts
+  if (/INSERT INTO receipts/i.test(cleanSql)) {
+    const newId = mockDb.receipts.length ? Math.max(...mockDb.receipts.map(r => r.id || 0)) + 1 : 1;
+    const [receipt_no, student_id, amount, payment_mode, semester, remarks, created_by] = params;
+    const rObj = {
+      id: newId,
+      receipt_no: receipt_no || `REC-${newId}`,
+      student_id: parseInt(student_id),
+      amount: parseFloat(amount) || 1550,
+      receipt_amount: parseFloat(amount) || 1550,
+      payment_mode: payment_mode || 'ONLINE',
+      payment_method: payment_mode || 'Online Gateway',
+      semester: semester || 'Semester 2',
+      remarks: remarks || 'BPUT Semester Examination & Board Fee',
+      created_by: created_by || 1,
+      created_at: new Date().toISOString()
+    };
+    mockDb.receipts.push(rObj);
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
+  // INSERT INTO payments
+  if (/INSERT INTO payments/i.test(cleanSql)) {
+    const newId = mockDb.payments.length ? Math.max(...mockDb.payments.map(p => p.id || 0)) + 1 : 1;
+    const [payment_no, student_id, amount, payment_method, transaction_id, status, idempotency_key] = params;
+    const pObj = {
+      id: newId,
+      payment_no: payment_no || `PAY-${newId}`,
+      student_id: parseInt(student_id),
+      amount: parseFloat(amount) || 1550,
+      payment_method: payment_method || 'ONLINE_PORTAL',
+      transaction_id: transaction_id || `TXN-${Date.now()}`,
+      status: status || 'SUCCESS',
+      idempotency_key: idempotency_key || `key_${Date.now()}`,
+      created_at: new Date().toISOString()
+    };
+    mockDb.payments.push(pObj);
+    return [{ insertId: newId, affectedRows: 1 }];
+  }
+
   // Generic fallback for any other unhandled queries
   return [[], {}];
 }
+
 
 module.exports = {
   getPool,

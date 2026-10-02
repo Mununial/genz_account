@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Control Login - Bhubaneswar Engineering College</title>
+  <meta name="description" content="Super Admin Master Control Login: Privileged root access to manage all roles, passwords, students, and academic registration windows.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cyber: #070D18;
+      --card-cyber: #0D1627;
+      --border-cyber: #1E2E48;
+      --border-glow: #2563EB;
+      --accent-cyan: #06B6D4;
+      --accent-amber: #F59E0B;
+      --accent-green: #10B981;
+      --accent-blue: #3B82F6;
+      --text-bright: #F8FAFC;
+      --text-dim: #94A3B8;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-cyber);
+      color: var(--text-bright);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.25), transparent),
+        radial-gradient(ellipse 60% 40% at 85% 100%, rgba(6, 182, 212, 0.15), transparent),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+    }
+
+    .master-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+    }
+
+    .master-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card-cyber);
+      border: 1px solid var(--border-cyber);
+      border-radius: 18px;
+      box-shadow: 
+        0 0 0 1px rgba(59, 130, 246, 0.1),
+        0 25px 60px -15px rgba(0, 0, 0, 0.8),
+        0 0 40px -10px rgba(37, 99, 235, 0.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .master-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #F59E0B, #3B82F6, #06B6D4, #10B981);
+    }
+
+    .master-header {
+      padding: 2.25rem 2rem 1.5rem;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid var(--border-cyber);
+    }
+
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.2rem;
+      background: #FFFFFF;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+
+    .brand-logo-wrap img {
+      max-width: 170px;
+      height: auto;
+      display: block;
+    }
+
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.8rem;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #FBBF24;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      margin-bottom: 0.65rem;
+      font-family: var(--font-mono);
+    }
+
+    .tier-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: #F59E0B;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #F59E0B;
+      animation: pulseGlow 1.8s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .master-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    .master-sub {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+
+    .master-body {
+      padding: 2rem;
+    }
+
+    .form-group-cyber {
+      margin-bottom: 1.25rem;
+    }
+
+    .label-cyber {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #CBD5E1;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .label-cyber span.hint {
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .input-wrap-cyber {
+      position: relative;
+    }
+
+    .input-cyber {
+      width: 100%;
+      background: #060B14;
+      border: 1.5px solid #1E2E48;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      color: #FFFFFF;
+      font-size: 0.95rem;
+      font-family: var(--font-mono);
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .input-cyber:focus {
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 0 16px rgba(59, 130, 246, 0.2);
+      background: #09111F;
+    }
+
+    .pwd-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .pwd-toggle-btn:hover {
+      color: var(--text-bright);
+    }
+
+    .btn-launch-master {
+      width: 100%;
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      border: 1px solid #3B82F6;
+      color: #FFFFFF;
+      padding: 0.95rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.4);
+      transition: all 0.2s ease;
+      margin-top: 1.5rem;
+    }
+
+    .btn-launch-master:hover {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-launch-master:active {
+      transform: translateY(0);
+    }
+
+    .quick-creds-section {
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-cyber);
+    }
+
+    .quick-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .quick-title span.badge {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .quick-chip {
+      background: #070E1A;
+      border: 1px solid #1E2D47;
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .quick-chip:hover {
+      background: #0F1D33;
+      border-color: #3B82F6;
+      transform: translateY(-1px);
+    }
+
+    .quick-chip .role-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #93C5FD;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .quick-chip .cred-id {
+      font-size: 0.75rem;
+      color: #E2E8F0;
+      font-family: var(--font-mono);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .quick-chip .cred-pwd {
+      font-size: 0.68rem;
+      color: #64748B;
+      font-family: var(--font-mono);
+    }
+
+    .back-nav {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+    }
+
+    .back-nav a {
+      color: #94A3B8;
+      text-decoration: none;
+      transition: color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .back-nav a:hover {
+      color: #38BDF8;
+    }
+
+    .cheat-sheet-modal {
+      background: #0B1324;
+      border: 1px solid #1E2E48;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+    }
+
+    .cheat-sheet-modal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .cheat-sheet-modal th {
+      text-align: left;
+      color: #94A3B8;
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid #1E2E48;
+    }
+
+    .cheat-sheet-modal td {
+      padding: 0.45rem 0.5rem;
+      border-bottom: 1px solid #142138;
+      color: #E2E8F0;
+    }
+
+    .code-pill {
+      background: #1E293B;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #38BDF8;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="master-wrapper">
+    <div class="master-card">
+      
+      <!-- Brand & Tier Header -->
+      <div class="master-header">
+        <div class="brand-logo-wrap">
+          <img src="/assets/bec-logo.jpg" alt="BEC Crest" style="width: 54px; height: 54px; border-radius: 12px; object-fit: contain; background: #ffffff; padding: 2px;">
+        </div>
+        <br>
+        <div class="tier-badge">
+          Root Authority • Tier 0
+        </div>
+        <h1 class="master-title">⚡ MASTER CONTROL CONSOLE</h1>
+        <p class="master-sub">Super Administrator &amp; Full System Access Portal</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="master-body">
+        <form id="masterLoginForm" onsubmit="handleMasterLogin(event)">
+          
+          <div class="form-group-cyber">
+            <label class="label-cyber" for="masterEmail">
+              <span>Master User ID / Email</span>
+              <span class="hint">admin@bec.ac.in (or 'admin')</span>
+            </label>
+            <div class="input-wrap-cyber">
+              <input 
+                type="text" 
+                id="masterEmail" 
+                class="input-cyber" 
+                placeholder="admin@bec.ac.in" 
+                value="admin@bec.ac.in" 
+                required 
+                autocomplete="username"
+              >
+            </div>
+          </div>
+
+          <div class="form-group-cyber">
+            <label class="label-cyber" for="masterPassword">
+              <span>Master Security Password</span>
+              <span class="hint">Admin@BEC2026!</span>
+            </label>
+            <div class="input-wrap-cyber">
+              <input 
+                type="password" 
+                id="masterPassword" 
+                class="input-cyber" 
+                placeholder="••••••••••••" 
+                value="Admin@BEC2026!" 
+                required 
+                autocomplete="current-password"
+              >
+              <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility()">Show</button>
+            </div>
+          </div>
+
+          <button type="submit" id="masterSubmitBtn" class="btn-launch-master">
+            <span>⚡ Authenticate &amp; Launch Master Console</span>
+          </button>
+        </form>
+
+        <!-- 1-Click Master Quick Login Switcher -->
+        <div class="quick-creds-section">
+          <div class="quick-title">
+            <span>1-Click Privileged Quick Access</span>
+            <span class="badge">Live MariaDB</span>
+          </div>
+
+          <div class="quick-grid">
+            
+            <!-- 1. Super Admin (Ayush Mallick) -->
+            <div class="quick-chip" onclick="quickFill('ayush', 'Ayushtech@26')" style="border-color: #F59E0B; background: rgba(245, 158, 11, 0.08);">
+              <div class="role-tag" style="color: #FBBF24;">👑 Ayush Mallick (Super Admin)</div>
+              <div class="cred-id">ayush.mallick@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Ayushtech@26 • 📱 7008407876</div>
+            </div>
+
+            <!-- 2. Director (Dr. B.N. Biswal) -->
+            <div class="quick-chip" onclick="quickFill('director', 'Bec@Biswal2026!')" style="border-color: #A855F7; background: rgba(168, 85, 247, 0.08);">
+              <div class="role-tag" style="color: #C084FC;">🏛️ Dr. B.N. Biswal (Director)</div>
+              <div class="cred-id">bn.biswal@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Biswal2026! • 📱 9861142627</div>
+            </div>
+
+            <!-- 3. Accountant (Harihara Parida) -->
+            <div class="quick-chip" onclick="quickFill('harihara', 'Bec@Harihara2026!')" style="border-color: #3B82F6; background: rgba(59, 130, 246, 0.08);">
+              <div class="role-tag" style="color: #60A5FA;">💼 Harihara Parida (Accountant)</div>
+              <div class="cred-id">harihara.parida@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Harihara2026!</div>
+            </div>
+
+            <!-- 4. Examiner (Mr. Manoj Kumar Pati) -->
+            <div class="quick-chip" onclick="quickFill('manoj', 'Bec@Manoj2026!')" style="border-color: #10B981; background: rgba(16, 185, 129, 0.08);">
+              <div class="role-tag" style="color: #34D399;">📋 Mr. Manoj Kumar Pati (Examiner)</div>
+              <div class="cred-id">manoj.pati@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Manoj2026!</div>
+            </div>
+
+            <!-- 5. HOD CSE & DS (Anita Behera) -->
+            <div class="quick-chip" onclick="quickFill('anita', 'Bec@Anita2026!')" style="border-color: #EC4899; background: rgba(236, 72, 153, 0.08);">
+              <div class="role-tag" style="color: #F472B6;">👔 Anita Behera (HOD CSE &amp; DS)</div>
+              <div class="cred-id">anita.behera@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Anita2026! • 📱 7008407876</div>
+            </div>
+
+            <!-- 6. HOD Agri (Ananyaa Mohanty) -->
+            <div class="quick-chip" onclick="quickFill('ananyaa', 'Bec@Ananyaa2026!')" style="border-color: #84CC16; background: rgba(132, 204, 22, 0.08);">
+              <div class="role-tag" style="color: #A3E635;">🌾 Ananyaa Mohanty (HOD Agri)</div>
+              <div class="cred-id">ananyaa.mohanty@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Ananyaa2026! • 📱 7978282332</div>
+            </div>
+
+            <!-- 7. HOD Mech & Mechatronics (Dr. Bishnu Prasad Mishra) -->
+            <div class="quick-chip" onclick="quickFill('bishnu', 'Bec@Bishnu2026!')">
+              <div class="role-tag" style="color: #FB923C;">⚙️ Dr. Bishnu Mishra (Mech &amp; Mecha)</div>
+              <div class="cred-id">bishnu.mishra@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Bishnu2026! • 📱 9438009384</div>
+            </div>
+
+            <!-- 8. HOD EE & ECE (Dr. Binaya Kumar Mallick) -->
+            <div class="quick-chip" onclick="quickFill('binaya', 'Bec@Binaya2026!')">
+              <div class="role-tag" style="color: #38BDF8;">⚡ Dr. Binaya Mallick (EE &amp; ECE)</div>
+              <div class="cred-id">binaya.malika@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Binaya2026! • 📱 7789948853</div>
+            </div>
+
+            <!-- 9. HOD Aero & AME (Dr. Sangram Keshari Samal) -->
+            <div class="quick-chip" onclick="quickFill('sangram', 'Bec@Sangram2026!')">
+              <div class="role-tag" style="color: #818CF8;">✈️ Dr. Sangram Samal (Aero &amp; AME)</div>
+              <div class="cred-id">sangram.samal@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Sangram2026! • 📱 7008323684</div>
+            </div>
+
+            <!-- 10. HOD MBA (Mr. Ashis Kumar Behera) -->
+            <div class="quick-chip" onclick="quickFill('ashis', 'Bec@Ashis2026!')">
+              <div class="role-tag" style="color: #E879F9;">📈 Mr. Ashis Behera (HOD MBA)</div>
+              <div class="cred-id">ashis.behera@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Ashis2026! • 📱 9040514865</div>
+            </div>
+
+            <!-- 11. HOD Civil & Environmental (Saswat Mohanty) -->
+            <div class="quick-chip" onclick="quickFill('saswat', 'Bec@Saswat2026!')" style="border-color: #06B6D4; background: rgba(6, 182, 212, 0.08);">
+              <div class="role-tag" style="color: #22D3EE;">🏗️ Saswat Mohanty (Civil &amp; Env)</div>
+              <div class="cred-id">hod.civil@bec.ac.in</div>
+              <div class="cred-pwd">Pass: Bec@Saswat2026! • 📱 Civil HOD</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Master Credentials Reference Table -->
+        <div style="margin-top: 1.5rem; text-align: center;">
+          <a href="javascript:void(0)" onclick="toggleCheatSheet()" style="font-size: 0.76rem; color: #38BDF8; text-decoration: none; font-weight: 600;">
+            🔑 View All Verified Staff ID, Phone &amp; Passwords ▾
+          </a>
+        </div>
+
+        <div id="cheatSheet" class="cheat-sheet-modal" style="display: none;">
+          <div style="font-weight: 700; color: #F1F5F9; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+            <span>Official Institutional Staff Database</span>
+            <span style="color: #34D399;">100% Real &amp; Active</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Designation &amp; Name</th>
+                <th>Login ID / Shortcut</th>
+                <th>Phone No.</th>
+                <th>Unique Password</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="color: #FBBF24;">👑 Super Admin (Ayush Mallick)</td>
+                <td><span class="code-pill" onclick="quickFill('ayush', 'Ayushtech@26')">ayush</span></td>
+                <td>7008407876</td>
+                <td><span class="code-pill" onclick="quickFill('ayush', 'Ayushtech@26')">Ayushtech@26</span></td>
+              </tr>
+              <tr>
+                <td style="color: #C084FC;">🏛️ Director (Dr. B.N. Biswal)</td>
+                <td><span class="code-pill" onclick="quickFill('director', 'Bec@Biswal2026!')">director</span></td>
+                <td>9861142627</td>
+                <td><span class="code-pill" onclick="quickFill('director', 'Bec@Biswal2026!')">Bec@Biswal2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #60A5FA;">💼 Accountant (Harihara Parida)</td>
+                <td><span class="code-pill" onclick="quickFill('harihara', 'Bec@Harihara2026!')">harihara</span></td>
+                <td>9437000002</td>
+                <td><span class="code-pill" onclick="quickFill('harihara', 'Bec@Harihara2026!')">Bec@Harihara2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #34D399;">📋 Examiner (Mr. Manoj Kumar Pati)</td>
+                <td><span class="code-pill" onclick="quickFill('manoj', 'Bec@Manoj2026!')">manoj</span></td>
+                <td>9437000020</td>
+                <td><span class="code-pill" onclick="quickFill('manoj', 'Bec@Manoj2026!')">Bec@Manoj2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #F472B6;">👔 HOD CSE &amp; DS (Anita Behera)</td>
+                <td><span class="code-pill" onclick="quickFill('anita', 'Bec@Anita2026!')">anita</span></td>
+                <td>7008407876</td>
+                <td><span class="code-pill" onclick="quickFill('anita', 'Bec@Anita2026!')">Bec@Anita2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #22D3EE;">🏗️ HOD Civil &amp; Env (Saswat Mohanty)</td>
+                <td><span class="code-pill" onclick="quickFill('saswat', 'Bec@Saswat2026!')">saswat</span></td>
+                <td>Civil Office</td>
+                <td><span class="code-pill" onclick="quickFill('saswat', 'Bec@Saswat2026!')">Bec@Saswat2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #A3E635;">🌾 HOD Agriculture (Ananyaa Mohanty)</td>
+                <td><span class="code-pill" onclick="quickFill('ananyaa', 'Bec@Ananyaa2026!')">ananyaa</span></td>
+                <td>7978282332</td>
+                <td><span class="code-pill" onclick="quickFill('ananyaa', 'Bec@Ananyaa2026!')">Bec@Ananyaa2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #FB923C;">⚙️ HOD Mech &amp; Mecha (Dr. Bishnu Mishra)</td>
+                <td><span class="code-pill" onclick="quickFill('bishnu', 'Bec@Bishnu2026!')">bishnu</span></td>
+                <td>9438009384</td>
+                <td><span class="code-pill" onclick="quickFill('bishnu', 'Bec@Bishnu2026!')">Bec@Bishnu2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #38BDF8;">⚡ HOD EE &amp; ECE (Dr. Binaya Mallick)</td>
+                <td><span class="code-pill" onclick="quickFill('binaya', 'Bec@Binaya2026!')">binaya</span></td>
+                <td>7789948853</td>
+                <td><span class="code-pill" onclick="quickFill('binaya', 'Bec@Binaya2026!')">Bec@Binaya2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #818CF8;">✈️ HOD Aero &amp; AME (Dr. Sangram Samal)</td>
+                <td><span class="code-pill" onclick="quickFill('sangram', 'Bec@Sangram2026!')">sangram</span></td>
+                <td>7008323684</td>
+                <td><span class="code-pill" onclick="quickFill('sangram', 'Bec@Sangram2026!')">Bec@Sangram2026!</span></td>
+              </tr>
+              <tr>
+                <td style="color: #E879F9;">📈 HOD MBA (Mr. Ashis Kumar Behera)</td>
+                <td><span class="code-pill" onclick="quickFill('ashis', 'Bec@Ashis2026!')">ashis</span></td>
+                <td>9040514865</td>
+                <td><span class="code-pill" onclick="quickFill('ashis', 'Bec@Ashis2026!')">Bec@Ashis2026!</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="back-nav">
+          <a href="/login.html">← Back to Regular Student / Staff Login</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('masterPassword');
+      const btn = event.target;
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        pwdInput.type = 'password';
+        btn.textContent = 'Show';
+      }
+    }
+
+    function toggleCheatSheet() {
+      const el = document.getElementById('cheatSheet');
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function quickFill(email, pass) {
+      document.getElementById('masterEmail').value = email;
+      document.getElementById('masterPassword').value = pass;
+      handleMasterLogin();
+    }
+
+    async function handleMasterLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      
+      const email = document.getElementById('masterEmail').value.trim();
+      const password = document.getElementById('masterPassword').value;
+      const btn = document.getElementById('masterSubmitBtn');
+
+      if (!email || !password) {
+        ui.showToast('Please enter both User ID and Master Password.', 'warning');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡ Verifying Root Authority...</span>';
+
+      try {
+        const res = await api.post('/auth/login', { email, password });
+        const { token, user } = res.data;
+
+        api.setToken(token, true);
+        auth.currentUser = user;
+
+        ui.showToast(`Access Granted: ${user.role} (${user.email})`, 'success');
+
+        // Immediate redirect straight into the Master Control Console
+        setTimeout(() => {
+          window.location.href = '/master-control.html';
+        }, 300);
+
+      } catch (err) {
+        ui.showToast(err.message || 'Authentication Failed. Invalid Master Credentials.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Authenticate &amp; Launch Master Console</span>';
+      }
+    }
+  </script>
+</body>
+</html>

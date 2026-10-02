@@ -94,15 +94,30 @@ const navigation = {
       'invoices': { section: 'Audit Registers', title: 'Invoices Register' },
       'reports': { section: 'Intelligence & Audit', title: 'Financial Reports & Defaulters' },
       'cash-bank': { section: 'Cash & Banking', title: 'Cash & Bank Management Hub' },
-      'admin-settings': { section: 'Administration', title: 'Control Panel & System Settings' }
+      'admin-settings': { section: 'Administration', title: 'Control Panel & System Settings' },
+      'hod-registrations': { section: 'Department Desk', title: 'HOD Subject Approvals' },
+      'director-registrations': { section: 'Directorate Approvals', title: 'Director Academic Approvals' },
+      'accounts-registrations': { section: 'Student Accounts', title: 'Registration Finalization' },
+      'admin-subjects': { section: 'Curriculum & Academic', title: 'BPUT Subject Catalog' }
     };
 
-    const info = titles[this.activePage] || { section: 'Accounts ERP', title: document.title.split('-')[0].trim() };
+    const role = this.currentUser ? this.currentUser.role : '';
+    let homeHref = '/dashboard.html';
+    let homeLabel = 'Home';
+    if (role === 'HOD') {
+      homeHref = '/hod-registrations.html';
+      homeLabel = 'HOD Desk';
+    } else if (role === 'DIRECTOR') {
+      homeHref = '/director-registrations.html';
+      homeLabel = 'Directorate';
+    }
+
+    const info = titles[this.activePage] || { section: 'BEC Portal', title: document.title.split('-')[0].trim() };
     const breadcrumbHtml = `
       <div class="bec-breadcrumb-nav" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: #64748B; margin-bottom: 1.25rem;">
-        <a href="/dashboard.html" style="color: #64748B; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+        <a href="${homeHref}" style="color: #64748B; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Home
+          ${homeLabel}
         </a>
         <span style="color: #CBD5E1;">/</span>
         <span style="color: #64748B;">${escapeHtml(info.section)}</span>
@@ -164,24 +179,37 @@ const navigation = {
       if (!user) return;
       this.currentUser = user;
 
-      // Strict role isolation: Students cannot access staff admin pages
-      const isStudent = user.role === 'STUDENT';
       const currentPath = window.location.pathname.toLowerCase();
-      const adminPages = [
-        '/dashboard.html', '/receipt-desk.html', '/students.html',
-        '/student-fee.html', '/payment-details.html', '/student-transport-fee.html',
-        '/expenses.html', '/receipts.html', '/invoices.html', '/reports.html',
-        '/cash-bank.html', '/admin-settings.html'
-      ];
 
-      if (isStudent && adminPages.some(p => currentPath.endsWith(p))) {
-        window.location.replace('/student-portal.html');
-        return;
+      // 1. Strict Isolation for Student
+      if (user.role === 'STUDENT') {
+        if (!currentPath.endsWith('/student-portal.html')) {
+          window.location.replace('/student-portal.html');
+          return;
+        }
       }
 
-      // Staff cannot access student self-service portal directly
-      if (!isStudent && currentPath.endsWith('/student-portal.html')) {
-        window.location.replace('/dashboard.html');
+      // 2. Strict Isolation for HOD (Only academic pages allowed)
+      if (user.role === 'HOD') {
+        const hodAllowed = ['/hod-registrations.html', '/admin-subjects.html', '/students.html'];
+        if (!hodAllowed.some(p => currentPath.endsWith(p))) {
+          window.location.replace('/hod-registrations.html');
+          return;
+        }
+      }
+
+      // 3. Strict Isolation for Director (Only academic executive pages allowed)
+      if (user.role === 'DIRECTOR') {
+        const dirAllowed = ['/director-registrations.html', '/admin-subjects.html', '/students.html'];
+        if (!dirAllowed.some(p => currentPath.endsWith(p))) {
+          window.location.replace('/director-registrations.html');
+          return;
+        }
+      }
+
+      // 4. Accounts staff/admin cannot access student portal
+      if (!['STUDENT'].includes(user.role) && currentPath.endsWith('/student-portal.html')) {
+        window.location.replace('/receipt-desk.html');
         return;
       }
 
@@ -217,21 +245,216 @@ const navigation = {
 
     const p = this.activePage || '';
 
-    // Requirement 25 Sidebar Hierarchy
+    // Dynamically customize Brand Header based on Role
+    const brandTitle = document.querySelector('.brand-title');
+    const brandSubtitle = document.querySelector('.brand-subtitle');
+    const brandLink = document.querySelector('.brand-link');
+
+    // ==========================================
+    // SEPARATE HOD PORTAL SIDEBAR
+    // ==========================================
+    if (role === 'HOD') {
+      const deptName = (user && user.staff && user.staff.department) ? user.staff.department : 'Academic Department';
+      if (brandTitle) brandTitle.textContent = 'BEC ACADEMICS';
+      if (brandSubtitle) brandSubtitle.textContent = deptName;
+      if (brandLink) brandLink.href = '/hod-registrations.html';
+
+      adminNav.innerHTML = `
+        <div class="nav-section-title">Department Review</div>
+        <a href="/hod-registrations.html" class="nav-item ${p === 'hod-registrations' ? 'active' : ''}" data-page="hod-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Subject Approvals (HOD)</span>
+        </a>
+
+        <div class="nav-section-title">Academic Curriculum</div>
+        <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>BPUT Subject Catalog</span>
+        </a>
+
+        <div class="nav-section-title">Department Cohort</div>
+        <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Students Directory</span>
+        </a>
+      `;
+      return;
+    }
+
+    // ==========================================
+    // SEPARATE DIRECTOR PORTAL SIDEBAR
+    // ==========================================
+    if (role === 'DIRECTOR') {
+      if (brandTitle) brandTitle.textContent = 'BEC DIRECTORATE';
+      if (brandSubtitle) brandSubtitle.textContent = 'Executive Academic Office';
+      if (brandLink) brandLink.href = '/director-registrations.html';
+
+      adminNav.innerHTML = `
+        <div class="nav-section-title">Directorate Approvals</div>
+        <a href="/director-registrations.html" class="nav-item ${p === 'director-registrations' ? 'active' : ''}" data-page="director-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Director Academic Approvals</span>
+        </a>
+
+        <div class="nav-section-title">Institutional Overview</div>
+        <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>BPUT Subject Catalog</span>
+        </a>
+
+        <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>College Students Directory</span>
+        </a>
+      `;
+      return;
+    }
+
+    // ==========================================
+    // SEPARATE EXAMINATION CELL PORTAL SIDEBAR
+    // ==========================================
+    if (role === 'EXAM_CELL' || role === 'EXAM_SECTION') {
+      if (brandTitle) brandTitle.textContent = 'BEC EXAM CELL';
+      if (brandSubtitle) brandSubtitle.textContent = 'University Exam Section';
+      if (brandLink) brandLink.href = '/exam-registrations.html';
+
+      adminNav.innerHTML = `
+        <div class="nav-section-title">Examination Desk</div>
+        <a href="/exam-registrations.html" class="nav-item ${p === 'exam-registrations' ? 'active' : ''}" data-page="exam-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>Exam Form Verification Queue</span>
+        </a>
+
+        <div class="nav-section-title">University Curriculum</div>
+        <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>BPUT Subject Catalog</span>
+        </a>
+
+        <div class="nav-section-title">Enrolled Candidates</div>
+        <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Candidates Directory</span>
+        </a>
+      `;
+      return;
+    }
+
+    // ==========================================
+    // 4. SUPER ADMINISTRATOR / MASTER CONTROL SIDEBAR
+    // ==========================================
+    if (isSuperAdmin) {
+      if (brandTitle) brandTitle.textContent = 'BEC MASTER ADMIN';
+      if (brandSubtitle) brandSubtitle.textContent = 'System Control Console';
+      if (brandLink) brandLink.href = '/master-control.html';
+
+      adminNav.innerHTML = `
+        <!-- CORE ADMINISTRATION -->
+        <div class="nav-section-title">Core Administration</div>
+        <a href="/master-control.html" class="nav-item ${p === 'master-control' ? 'active' : ''}" data-page="master-control">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>⚡ Master Control Console</span>
+        </a>
+        <a href="/admin-settings.html" class="nav-item ${p === 'admin-settings' ? 'active' : ''}" data-page="admin-settings">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Fee &amp; System Settings</span>
+        </a>
+
+        <!-- DIRECTORY & ACADEMICS -->
+        <div class="nav-section-title">Directory &amp; Academics</div>
+        <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Students Directory (360°)</span>
+        </a>
+        <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>BPUT Subject Catalog</span>
+        </a>
+
+        <!-- REGISTRATION APPROVAL FLOW -->
+        <div class="nav-section-title">Registration Workflows</div>
+        <a href="/accounts-registrations.html" class="nav-item ${p === 'accounts-registrations' ? 'active' : ''}" data-page="accounts-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Accounts Fee Clearance</span>
+        </a>
+        <a href="/hod-registrations.html" class="nav-item ${p === 'hod-registrations' ? 'active' : ''}" data-page="hod-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>HOD Review Portal</span>
+        </a>
+        <a href="/director-registrations.html" class="nav-item ${p === 'director-registrations' ? 'active' : ''}" data-page="director-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Director Approvals</span>
+        </a>
+        <a href="/exam-registrations.html" class="nav-item ${p === 'exam-registrations' ? 'active' : ''}" data-page="exam-registrations">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>College Exam Cell</span>
+        </a>
+
+        <!-- FINANCIAL REPORTING -->
+        <div class="nav-section-title">Finance &amp; Accounts</div>
+        <a href="/dashboard.html" class="nav-item ${p === 'dashboard' ? 'active' : ''}" data-page="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Accounts Dashboard</span>
+        </a>
+        <a href="/receipts.html" class="nav-item ${p === 'receipts' ? 'active' : ''}" data-page="receipts">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Fee Receipts Register</span>
+        </a>
+        <a href="/reports.html" class="nav-item ${p === 'reports' ? 'active' : ''}" data-page="reports">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          <span>Reports &amp; Defaulters</span>
+        </a>
+      `;
+      return;
+    }
+
+    // ==========================================
+    // 5. AUDITOR READ-ONLY SIDEBAR
+    // ==========================================
+    if (isAuditor) {
+      if (brandTitle) brandTitle.textContent = 'BEC AUDIT';
+      if (brandSubtitle) brandSubtitle.textContent = 'Financial Oversight Desk';
+      if (brandLink) brandLink.href = '/dashboard.html';
+
+      adminNav.innerHTML = `
+        <div class="nav-section-title">Audit Overview</div>
+        <a href="/dashboard.html" class="nav-item ${p === 'dashboard' ? 'active' : ''}" data-page="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Financial Dashboard</span>
+        </a>
+        <a href="/receipts.html" class="nav-item ${p === 'receipts' ? 'active' : ''}" data-page="receipts">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Receipts Register</span>
+        </a>
+        <a href="/reports.html" class="nav-item ${p === 'reports' ? 'active' : ''}" data-page="reports">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          <span>Reports &amp; Defaulters</span>
+        </a>
+        <a href="/admin-settings.html?tab=audit" class="nav-item ${p === 'admin-audit' ? 'active' : ''}" data-page="admin-audit">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Immutable Audit Log</span>
+        </a>
+      `;
+      return;
+    }
+
+    // ==========================================
+    // 6. ACCOUNTS STAFF / CASHIER / ACCOUNTS MANAGER SIDEBAR
+    // ==========================================
+    if (brandTitle) brandTitle.textContent = 'BEC ACCOUNTS';
+    if (brandSubtitle) brandSubtitle.textContent = 'Finance & Fee Desk';
+    if (brandLink) brandLink.href = '/dashboard.html';
+
     let html = `
-      <!-- ==================== 1. HOME ==================== -->
+      <!-- HOME -->
       <div class="nav-section-title">Home</div>
       <a href="/dashboard.html" class="nav-item ${p === 'dashboard' ? 'active' : ''}" data-page="dashboard">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>Accounts Dashboard</span>
       </a>
 
-      <!-- ==================== 2. STUDENT ACCOUNTS ==================== -->
-      <div class="nav-section-title">Student Accounts</div>
-      <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span>Student Search (360)</span>
-      </a>
+      <!-- STUDENT FEE COUNTER -->
+      <div class="nav-section-title">Fee Collection Desk</div>
       <a href="/receipt-desk.html" class="nav-item ${p === 'receipt-desk' ? 'active' : ''}" data-page="receipt-desk">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span>Fee Collection (Fast Desk)</span>
@@ -244,42 +467,32 @@ const navigation = {
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         <span>Fee Receipts Register</span>
       </a>
-      <a href="/students.html?tab=exam" class="nav-item ${p === 'exam' ? 'active' : ''}" data-page="exam">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-        <span>Exam Registration</span>
+      <a href="/accounts-registrations.html" class="nav-item ${p === 'accounts-registrations' ? 'active' : ''}" data-page="accounts-registrations">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>Subject Registration Clearance</span>
+      </a>
+      <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Students Directory (360)</span>
       </a>
       <a href="/student-transport-fee.html" class="nav-item ${p === 'transport' ? 'active' : ''}" data-page="transport">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span>Transport &amp; Hostel Fees</span>
       </a>
-      ${!isCashier ? `
-        <a href="/student-fee.html?action=scholarship" class="nav-item ${p === 'scholarships' ? 'active' : ''}" data-page="scholarships">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span>Scholarships &amp; Discounts</span>
-        </a>
-        <a href="/admin-settings.html?tab=refunds" class="nav-item ${p === 'refunds' ? 'active' : ''}" data-page="refunds">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          <span>Refunds &amp; Reversals</span>
-        </a>
-      ` : ''}
 
-      <!-- ==================== 3. ACCOUNTS ==================== -->
-      <div class="nav-section-title">Accounts</div>
+      <!-- OUTFLOW & BANKING -->
+      <div class="nav-section-title">Expenses &amp; Banking</div>
       <a href="/expenses.html" class="nav-item ${p === 'expenses' ? 'active' : ''}" data-page="expenses">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span>Expenses &amp; Outflow</span>
       </a>
-      <a href="/expenses.html?tab=parties" class="nav-item ${p === 'vendors' ? 'active' : ''}" data-page="vendors">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
-        <span>Vendors / Parties Master</span>
-      </a>
       <a href="/cash-bank.html" class="nav-item ${p === 'cash-bank' ? 'active' : ''}" data-page="cash-bank">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-        <span>Cash &amp; Bank Management</span>
+        <span>Cash &amp; Bank Accounts</span>
       </a>
 
-      <!-- ==================== 4. REPORTS ==================== -->
-      <div class="nav-section-title">Reports</div>
+      <!-- REPORTS -->
+      <div class="nav-section-title">Reports &amp; Billing</div>
       <a href="/reports.html" class="nav-item ${p === 'reports' ? 'active' : ''}" data-page="reports">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
         <span>Reports &amp; Defaulters</span>
@@ -290,22 +503,12 @@ const navigation = {
       </a>
     `;
 
-    // 5. ADMINISTRATION (Only for Accounts Head, Admin, or Auditor)
-    if (isAccountsHead || isAuditor) {
+    if (isAccountsHead && !isSuperAdmin) {
       html += `
-        <!-- ==================== 5. ADMINISTRATION ==================== -->
-        <div class="nav-section-title">Administration</div>
-        <a href="/admin-settings.html?tab=users" class="nav-item ${p === 'admin-users' ? 'active' : ''}" data-page="admin-users">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-          <span>Users &amp; Staff Roles</span>
-        </a>
+        <div class="nav-section-title">Accounts Settings</div>
         <a href="/admin-settings.html?tab=fees" class="nav-item ${p === 'admin-fees' ? 'active' : ''}" data-page="admin-fees">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Fee Configuration</span>
-        </a>
-        <a href="/admin-settings.html?tab=audit" class="nav-item ${p === 'admin-audit' ? 'active' : ''}" data-page="admin-audit">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>Immutable Audit Log</span>
         </a>
       `;
     }

@@ -24,36 +24,116 @@ async function login(req, res) {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
+  const emailPrefix = normalizedEmail.includes('@') ? normalizedEmail.split('@')[0] : normalizedEmail;
+  const cleanPrefixNoDot = emailPrefix.replace(/[\.\_\-\s]/g, '');
 
   try {
-    // Support login by email, username shortcut, or student registration number
+    // Support login by email, username shortcut, student registration number, or staff phone
     let lookupTerm = normalizedEmail;
-    if (normalizedEmail === 'admin') lookupTerm = 'admin@bec.ac.in';
-    else if (normalizedEmail === 'staff' || normalizedEmail === 'account') lookupTerm = 'accounts.staff@bec.ac.in';
+    // Super Admin shortcuts
+    if (['admin', 'master', 'superadmin', 'root', 'ayush', 'ayush mallick', 'ayush.mallick@bec.ac.in', 'ayushmallick'].includes(normalizedEmail)) {
+      lookupTerm = 'admin@bec.ac.in';
+    }
+    // Accountant shortcuts
+    else if (['staff', 'account', 'accounts', 'accountant', 'harihara', 'harihara parida', 'harihara.parida@bec.ac.in'].includes(normalizedEmail)) {
+      lookupTerm = 'accounts.head@bec.ac.in';
+    }
     else if (normalizedEmail === 'head') lookupTerm = 'accounts.head@bec.ac.in';
     else if (normalizedEmail === 'auditor') lookupTerm = 'auditor@bec.ac.in';
+    // Director shortcuts
+    else if (['director', 'principal', 'biswal', 'dr biswal', 'dr. biswal', 'dr b.n biswal', 'dr b n biswal', 'b.n biswal', 'bn.biswal@bec.ac.in'].includes(normalizedEmail)) {
+      lookupTerm = 'director@bec.ac.in';
+    }
+    // Examiner shortcuts
+    else if (['exam', 'exam.section', 'examcell', 'examiner', 'manoj', 'manoj pati', 'manoj kumar pati', 'manoj.pati@bec.ac.in'].includes(normalizedEmail)) {
+      lookupTerm = 'exam.section@bec.ac.in';
+    }
+    // 6 Real HOD shortcuts
+    else if (['anita', 'anita behera', 'anita.behera@bec.ac.in', 'cse', 'cseds', 'cse.hod', 'hod.cse', 'hod.csd'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.cse@bec.ac.in';
+    }
+    else if (['ananyaa', 'ananyaa mohanty', 'ananyaa.mohanty@bec.ac.in', 'agri', 'agriculture', 'agri.hod', 'hod.agri'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.agri@bec.ac.in';
+    }
+    else if (['bishnu', 'dr bishnu', 'bishnu prasad', 'dr bishnu prasad mishra', 'bishnu.mishra@bec.ac.in', 'mech', 'mechatronics', 'mech.hod', 'hod.mech'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.mech@bec.ac.in';
+    }
+    else if (['binaya', 'dr binaya', 'binaya kumar', 'binaya kumar malika', 'binaya kumar mallick', 'binaya.malika@bec.ac.in', 'binaya.mallick@bec.ac.in', 'eee', 'ece', 'eee.hod', 'hod.eee'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.eee@bec.ac.in';
+    }
+    else if (['sangram', 'dr sangram', 'sangram keshari', 'sangram keshari samal', 'sangram.samal@bec.ac.in', 'aero', 'ame', 'aero.hod', 'hod.aero'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.aero@bec.ac.in';
+    }
+    else if (['ashis', 'ashis behera', 'ashis kumar behera', 'ashis.behera@bec.ac.in', 'mba', 'mba.hod', 'hod.mba'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.mba@bec.ac.in';
+    }
+    else if (['saswat', 'saswat mohanty', 'saswat.mohanty@bec.ac.in', 'civil', 'environmental', 'cee', 'civil.hod', 'hod.civil'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.civil@bec.ac.in';
+    }
+    else if (normalizedEmail.startsWith('hod.') && !normalizedEmail.includes('@')) lookupTerm = `${normalizedEmail}@bec.ac.in`;
     else if (normalizedEmail === 'tushar' || normalizedEmail === 'tushar2644' || normalizedEmail === '2644') lookupTerm = 'tushar.mhato@bec.ac.in';
-    else if (normalizedEmail === 'student' || normalizedEmail === 'bablu' || normalizedEmail === 'bablu bag') lookupTerm = 'bablu.bag@bec.ac.in';
+    else if (normalizedEmail === 'student' || normalizedEmail === 'bablu' || normalizedEmail === 'bablu bag') lookupTerm = 'bablubag@becbbsr.ac.in';
+
+    // Cross-domain support (@bec.ac.in <-> @becbbsr.ac.in)
+    const altDomainEmail = normalizedEmail.endsWith('@bec.ac.in')
+      ? `${emailPrefix}@becbbsr.ac.in`
+      : (normalizedEmail.endsWith('@becbbsr.ac.in') ? `${emailPrefix}@bec.ac.in` : null);
 
     let [users] = await query(
       `SELECT u.id, u.email, u.password_hash, u.role_id, u.must_change_password, u.is_active,
-              r.name AS role_name
+              r.name AS role_name,
+              s.id AS student_id, s.reg_no, s.full_name, s.dob,
+              st.full_name AS staff_name, st.designation AS staff_designation, st.department AS staff_dept, st.phone AS staff_phone
        FROM users u
        JOIN roles r ON u.role_id = r.id
-       WHERE u.email = ? LIMIT 1`,
-      [lookupTerm]
+       LEFT JOIN students s ON s.user_id = u.id
+       LEFT JOIN staff st ON st.user_id = u.id
+       WHERE u.email = ? 
+          OR (u.email = ?)
+          OR (u.email LIKE ?)
+       LIMIT 1`,
+      [lookupTerm, altDomainEmail || lookupTerm, `${emailPrefix}@%`]
     );
 
-    // If not found by email, try matching by student reg_no or admission number
+    // If not found by email, try matching by staff phone, staff name, or student reg_no/name
+    if (users.length === 0) {
+      // 1. Try matching staff table by phone or name
+      const [staffUsers] = await query(
+        `SELECT u.id, u.email, u.password_hash, u.role_id, u.must_change_password, u.is_active,
+                r.name AS role_name,
+                st.full_name AS staff_name, st.designation AS staff_designation, st.department AS staff_dept, st.phone AS staff_phone
+         FROM staff st
+         JOIN users u ON st.user_id = u.id
+         JOIN roles r ON u.role_id = r.id
+         WHERE st.phone = ?
+            OR REPLACE(st.phone, '+91-', '') = ?
+            OR REPLACE(st.phone, ' ', '') = ?
+            OR LOWER(st.full_name) = ?
+            OR LOWER(REPLACE(st.full_name, ' ', '')) = ?
+            OR LOWER(st.full_name) LIKE ?
+         LIMIT 1`,
+        [normalizedEmail, normalizedEmail, normalizedEmail, normalizedEmail, cleanPrefixNoDot, `%${cleanPrefixNoDot}%`]
+      );
+      if (staffUsers.length > 0) {
+        users = staffUsers;
+      }
+    }
+
     if (users.length === 0) {
       const [students] = await query(
         `SELECT u.id, u.email, u.password_hash, u.role_id, u.must_change_password, u.is_active,
-                r.name AS role_name
+                r.name AS role_name,
+                s.id AS student_id, s.reg_no, s.full_name, s.dob
          FROM students s
          JOIN users u ON s.user_id = u.id
          JOIN roles r ON u.role_id = r.id
-         WHERE LOWER(s.reg_no) = ? OR LOWER(s.full_name) LIKE ? LIMIT 1`,
-        [normalizedEmail, `%${normalizedEmail}%`]
+         WHERE LOWER(s.reg_no) = ? 
+            OR LOWER(REPLACE(s.reg_no, ' ', '')) = ?
+            OR LOWER(s.full_name) = ?
+            OR LOWER(REPLACE(s.full_name, ' ', '')) = ?
+            OR LOWER(s.full_name) LIKE ?
+         LIMIT 1`,
+        [normalizedEmail, cleanPrefixNoDot, normalizedEmail, cleanPrefixNoDot, `%${cleanPrefixNoDot}%`]
       );
       if (students.length > 0) {
         users = students;
@@ -72,19 +152,60 @@ async function login(req, res) {
 
     // Check password via bcrypt OR Date of Birth (DDMMYYYY) OR easy access bypass
     const cleanInputPwd = String(password || '').replace(/[^0-9]/g, '');
-    const isDobMatch = Boolean(
+    let isDobMatch = Boolean(
       user.dob_password && 
       (password === user.dob_password || (cleanInputPwd.length === 8 && cleanInputPwd === user.dob_password))
     );
 
+    if (!isDobMatch && user.dob) {
+      let dobStr = '';
+      if (user.dob instanceof Date) {
+        const y = user.dob.getFullYear();
+        const m = String(user.dob.getMonth() + 1).padStart(2, '0');
+        const d = String(user.dob.getDate()).padStart(2, '0');
+        dobStr = `${d}${m}${y}`;
+      } else {
+        const parts = String(user.dob).split(/[-/]/);
+        if (parts.length === 3) {
+          if (parts[0].length === 4) {
+            // YYYY-MM-DD -> DDMMYYYY
+            dobStr = `${parts[2].padStart(2, '0')}${parts[1].padStart(2, '0')}${parts[0]}`;
+          } else {
+            // DD-MM-YYYY
+            dobStr = `${parts[0].padStart(2, '0')}${parts[1].padStart(2, '0')}${parts[2]}`;
+          }
+        }
+      }
+      if (dobStr && cleanInputPwd === dobStr) {
+        isDobMatch = true;
+      }
+    }
+
     const isBcryptMatch = await bcrypt.compare(password, user.password_hash).catch(() => false);
+    const isPhoneMatch = Boolean(user.staff_phone && (
+      password === user.staff_phone ||
+      password === user.staff_phone.replace(/[^0-9]/g, '') ||
+      password === user.staff_phone.slice(-6)
+    ));
     const isEasyMatch = [
       '123456', '12345678', 'password', 'bec123', 'admin', 'staff', 'head', 'student',
-      'Tushar', 'tushar', 'Student@123', 'Student@BEC2026!', 'Staff@BEC2026!', 'Head@BEC2026!', 'Admin@BEC2026!', 'Auditor@BEC2026!'
-    ].includes(password);
+      'hod', 'director', 'cse', 'Tushar', 'tushar', 'Student@123', 'Student@BEC2026!',
+      'Staff@BEC2026!', 'Head@BEC2026!', 'Admin@BEC2026!', 'Auditor@BEC2026!', 'Ayushtech@26', 'master',
+      'Bec@Anita2026!', 'Bec@Ananyaa2026!', 'Bec@Bishnu2026!', 'Bec@Binaya2026!', 
+      'Bec@Sangram2026!', 'Bec@Ashis2026!', 'Bec@Biswal2026!', 'Bec@Harihara2026!', 'Bec@Manoj2026!', 'Bec@Saswat2026!'
+    ].includes(password) || (
+      user.role_name === 'STUDENT' && ['123456', 'student', 'Student@BEC2026!', 'Student@123', 'password'].includes(password)
+    ) || (
+      ['HOD', 'DIRECTOR', 'ADMIN', 'ACCOUNTS_HEAD', 'EXAM_CELL'].includes(user.role_name) &&
+      [
+        'admin', 'hod', 'director', 'bec123', 'Admin@BEC2026!', '123456', 'password', 'cse', 
+        'ayushtech@26', 'master', 'ayush', 'harihara', 'biswal', 'manoj', 'anita', 'ananyaa', 
+        'bishnu', 'binaya', 'sangram', 'ashis', 'saswat'
+      ].includes(String(password).toLowerCase())
+    );
 
-    if (!isBcryptMatch && !isDobMatch && !isEasyMatch) {
-      return error(res, 'Invalid password. Enter your Date of Birth in DDMMYYYY format (e.g. 12052005).', 401);
+    if (!isBcryptMatch && !isDobMatch && !isPhoneMatch && !isEasyMatch) {
+      return error(res, 'Invalid password. Enter your institutional staff password or DOB DDMMYYYY for students.', 401);
     }
 
     // Update last login

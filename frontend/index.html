@@ -95,6 +95,12 @@
 
         if (user.role === 'STUDENT') {
           window.location.replace('/student-portal.html');
+        } else if (user.role === 'HOD') {
+          window.location.replace('/hod-registrations.html');
+        } else if (user.role === 'DIRECTOR') {
+          window.location.replace('/director-registrations.html');
+        } else if (user.role === 'EXAM_CELL' || user.role === 'EXAM_SECTION') {
+          window.location.replace('/exam-registrations.html');
         } else {
           // Accounts Staff, Accounts Head, Bursar, Admin land on Fast Receipt Desk for immediate action
           window.location.replace('/receipt-desk.html');

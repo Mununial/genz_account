@@ -1269,10 +1269,146 @@
       padding: 0 35px;
     }
 
-    .sig-block {
-      font-size: 10px;
+    /* ============================================================
+     * SUBJECT REGISTRATION APPROVAL ROADMAP STYLES
+     * ============================================================ */
+    .sr-roadmap-container {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+    .sr-roadmap-title {
+      font-size: 0.95rem;
       font-weight: 700;
-      color: #000000;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .sr-roadmap-stepper {
+      display: flex;
+      position: relative;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    @media (max-width: 820px) {
+      .sr-roadmap-stepper {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+    .sr-roadmap-step {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 0.9rem 0.85rem;
+      transition: all 0.25s ease;
+    }
+    .sr-roadmap-step.active {
+      border-color: #3B82F6;
+      background: #EFF6FF;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+    }
+    .sr-roadmap-step.completed {
+      border-color: #86EFAC;
+      background: #F0FDF4;
+    }
+    .sr-roadmap-step.reverted {
+      border-color: #FCA5A5;
+      background: #FEF2F2;
+    }
+    .sr-step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .sr-step-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .sr-step-icon.completed {
+      background: #16A34A;
+      color: #FFFFFF;
+    }
+    .sr-step-icon.active {
+      background: #2563EB;
+      color: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+    .sr-step-icon.waiting {
+      background: #E2E8F0;
+      color: #64748B;
+    }
+    .sr-step-icon.reverted {
+      background: #DC2626;
+      color: #FFFFFF;
+    }
+    .sr-step-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0F172A;
+      line-height: 1.2;
+    }
+    .sr-step-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+      margin-top: 0.2rem;
+    }
+    .sr-step-body {
+      font-size: 0.76rem;
+      color: #64748B;
+      line-height: 1.45;
+      margin-top: 0.35rem;
+    }
+    .sr-step-officer {
+      font-weight: 600;
+      color: #334155;
+    }
+    .sr-step-time {
+      font-size: 0.7rem;
+      color: #94A3B8;
+      margin-top: 0.25rem;
+    }
+    .sr-semester-pill {
+      cursor: pointer;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #475569;
+      transition: all 0.2s ease;
+    }
+    .sr-semester-pill.active {
+      background: #0B63C5;
+      color: #FFFFFF;
+      border-color: #0B63C5;
+      box-shadow: 0 2px 6px rgba(11, 99, 197, 0.25);
+    }
+    .sr-semester-pill:hover:not(.active) {
+      background: #F1F5F9;
+      color: #0F172A;
     }
   </style>
 </head>
@@ -1287,7 +1423,9 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="topbar-college-brand">
-        <img src="/assets/logo.svg" alt="BEC Crest" style="height: 32px; filter: brightness(0) invert(1);">
+        <div style="background: #ffffff; border-radius: 8px; padding: 2px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+          <img src="/assets/bec-logo.jpg" alt="Bhubaneswar Engineering College Logo" style="height: 36px; width: 36px; object-fit: contain; border-radius: 6px; display: block;">
+        </div>
         <span>BHUBANESWAR ENGINEERING COLLEGE - STUDENT ERP</span>
       </div>
     </div>
@@ -1339,8 +1477,21 @@
           <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           Payment
         </a>
+        <a class="nav-link-item" data-tab="subject-registration">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Subject Registration
+        </a>
+        <a class="nav-link-item" data-tab="backlog-registration">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Backlog Registration
+        </a>
+        <a class="nav-link-item" data-tab="health">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Health &amp; Medical
+        </a>
       </nav>
     </aside>
+
 
     <!-- 2B. MAIN TAB WORKSPACE -->
     <main class="student-main-workspace">
@@ -1490,7 +1641,280 @@
           </div>
         </div>
       </section>
+
+      <!-- ============================================================= -->
+      <!-- TAB: SUBJECT REGISTRATION                                     -->
+      <!-- ============================================================= -->
+      <section id="tabPane-subject-registration" class="student-tab-pane" style="display: none;">
+        <div style="max-width:900px;">
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="background:linear-gradient(135deg,#0B63C5,#1D4ED8);width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div>
+                <h2 style="margin:0;font-size:1.3rem;font-weight:700;color:#0F172A;">Subject Registration</h2>
+                <p style="margin:0;font-size:0.85rem;color:#64748B;">Academic Year 2026-27 | BPUT Affiliation</p>
+              </div>
+            </div>
+            <!-- Semester Progression Selector -->
+            <div id="srSemesterSelectorBar" style="display:flex;align-items:center;gap:0.4rem;background:#F8FAFC;padding:0.35rem 0.6rem;border:1px solid #E2E8F0;border-radius:24px;"></div>
+          </div>
+
+          <!-- Eligibility Card -->
+          <div id="srEligibilityCard" style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B63C5" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span style="font-weight:700;font-size:1rem;color:#0F172A;">Fee Eligibility Check</span>
+            </div>
+            <div id="srEligContent">
+              <div style="text-align:center;padding:2rem;color:#64748B;">
+                <div class="spinner" style="width:28px;height:28px;border:3px solid #E2E8F0;border-top-color:#0B63C5;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 0.75rem;"></div>
+                Checking fee eligibility...
+              </div>
+            </div>
+          </div>
+
+          <!-- Existing Registration Status & Approval Roadmap -->
+          <div id="srExistingCard" style="display:none;background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div id="srExistingContent"></div>
+          </div>
+
+          <!-- Subject Selection Form -->
+          <div id="srFormCard" style="display:none;background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="font-weight:700;font-size:1rem;color:#0F172A;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+              <span id="srFormTitle">📚 Select Subjects for Registration</span>
+              <span style="font-size:0.8rem;font-weight:500;color:#64748B;">Credits: <span id="srCreditCount" style="font-weight:700;color:#0B63C5;">0</span> / Min 20 – Max 28</span>
+            </div>
+
+            <!-- CORE Subjects -->
+            <div id="srCoreSubjects">
+              <div style="font-size:0.85rem;font-weight:600;color:#334155;background:#F8FAFC;padding:0.5rem 0.75rem;border-radius:6px;margin-bottom:0.5rem;">CORE SUBJECTS (Compulsory)</div>
+              <div id="srCoreList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem;margin-bottom:1rem;"></div>
+            </div>
+
+            <!-- LAB Subjects -->
+            <div id="srLabSubjects">
+              <div style="font-size:0.85rem;font-weight:600;color:#334155;background:#F8FAFC;padding:0.5rem 0.75rem;border-radius:6px;margin-bottom:0.5rem;">LAB SUBJECTS</div>
+              <div id="srLabList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem;margin-bottom:1rem;"></div>
+            </div>
+
+            <!-- Elective Subjects -->
+            <div id="srElectiveSubjects" style="display:none;">
+              <div style="font-size:0.85rem;font-weight:600;color:#334155;background:#F8FAFC;padding:0.5rem 0.75rem;border-radius:6px;margin-bottom:0.5rem;">ELECTIVE SUBJECTS (Choose any 1)</div>
+              <div id="srElectiveList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem;margin-bottom:1rem;"></div>
+            </div>
+
+            <!-- Submit Bar -->
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+              <div>
+                <div style="font-size:0.9rem;color:#334155;"><strong>Subjects Selected:</strong> <span id="srSelectedCount" style="color:#0B63C5;font-weight:700;">0</span></div>
+                <div style="font-size:0.9rem;color:#334155;"><strong>Total Credits:</strong> <span id="srCreditDisplay" style="color:#0B63C5;font-weight:700;">0</span> <span style="color:#64748B;font-size:0.8rem;">(Required: 20-28)</span></div>
+              </div>
+              <button id="srSubmitBtn" onclick="studentPortal.submitSubjectRegistration('REGULAR')" style="background:linear-gradient(135deg,#0B63C5,#1D4ED8);color:#fff;border:none;padding:0.65rem 1.5rem;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(11,99,197,0.28);transition:all 0.2s;" disabled>
+                Submit Registration →
+              </button>
+            </div>
+          </div>
+
+          <!-- Registration History -->
+          <div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="font-weight:700;font-size:1rem;color:#0F172A;margin-bottom:0.75rem;">📜 Registration History</div>
+            <div id="srHistoryList"><div style="text-align:center;padding:1.5rem;color:#94A3B8;font-size:0.9rem;">No registration history yet.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================= -->
+      <!-- TAB: BACKLOG REGISTRATION                                     -->
+      <!-- ============================================================= -->
+      <section id="tabPane-backlog-registration" class="student-tab-pane" style="display: none;">
+        <div style="max-width:900px;">
+          <!-- Header -->
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
+            <div style="background:linear-gradient(135deg,#DC2626,#991B1B);width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <h2 style="margin:0;font-size:1.3rem;font-weight:700;color:#0F172A;">Backlog Subject Registration</h2>
+              <p style="margin:0;font-size:0.85rem;color:#64748B;">Register for subjects from previous semesters | Fee: ₹500 per subject</p>
+            </div>
+          </div>
+
+          <!-- Info Banner -->
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:1rem;margin-bottom:1.25rem;">
+            <div style="font-weight:600;color:#DC2626;font-size:0.9rem;margin-bottom:0.25rem;">⚠️ Backlog Registration Terms</div>
+            <ul style="margin:0;padding-left:1.25rem;color:#7F1D1D;font-size:0.85rem;line-height:1.6;">
+              <li>Backlog fee: <strong>₹500 per subject</strong></li>
+              <li>You must be eligible (no dues for current semester)</li>
+              <li>Backlogs require separate HOD → Director → Accounts approval</li>
+              <li>Maximum 4 backlog subjects per semester</li>
+            </ul>
+          </div>
+
+          <!-- Eligibility Check for Backlog -->
+          <div id="blEligCard" style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div id="blEligContent">
+              <div style="text-align:center;padding:2rem;color:#64748B;">
+                <div class="spinner" style="width:28px;height:28px;border:3px solid #E2E8F0;border-top-color:#DC2626;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 0.75rem;"></div>
+                Checking eligibility...
+              </div>
+            </div>
+          </div>
+
+          <!-- Backlog Subject Selection -->
+          <div id="blFormCard" style="display:none;background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="font-weight:700;font-size:1rem;color:#0F172A;margin-bottom:0.5rem;">Select Backlog Subjects</div>
+            <div style="font-size:0.85rem;color:#64748B;margin-bottom:1rem;">Semester: <select id="blSemesterSelect" onchange="studentPortal.loadBacklogSubjects()" style="border:1px solid #CBD5E1;border-radius:4px;padding:0.25rem 0.5rem;font-size:0.85rem;">
+              <option value="1">1st Semester</option><option value="2">2nd Semester</option><option value="3">3rd Semester</option><option value="4">4th Semester</option><option value="5">5th Semester</option><option value="6">6th Semester</option><option value="7">7th Semester</option>
+            </select></div>
+            <div id="blSubjectList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem;margin-bottom:1rem;"></div>
+            <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+              <div>
+                <div style="font-size:0.9rem;color:#334155;"><strong>Selected:</strong> <span id="blSelectedCount" style="color:#DC2626;font-weight:700;">0</span> subjects</div>
+                <div style="font-size:0.9rem;color:#334155;"><strong>Backlog Fee:</strong> ₹<span id="blFeeDisplay" style="color:#DC2626;font-weight:700;">0</span></div>
+              </div>
+              <button id="blSubmitBtn" onclick="studentPortal.submitSubjectRegistration('BACKLOG')" style="background:linear-gradient(135deg,#DC2626,#991B1B);color:#fff;border:none;padding:0.65rem 1.5rem;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(220,38,38,0.28);transition:all 0.2s;" disabled>
+                Submit Backlog Registration →
+              </button>
+            </div>
+          </div>
+
+          <!-- Backlog History -->
+          <div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="font-weight:700;font-size:1rem;color:#0F172A;margin-bottom:0.75rem;">📜 Backlog Registration History</div>
+            <div id="blHistoryList"><div style="text-align:center;padding:1.5rem;color:#94A3B8;font-size:0.9rem;">No backlog registrations yet.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================= -->
+      <!-- TAB: HEALTH & MEDICAL RECORD & UPDATE                          -->
+      <!-- ============================================================= -->
+      <section id="tabPane-health" class="student-tab-pane" style="display: none;">
+        <div style="max-width: 900px;">
+          <!-- Top Header Card -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="background:linear-gradient(135deg,#DC2626,#EF4444);width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(220,38,38,0.25);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <div>
+                <h2 style="margin:0;font-size:1.3rem;font-weight:800;color:#0F172A;">Student Health &amp; Medical Wellness</h2>
+                <p style="margin:2px 0 0 0;font-size:0.85rem;color:#64748B;">Official Institutional Medical Record &bull; BPUT Campus Wellness Registry</p>
+              </div>
+            </div>
+            <div>
+              <span id="healthFitBadge" style="background:#DCFCE7;color:#15803D;font-weight:700;font-size:0.82rem;padding:0.4rem 1rem;border-radius:20px;border:1px solid #86EFAC;">
+                &#10003; Certified Fit
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Overview Cards Grid -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem;">
+            <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:1.1rem;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Blood Group</div>
+              <div id="dispBloodGroup" style="font-size:1.6rem;font-weight:800;color:#DC2626;margin-top:0.25rem;">B+</div>
+              <div style="font-size:0.75rem;color:#94A3B8;">Verified Medical Profile</div>
+            </div>
+            <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:1.1rem;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Vaccination Status</div>
+              <div id="dispVaccine" style="font-size:1.15rem;font-weight:800;color:#15803D;margin-top:0.5rem;">Fully Vaccinated</div>
+              <div style="font-size:0.75rem;color:#94A3B8;">BPUT Health Protocol</div>
+            </div>
+            <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:1.1rem;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Campus Health Center</div>
+              <div style="font-size:1.05rem;font-weight:800;color:#0B63C5;margin-top:0.5rem;">108 / 0674-2970000</div>
+              <div style="font-size:0.75rem;color:#94A3B8;">24x7 Ambulance &amp; Doctor</div>
+            </div>
+            <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:1.1rem;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Student Mediclaim</div>
+              <div id="dispInsurance" style="font-size:0.85rem;font-weight:800;color:#0F172A;margin-top:0.5rem;word-break:break-all;">BPUT-STU-MED-2026</div>
+              <div style="font-size:0.75rem;color:#94A3B8;">Institutional Group Coverage</div>
+            </div>
+          </div>
+
+          <!-- Health Update Form -->
+          <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding-bottom:0.85rem;margin-bottom:1.25rem;">
+              <div>
+                <h3 style="margin:0;font-size:1.05rem;font-weight:700;color:#0F172A;">Update Medical &amp; Emergency Health Details</h3>
+                <p style="margin:2px 0 0 0;font-size:0.8rem;color:#64748B;">Keep your health records up to date for campus emergencies and sports events.</p>
+              </div>
+              <div style="font-size:0.75rem;color:#94A3B8;" id="healthLastUpdated">Last Updated: Recently</div>
+            </div>
+
+            <form id="studentHealthForm" onsubmit="studentPortal.saveHealthRecord(event)">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1rem;">
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Blood Group *</label>
+                  <select id="inpBloodGroup" required style="width:100%;height:42px;border:1px solid #CBD5E1;border-radius:6px;padding:0 0.75rem;font-size:0.9rem;">
+                    <option value="A+">A Positive (A+)</option>
+                    <option value="A-">A Negative (A-)</option>
+                    <option value="B+" selected>B Positive (B+)</option>
+                    <option value="B-">B Negative (B-)</option>
+                    <option value="O+">O Positive (O+)</option>
+                    <option value="O-">O Negative (O-)</option>
+                    <option value="AB+">AB Positive (AB+)</option>
+                    <option value="AB-">AB Negative (AB-)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Vaccination Status *</label>
+                  <select id="inpVaccineStatus" required style="width:100%;height:42px;border:1px solid #CBD5E1;border-radius:6px;padding:0 0.75rem;font-size:0.9rem;">
+                    <option value="Fully Vaccinated" selected>Fully Vaccinated (Double Dose + Booster)</option>
+                    <option value="Partially Vaccinated">Partially Vaccinated (Single Dose)</option>
+                    <option value="Medically Exempted">Medically Exempted</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Emergency Contact Person *</label>
+                  <input type="text" id="inpEmergName" required placeholder="Parent / Guardian Full Name" style="width:100%;height:42px;border:1px solid #CBD5E1;border-radius:6px;padding:0 0.75rem;font-size:0.9rem;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Emergency Contact Number *</label>
+                  <input type="tel" id="inpEmergPhone" required placeholder="e.g. +91 9876543210" style="width:100%;height:42px;border:1px solid #CBD5E1;border-radius:6px;padding:0 0.75rem;font-size:0.9rem;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Relation to Student</label>
+                  <select id="inpEmergRelation" style="width:100%;height:42px;border:1px solid #CBD5E1;border-radius:6px;padding:0 0.75rem;font-size:0.9rem;">
+                    <option value="Father" selected>Father</option>
+                    <option value="Mother">Mother</option>
+                    <option value="Local Guardian">Local Guardian</option>
+                    <option value="Family Doctor">Family Doctor</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Health Insurance / Policy ID</label>
+                  <input type="text" id="inpInsuranceNo" placeholder="Policy ID or National Health ID" style="width:100%;height:42px;border:1px solid #CBD5E1;border-radius:6px;padding:0 0.75rem;font-size:0.9rem;">
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem;">
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Known Allergies (Food / Drugs / Pollen)</label>
+                  <textarea id="inpAllergies" rows="2" placeholder="e.g. Penicillin, Dust, Peanuts (or write 'None')" style="width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:0.6rem 0.75rem;font-size:0.88rem;resize:vertical;"></textarea>
+                </div>
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.35rem;">Medical Conditions / Regular Medications</label>
+                  <textarea id="inpConditions" rows="2" placeholder="e.g. Asthma Inhaler, Eye Power -1.5, Diabetes (or write 'None')" style="width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:0.6rem 0.75rem;font-size:0.88rem;resize:vertical;"></textarea>
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:flex-end;gap:0.75rem;border-top:1px solid #E2E8F0;padding-top:1rem;">
+                <button type="submit" id="btnSaveHealth" style="background:linear-gradient(135deg,#0B63C5,#1D4ED8);color:#fff;border:none;padding:0.65rem 1.8rem;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(11,99,197,0.28);display:inline-flex;align-items:center;gap:0.5rem;">
+                  Save Health Record &#10003;
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
     </main>
+
   </div>
 
   <!-- ONLINE PAYMENT CHECKOUT MODAL -->
