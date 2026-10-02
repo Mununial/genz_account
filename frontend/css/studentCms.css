@@ -1099,5 +1099,35 @@
 .cms-tab-bar-nav {
   overflow-x: auto;
   white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .cms-page-title-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  .cms-top-toolbar {
+    width: 100% !important;
+  }
+  .cms-search-box-wrap {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+  .s360-kpis-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .cms-profile-card-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .s360-kpis-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 

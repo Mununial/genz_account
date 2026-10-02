@@ -346,38 +346,53 @@ a:hover {
 
 /* 3. TOPBAR */
 .app-topbar {
-  height: var(--topbar-height);
+  min-height: var(--topbar-height);
+  height: auto;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0.6rem 1.5rem;
   position: sticky;
   top: 0;
   z-index: 90;
   box-shadow: var(--shadow-xs);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  box-sizing: border-box;
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
-.menu-toggle-btn {
+.menu-toggle-btn,
+.btn-sidebar-toggle {
   display: none;
-  background: none;
-  border: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   cursor: pointer;
-  padding: 0.4rem;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
+  padding: 0.45rem;
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
 }
 
-.menu-toggle-btn:hover {
+.menu-toggle-btn:hover,
+.btn-sidebar-toggle:hover {
   background: var(--bg-subtle);
-  color: var(--text-primary);
+  border-color: var(--border-strong);
+  color: var(--primary);
 }
 
 .page-title {
@@ -387,12 +402,17 @@ a:hover {
   letter-spacing: -0.01em;
   margin: 0;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .topbar-clock {
@@ -437,42 +457,280 @@ a:hover {
   box-sizing: border-box;
 }
 
+/* Universal Anti-Overlap Resets */
+img, svg, canvas, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fluid Tables (Zero Horizontal Page Blowout) */
+.table-responsive,
+.table-container,
+div[style*="overflow-x: auto"],
+div[style*="overflow-x:auto"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+table {
+  border-collapse: collapse;
+  max-width: 100%;
+}
+
+th, td {
+  white-space: nowrap;
+}
+
+/* Allow text cells to wrap gracefully without pushing screen width */
+td.cell-wrap,
+td strong,
+td .cell-title {
+  white-space: normal;
+}
+
 /* ==============================================================================
- * RESPONSIVENESS (1366x768 Optimized + Mobile Drawer)
+ * RESPONSIVENESS & ANTI-OVERLAP ENGINE (Desktop, Tablet & Mobile Perfected)
  * ============================================================================== */
+
+/* 1. TABLET & LAPTOP RESPONSIVE BREAKPOINT (<= 1024px) */
 @media (max-width: 1024px) {
   .app-sidebar {
     transform: translateX(-100%);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
   }
-  .app-sidebar.open {
-    transform: translateX(0);
+  .app-sidebar.open,
+  .app-sidebar.active {
+    transform: translateX(0) !important;
   }
   .app-main {
-    margin-left: 0;
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
-  .menu-toggle-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  .menu-toggle-btn,
+  .btn-sidebar-toggle {
+    display: inline-flex !important;
   }
   .sidebar-backdrop {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(15, 23, 42, 0.55);
     backdrop-filter: blur(2px);
-    z-index: 95;
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 995;
   }
-  .sidebar-backdrop.active {
-    display: block;
+  .sidebar-backdrop.active,
+  .sidebar-backdrop.open {
+    display: block !important;
   }
   .page-content {
-    padding: 1rem;
+    padding: 1.15rem;
   }
   .app-topbar {
-    padding: 0 1rem;
+    padding: 0.65rem 1.15rem;
   }
   .topbar-clock {
-    display: none; /* Hide on smaller screens to prevent header wrap */
+    display: none;
+  }
+}
+
+/* 2. MOBILE VIEW (<= 768px) */
+@media (max-width: 768px) {
+  html {
+    font-size: 13.5px;
+  }
+
+  .app-topbar {
+    padding: 0.55rem 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .page-content {
+    padding: 0.75rem !important;
+  }
+
+  .page-title {
+    font-size: 1.1rem;
+    white-space: normal;
+  }
+
+  .topbar-left {
+    gap: 0.5rem;
+  }
+
+  .topbar-right {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.4rem;
+  }
+
+  .topbar-right .btn {
+    flex: 1 1 auto;
+    font-size: 0.76rem;
+    padding: 0.35rem 0.6rem;
+    height: 32px;
+    justify-content: center;
+  }
+
+  /* Page Header Cards - Clean stacking instead of squished side-by-side */
+  .page-header-card,
+  div[style*="display: flex"][style*="justify-content: space-between"][style*="border-radius: 12px"],
+  div[style*="display:flex"][style*="justify-content:space-between"][style*="border-radius:12px"],
+  div[style*="border-radius: 12px"][style*="display: flex"],
+  div[style*="border-radius:12px"][style*="display:flex"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Filter toolbars and search boxes - Clean full-width wrapping */
+  .filter-bar,
+  .action-toolbar,
+  .cms-top-toolbar,
+  div[style*="display: flex"][style*="align-items: flex-end"],
+  div[style*="display:flex"][style*="align-items:flex-end"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+  }
+
+  .filter-bar input,
+  .filter-bar select,
+  .cms-search-box-wrap,
+  .cms-search-box-wrap input,
+  input[type="text"],
+  input[type="search"],
+  select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Stat Grids & Metric Cards - Clean 2-column or 1-column layouts */
+  .stats-grid,
+  .stat-grid,
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"],
+  div[style*="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr))"],
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"],
+  div[style*="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr))"],
+  div[style*="grid-template-columns: repeat(4, 1fr)"],
+  div[style*="grid-template-columns:repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+  }
+
+  /* Modal Windows - Responsive Full-Fit with Smooth Scrolling */
+  .modal-backdrop,
+  .modal-overlay,
+  div[id$="Modal"] {
+    padding: 0.35rem !important;
+    align-items: flex-start !important;
+  }
+
+  .modal-container,
+  .modal-card,
+  .modal-box,
+  div[id$="Modal"] > div,
+  div[id="accVoucherModal"] > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0.5rem auto !important;
+    border-radius: 8px !important;
+    max-height: 96vh !important;
+  }
+
+  .modal-body {
+    padding: 0.85rem !important;
+    max-height: calc(96vh - 110px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modal Internal Components: Photo & Student Grid */
+  .modal-body div[style*="grid-template-columns:auto 1fr"],
+  .modal-body div[style*="grid-template-columns: auto 1fr"] {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    justify-items: center !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Modal Metric Cards & 5-Stage Trail - Stacking Cleanly */
+  .modal-body div[style*="repeat(auto-fit, minmax(260px, 1fr))"],
+  .modal-body div[style*="repeat(auto-fit, minmax(250px, 1fr))"],
+  .modal-body div[style*="repeat(auto-fit, minmax(200px, 1fr))"],
+  .modal-body div[style*="repeat(auto-fit, minmax(170px, 1fr))"],
+  .modal-body div[style*="repeat(auto-fit, minmax(160px, 1fr))"],
+  .modal-body div[style*="grid-template-columns: 1fr 1fr"],
+  .modal-body div[style*="grid-template-columns:1fr 1fr"],
+  .modal-body div[style*="grid-template-columns: 1fr 1fr 1fr"],
+  .modal-body div[style*="grid-template-columns:1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  /* Slip Letterheads & Signatures - No Overlap */
+  #printableBputSlip div[style*="justify-content: space-between"],
+  #printableAccountsVoucher div[style*="justify-content: space-between"],
+  #registrationSlipPrintArea div[style*="grid-template-columns:1fr 1fr 1fr"],
+  #registrationSlipPrintArea div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    text-align: center !important;
+  }
+
+  /* Modal Footer Buttons - Full Width Stacking */
+  .modal-footer,
+  .modal-body div[style*="justify-content: flex-end"],
+  .modal-body div[style*="justify-content:flex-end"] {
+    flex-direction: column-reverse !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .modal-footer .btn,
+  .modal-body div[style*="justify-content: flex-end"] .btn,
+  .modal-body div[style*="justify-content:flex-end"] .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* 3. EXTRA SMALL SMARTPHONES (<= 480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+
+  .stats-grid,
+  .stat-grid,
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"],
+  div[style*="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr))"],
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"],
+  div[style*="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr))"],
+  div[style*="grid-template-columns: repeat(4, 1fr)"],
+  div[style*="grid-template-columns:repeat(4, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .department-breakdown-chips,
+  div[style*="display: flex"][style*="flex-wrap: wrap"][style*="gap: 0.4rem"],
+  div[style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:0.4rem"] {
+    gap: 0.35rem !important;
+  }
+
+  .department-breakdown-chips button,
+  div[style*="display: flex"][style*="flex-wrap: wrap"][style*="gap: 0.4rem"] button,
+  div[style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:0.4rem"] button {
+    font-size: 0.72rem !important;
+    padding: 0.25rem 0.5rem !important;
   }
 }

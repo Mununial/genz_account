@@ -18,6 +18,43 @@ const navigation = {
     this.checkAuthAndUser();
   },
 
+  setupMobileMenu() {
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+
+    const toggle = () => {
+      if (sidebar) {
+        sidebar.classList.toggle('open');
+        sidebar.classList.toggle('active');
+      }
+      if (backdrop) {
+        backdrop.classList.toggle('open');
+        backdrop.classList.toggle('active');
+      }
+    };
+
+    window.toggleSidebar = toggle;
+
+    const toggleBtns = document.querySelectorAll('.btn-sidebar-toggle, .menu-toggle-btn');
+    toggleBtns.forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        toggle();
+      };
+    });
+
+    if (backdrop) {
+      backdrop.onclick = () => {
+        if (sidebar) {
+          sidebar.classList.remove('open');
+          sidebar.classList.remove('active');
+        }
+        backdrop.classList.remove('open');
+        backdrop.classList.remove('active');
+      };
+    }
+  },
+
   setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
       // F2: Focus local counter search or open student search omnibar

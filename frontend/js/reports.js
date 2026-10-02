@@ -32,6 +32,7 @@ const reportsModule = {
     { code: 'MBA-MKT', name: 'MBA (Marketing & Sales)', course: 'MBA' },
     { code: 'MBA-OPS', name: 'MBA (Operations & Supply Chain)', course: 'MBA' },
     { code: 'MBA-BA', name: 'MBA (Business Analytics)', course: 'MBA' }
+  ],
   academicPrograms: {
     'B.Tech': {
       years: ['1st Year', '2nd Year', '3rd Year', '4th Year'],

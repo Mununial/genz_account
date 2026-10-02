@@ -1529,5 +1529,53 @@
   margin-top: 0.2rem;
 }
 
+/* ========================================================================= */
+/* RESPONSIVE OPTIMIZATIONS FOR MOBILE & TABLET                               */
+/* ========================================================================= */
+@media (max-width: 768px) {
+  .report-kpi-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+  }
+
+  .bec-pay-dialog {
+    width: 96% !important;
+    max-width: 96% !important;
+    margin: 0.5rem auto !important;
+  }
+
+  .receipt-foil,
+  .bec-official-receipt,
+  .bec-official-receipt-frame {
+    padding: 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .receipt-modal-actions {
+    flex-direction: column-reverse !important;
+    gap: 0.5rem !important;
+  }
+
+  .receipt-modal-actions button,
+  .receipt-modal-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .sig-block-wrap,
+  .receipt-signatures-grid {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-kpi-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 
 

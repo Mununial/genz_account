@@ -1410,6 +1410,75 @@
       background: #F1F5F9;
       color: #0F172A;
     }
+
+    /* Mobile Responsive Optimizations for Student Portal */
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      top: 58px;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 980;
+    }
+    .drawer-backdrop.active {
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .student-drawer {
+        position: fixed;
+        top: 58px;
+        bottom: 0;
+        left: 0;
+        width: 270px;
+        max-width: 85vw;
+        background: #ffffff;
+        z-index: 990;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        box-shadow: 2px 0 16px rgba(0,0,0,0.15);
+      }
+      .student-drawer.open {
+        transform: translateX(0);
+      }
+      .student-main-workspace {
+        padding: 1.25rem 1rem;
+        width: 100%;
+        max-width: 100%;
+      }
+      .pd-form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .payment-details-card {
+        padding: 1.25rem 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .student-topbar-blue {
+        padding: 0 0.75rem;
+      }
+      .topbar-college-brand {
+        font-size: 0.95rem;
+      }
+      .live-clock-badge {
+        display: none;
+      }
+      .btn-topbar-logout {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+      }
+      .student-main-workspace {
+        padding: 0.75rem 0.5rem;
+      }
+      .sr-semester-pill {
+        padding: 0.25rem 0.65rem;
+        font-size: 0.75rem;
+      }
+    }
   </style>
 </head>
 <body>
