@@ -864,9 +864,8 @@ const studentPortal = {
       return;
     }
 
-    this.checkoutState.step = 'GATEWAY';
-    this.startGatewayTimer();
-    this.renderCheckoutModal();
+    // Directly launch Official Razorpay Gateway!
+    this.executeGatewayPayment();
   },
 
   backToCheckoutConfig() {
@@ -1195,11 +1194,25 @@ const studentPortal = {
     `;
   },
 
+  async ensureRazorpayLoaded() {
+    if (typeof Razorpay !== 'undefined') return true;
+    return new Promise((resolve) => {
+      const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+      if (existing) {
+        existing.onload = () => resolve(true);
+        setTimeout(() => resolve(typeof Razorpay !== 'undefined'), 1200);
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      s.onload = () => resolve(true);
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+  },
+
   async executeGatewayPayment() {
     this.stopGatewayTimer();
-    this.checkoutState.step = 'PROCESSING';
-    this.renderCheckoutModal();
-
     const desc = this.checkoutState.desc;
     const amount = this.checkoutState.payAmount;
     const method = this.checkoutState.selectedMethod;
@@ -1212,30 +1225,125 @@ const studentPortal = {
     };
     const paymentMethodLabel = methodLabels[method] || 'ONLINE_GATEWAY';
 
+    this.checkoutState.step = 'PROCESSING';
+    this.renderCheckoutModal();
+    const substepEl = document.getElementById('becProcessingSubstep');
+    if (substepEl) substepEl.textContent = 'Connecting to Razorpay & initializing secure order...';
+
     try {
+      await this.ensureRazorpayLoaded();
+
       // Step 1: Create Order on Backend
-      let orderId = `order_mock_${Date.now()}`;
+      let orderRes = null;
       try {
-        const orderRes = await api.post('/payments/create-order', {
+        orderRes = await api.post('/payments/create-order', {
           invoiceId,
           amount,
           paymentMethod: paymentMethodLabel
         });
-        if (orderRes && orderRes.data && orderRes.data.orderId) {
-          orderId = orderRes.data.orderId;
-        }
       } catch (err) {
-        console.warn('Order creation note:', err.message);
+        console.error('Order creation error:', err);
+        throw new Error(err.message || 'Unable to initiate payment order.');
       }
 
-      // Live simulated latency for bank authorization
-      const substepEl = document.getElementById('becProcessingSubstep');
+      const ord = (orderRes && orderRes.data) ? orderRes.data : {};
+
+      // ── Step 2: Launch Official Razorpay Popup ───────────────────────────────
+      if (typeof Razorpay !== 'undefined' && ord.key && ord.orderId) {
+        const s = this.currentStudent || {};
+        const options = {
+          key: ord.key,
+          amount: Math.round(amount * 100),
+          currency: ord.currency || 'INR',
+          name: 'Bhubaneswar Engineering College',
+          description: `${desc || 'College Fee Payment'} (${ord.invoiceNo || 'Fee'})`,
+          image: '/assets/logo.svg',
+          order_id: ord.orderId,
+          prefill: {
+            name: s.full_name || '',
+            email: s.email || 'accounts@bec.ac.in',
+            contact: s.contact_number || s.phone || '9876543210'
+          },
+          notes: {
+            studentId: String(s.id || ''),
+            studentRegNo: s.reg_no || '',
+            invoiceId: String(invoiceId || '')
+          },
+          theme: {
+            color: '#006644'
+          },
+          handler: async (response) => {
+            this.checkoutState.step = 'PROCESSING';
+            this.renderCheckoutModal();
+            const stepEl = document.getElementById('becProcessingSubstep');
+            if (stepEl) stepEl.textContent = 'Verifying cryptographic digital signature with Razorpay...';
+
+            try {
+              const verifyRes = await api.post('/payments/verify', {
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                invoiceId,
+                paymentMethod: 'RAZORPAY_TEST_ONLINE'
+              });
+
+              const receiptData = (verifyRes && verifyRes.data) ? verifyRes.data : {};
+              const receiptNo = receiptData.receiptNo || `REC-2026-${Date.now().toString().slice(-5)}`;
+
+              if (this.currentStudent) {
+                const currentPaid = parseFloat(this.currentStudent.total_paid || 0);
+                const currentOut = parseFloat(this.currentStudent.total_outstanding !== undefined ? this.currentStudent.total_outstanding : this.checkoutState.totalDue);
+                this.currentStudent.total_paid = currentPaid + amount;
+                this.currentStudent.total_outstanding = Math.max(0, currentOut - amount);
+              }
+
+              const newReceipt = {
+                id: receiptData.receiptId || (this.receiptsList.length + 1),
+                receipt_no: receiptNo,
+                amount: amount,
+                date: new Date().toISOString().split('T')[0],
+                invoice_no: ord.invoiceNo || 'INV-2026-FEE',
+                payment_method: 'Razorpay Online (UPI/Card/NetBanking)',
+                status: 'SUCCESS'
+              };
+              this.receiptsList.unshift(newReceipt);
+
+              this.checkoutState.step = 'SUCCESS';
+              this.checkoutState.latestReceipt = newReceipt;
+              this.renderCheckoutModal();
+              this.renderFeesLedger();
+              this.updateHeaderProfile();
+              ui.showToast(`Payment of ${ui.formatCurrency(amount)} verified successfully!`, 'success');
+            } catch (verr) {
+              console.error('Razorpay verification error:', verr);
+              this.checkoutState.step = 'FAILED';
+              this.checkoutState.failureReason = verr.message || 'Signature verification failed.';
+              this.renderCheckoutModal();
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              this.checkoutState.step = 'CONFIG';
+              this.renderCheckoutModal();
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', (errResp) => {
+          this.checkoutState.step = 'FAILED';
+          this.checkoutState.failureReason = errResp?.error?.description || 'Payment was declined or cancelled.';
+          this.renderCheckoutModal();
+        });
+        rzp.open();
+        return;
+      }
+
+      // ── Step 3: Fallback Simulation (if Razorpay SDK unavailable) ─────────────
+      const orderId = ord.orderId || `order_${Date.now()}`;
       if (substepEl) substepEl.textContent = 'Verifying cryptographic digital signature...';
       await new Promise(r => setTimeout(r, 600));
-      if (substepEl) substepEl.textContent = 'Authorizing transaction and posting to student accounts ledger...';
-      await new Promise(r => setTimeout(r, 600));
 
-      // Step 2: Verify & Finalize on Backend
       let receiptData = null;
       try {
         const verifyRes = await api.post('/payments/verify', {
@@ -1256,11 +1364,9 @@ const studentPortal = {
         ? receiptData.receiptNo 
         : `REC-2026-${Date.now().toString().slice(-5)}`;
 
-      // Step 3: Update local student balances
       if (this.currentStudent) {
         const currentPaid = parseFloat(this.currentStudent.total_paid || 0);
         const currentOut = parseFloat(this.currentStudent.total_outstanding !== undefined ? this.currentStudent.total_outstanding : this.checkoutState.totalDue);
-        
         this.currentStudent.total_paid = currentPaid + amount;
         this.currentStudent.total_outstanding = Math.max(0, currentOut - amount);
       }
@@ -3369,6 +3475,8 @@ const studentPortal = {
     const method = this.activeGatewayMethod;
     const modalBody = document.getElementById('checkoutModalBody');
     if (!regId || !modalBody) return;
+
+    await this.ensureRazorpayLoaded();
 
     // ── Attempt Official Razorpay Checkout Popup if available ────────────────
     if (typeof Razorpay !== 'undefined') {
