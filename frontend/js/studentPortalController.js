@@ -3370,7 +3370,88 @@ const studentPortal = {
     const modalBody = document.getElementById('checkoutModalBody');
     if (!regId || !modalBody) return;
 
-    // Show Realistic Gateway Processing Screen
+    // ── Attempt Official Razorpay Checkout Popup if available ────────────────
+    if (typeof Razorpay !== 'undefined') {
+      try {
+        modalBody.innerHTML = `
+          <div style="text-align:center; padding:3rem 1.5rem;">
+            <div class="spinner" style="width:50px; height:50px; border:4px solid #E2E8F0; border-top-color:#006644; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.5rem;"></div>
+            <div style="font-size:1.15rem; font-weight:800; color:#0F172A; margin-bottom:0.4rem;">Connecting to Razorpay Gateway...</div>
+            <div style="font-size:0.85rem; color:#64748B; margin-bottom:1rem;">Initializing 256-Bit SSL Order for ₹${amount.toLocaleString('en-IN')}</div>
+          </div>
+        `;
+
+        const orderRes = await api.post(`/registration/${regId}/create-exam-order`, { amount });
+        if (orderRes && orderRes.data && orderRes.data.orderId) {
+          const ord = orderRes.data;
+          const options = {
+            key: ord.key,
+            amount: ord.amountPaise || (amount * 100),
+            currency: ord.currency || 'INR',
+            name: 'Bhubaneswar Engineering College',
+            description: `BPUT Semester Exam Fee (${ord.studentRegNo || 'Exam Registration'})`,
+            order_id: ord.orderId,
+            prefill: {
+              name: ord.studentName || this.currentStudent?.full_name || '',
+              email: ord.studentEmail || 'student@bec.ac.in',
+              contact: '9876543210'
+            },
+            notes: {
+              registrationId: String(regId),
+              college: 'BEC Bhubaneswar'
+            },
+            theme: {
+              color: '#006644'
+            },
+            handler: async (response) => {
+              modalBody.innerHTML = `
+                <div style="text-align:center; padding:3rem 1.5rem;">
+                  <div class="spinner" style="width:50px; height:50px; border:4px solid #E2E8F0; border-top-color:#006644; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.5rem;"></div>
+                  <div style="font-size:1.15rem; font-weight:800; color:#0F172A; margin-bottom:0.4rem;">Verifying Cryptographic Digital Signature...</div>
+                  <div style="font-size:0.85rem; color:#64748B;">Razorpay Payment ID: ${response.razorpay_payment_id}</div>
+                </div>
+              `;
+
+              try {
+                const verifyRes = await api.post(`/registration/${regId}/pay-exam-fee`, {
+                  amount,
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature,
+                  paymentMethod: 'RAZORPAY_TEST_ONLINE'
+                });
+
+                if (!verifyRes || !verifyRes.data || !verifyRes.data.success) {
+                  throw new Error(verifyRes?.data?.message || 'Razorpay signature verification failed.');
+                }
+
+                this.renderPaymentSuccessScreen(regId, amount, response.razorpay_payment_id, 'Razorpay Online Gateway (Verified ✓)');
+                await this.loadSubjectRegistrationEligibility(this.srActiveSemester);
+              } catch (verr) {
+                this.renderPaymentErrorScreen(regId, amount, verr.message);
+              }
+            },
+            modal: {
+              ondismiss: () => {
+                this.openExamFeeGateway(regId, amount);
+              }
+            }
+          };
+
+          const rzpInstance = new Razorpay(options);
+          rzpInstance.on('payment.failed', (errResp) => {
+            const msg = errResp?.error?.description || 'Payment was declined by Razorpay gateway.';
+            this.renderPaymentErrorScreen(regId, amount, msg);
+          });
+          rzpInstance.open();
+          return;
+        }
+      } catch (err) {
+        console.warn('Razorpay order creation fallback to simulated gateway:', err);
+      }
+    }
+
+    // ── Fallback Direct Simulation (if offline or direct simulation) ───────────
     modalBody.innerHTML = `
       <div style="text-align:center; padding:3rem 1.5rem;">
         <div class="spinner" style="width:50px; height:50px; border:4px solid #E2E8F0; border-top-color:#006644; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.5rem;"></div>
@@ -3398,63 +3479,73 @@ const studentPortal = {
       }
 
       const pData = res.data.data || {};
-      const rcNo = pData.receiptNumber || `EXAM-REC-2026-${regId}`;
-
-      // Show Authentic Success Checkmark Screen
-      modalBody.innerHTML = `
-        <div style="text-align:center; padding:2rem 1.5rem;">
-          <div style="width:65px; height:65px; border-radius:50%; background:#DCFCE7; border:3px solid #86EFAC; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#15803D; font-size:2.2rem; font-weight:800; box-shadow:0 8px 16px rgba(22,163,74,0.2);">
-            ✓
-          </div>
-          <div style="font-size:1.35rem; font-weight:800; color:#15803D; margin-bottom:0.25rem;">Payment Successful!</div>
-          <div style="font-size:0.88rem; color:#475569; margin-bottom:1.5rem;">₹${amount.toLocaleString('en-IN')} paid successfully for BPUT Semester Registration</div>
-
-          <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:1rem; text-align:left; font-size:0.85rem; margin-bottom:1.5rem;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
-              <span style="color:#64748B;">Transaction ID:</span>
-              <strong style="color:#0F172A; font-family:monospace;">${pData.transactionId || gatewayTxnId}</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
-              <span style="color:#64748B;">Receipt Number:</span>
-              <strong style="color:#0B63C5; font-family:monospace;">${rcNo}</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
-              <span style="color:#64748B;">Payment Mode:</span>
-              <strong style="color:#0F172A;">${paymentMethodName}</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between;">
-              <span style="color:#64748B;">Status:</span>
-              <strong style="color:#15803D;">Dispatched to Exam Section ✓</strong>
-            </div>
-          </div>
-
-          <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
-            <button type="button" onclick="studentPortal.closeCheckoutModal(); studentPortal.printRegistrationSlip(${regId})" style="padding:0.6rem 1.25rem; background:#ffffff; border:1.5px solid #006644; color:#006644; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              View &amp; Print Receipt Slip
-            </button>
-            <button type="button" onclick="studentPortal.closeCheckoutModal()" style="padding:0.6rem 1.5rem; background:#006644; border:none; color:#ffffff; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer;">
-              Continue to Roadmap &rarr;
-            </button>
-          </div>
-        </div>
-      `;
-
-      // Refresh eligibility to show Stage 5 active!
+      this.renderPaymentSuccessScreen(regId, amount, pData.transactionId || gatewayTxnId, paymentMethodName);
       await this.loadSubjectRegistrationEligibility(this.srActiveSemester);
     } catch (err) {
       console.error('submitGatewayPayment error:', err);
-      modalBody.innerHTML = `
-        <div style="text-align:center; padding:2rem 1rem;">
-          <div style="width:60px; height:60px; border-radius:50%; background:#FEE2E2; color:#DC2626; font-size:2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">!</div>
-          <div style="font-size:1.15rem; font-weight:800; color:#991B1B; margin-bottom:0.5rem;">Payment Could Not Be Completed</div>
-          <div style="font-size:0.85rem; color:#7F1D1D; margin-bottom:1.5rem;">${escapeHtml(err.message || 'The gateway transaction was not approved.')}</div>
-          <button type="button" onclick="studentPortal.openExamFeeGateway(${regId}, ${amount})" style="padding:0.6rem 1.25rem; background:#0B63C5; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-            Try Again
+      this.renderPaymentErrorScreen(regId, amount, err.message);
+    }
+  },
+
+  renderPaymentSuccessScreen(regId, amount, txnId, methodLabel) {
+    const modalBody = document.getElementById('checkoutModalBody');
+    if (!modalBody) return;
+    const rcNo = `EXAM-REC-2026-${regId}`;
+
+    modalBody.innerHTML = `
+      <div style="text-align:center; padding:2rem 1.5rem;">
+        <div style="width:65px; height:65px; border-radius:50%; background:#DCFCE7; border:3px solid #86EFAC; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#15803D; font-size:2.2rem; font-weight:800; box-shadow:0 8px 16px rgba(22,163,74,0.2);">
+          ✓
+        </div>
+        <div style="font-size:1.35rem; font-weight:800; color:#15803D; margin-bottom:0.25rem;">Payment Successful!</div>
+        <div style="font-size:0.88rem; color:#475569; margin-bottom:1.5rem;">₹${amount.toLocaleString('en-IN')} paid successfully for BPUT Semester Registration</div>
+
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:1rem; text-align:left; font-size:0.85rem; margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="color:#64748B;">Transaction ID:</span>
+            <strong style="color:#0F172A; font-family:monospace;">${escapeHtml(txnId)}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="color:#64748B;">Receipt Number:</span>
+            <strong style="color:#0B63C5; font-family:monospace;">${rcNo}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="color:#64748B;">Payment Mode:</span>
+            <strong style="color:#0F172A;">${escapeHtml(methodLabel)}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:#64748B;">Status:</span>
+            <strong style="color:#15803D;">Dispatched to Exam Section ✓</strong>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
+          <button type="button" onclick="studentPortal.closeCheckoutModal(); studentPortal.printRegistrationSlip(${regId})" style="padding:0.6rem 1.25rem; background:#ffffff; border:1.5px solid #006644; color:#006644; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            View &amp; Print Receipt Slip
+          </button>
+          <button type="button" onclick="studentPortal.closeCheckoutModal()" style="padding:0.6rem 1.5rem; background:#006644; border:none; color:#ffffff; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer;">
+            Continue to Roadmap &rarr;
           </button>
         </div>
-      `;
-    }
+      </div>
+    `;
+  },
+
+  renderPaymentErrorScreen(regId, amount, errorMsg) {
+    const modalBody = document.getElementById('checkoutModalBody');
+    if (!modalBody) return;
+
+    modalBody.innerHTML = `
+      <div style="text-align:center; padding:2rem 1rem;">
+        <div style="width:60px; height:60px; border-radius:50%; background:#FEE2E2; color:#DC2626; font-size:2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">!</div>
+        <div style="font-size:1.15rem; font-weight:800; color:#991B1B; margin-bottom:0.5rem;">Payment Could Not Be Completed</div>
+        <div style="font-size:0.85rem; color:#7F1D1D; margin-bottom:1.5rem;">${escapeHtml(errorMsg || 'The gateway transaction was not approved.')}</div>
+        <button type="button" onclick="studentPortal.openExamFeeGateway(${regId}, ${amount})" style="padding:0.6rem 1.25rem; background:#0B63C5; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
+          Try Again
+        </button>
+      </div>
+    `;
   },
 
   closeCheckoutModal() {

@@ -8,6 +8,7 @@
 const { query } = require('../config/db');
 const { success, error } = require('../utils/response');
 const { logAudit } = require('../services/auditService');
+const paymentService = require('../services/paymentService');
 
 // Credit Rules
 const MIN_CREDITS = 20;
@@ -1288,6 +1289,61 @@ async function accountsFinalize(req, res) {
 }
 
 /**
+ * 14B. POST /api/registration/:id/create-exam-order
+ * Initiates Razorpay Order for BPUT Exam Fee
+ */
+async function createExamFeeOrder(req, res) {
+  try {
+    const rid = parseInt(req.params.id);
+    const sid = req.user.studentId;
+    if (!sid) return error(res, 'Student account record required.', 401);
+
+    const [r] = await query(
+      `SELECT sr.*, s.full_name, s.reg_no, s.course_id, u.email
+       FROM subject_registrations sr
+       JOIN students s ON s.id = sr.student_id
+       LEFT JOIN users u ON u.id = s.user_id
+       WHERE sr.id = ? AND sr.student_id = ? LIMIT 1`,
+      [rid, sid]
+    );
+    if (!r.length) return error(res, 'Registration application not found.', 404);
+
+    const reg = r[0];
+    const progId = reg.program_id || reg.course_id || 1;
+    const pFee = BPUT_PROGRAM_FEES[progId] || BPUT_PROGRAM_FEES[1];
+    const examFeeAmount = parseFloat(req.body.amount) || pFee.examFeePerSem || 1550;
+
+    const orderData = await paymentService.createOrder({
+      invoiceNo: `EXAM_${reg.reference_number || rid}`,
+      amount: examFeeAmount,
+      studentId: sid,
+      email: reg.email || '',
+      notes: {
+        registrationId: String(rid),
+        studentRegNo: reg.reg_no,
+        feeType: 'BPUT_SEMESTER_EXAM_FEE'
+      }
+    });
+
+    return success(res, {
+      orderId: orderData.orderId,
+      amount: examFeeAmount,
+      amountPaise: orderData.amount,
+      currency: orderData.currency || 'INR',
+      key: orderData.key,
+      provider: orderData.provider,
+      registrationId: rid,
+      studentName: reg.full_name,
+      studentRegNo: reg.reg_no,
+      studentEmail: reg.email
+    }, 'Razorpay Exam Fee Order initiated.');
+  } catch (err) {
+    console.error('createExamFeeOrder error:', err);
+    return error(res, 'Failed to create Razorpay exam fee order: ' + err.message, 500);
+  }
+}
+
+/**
  * 15. POST /api/registration/:id/pay-exam-fee
  * Student pays BPUT semester exam fee (₹1,550 for B.Tech, ₹1,000 for Diploma, ₹2,000 for MBA)
  * Automatically advances application to College Examination Section queue!
@@ -1312,14 +1368,30 @@ async function payExamFee(req, res) {
       return error(res, `Cannot pay exam fee when application is in status: ${reg.status}. Must be DIRECTOR_APPROVED.`, 400);
     }
 
+    // Razorpay signature verification if provided
+    const razorpayOrderId = req.body.razorpayOrderId || req.body.razorpay_order_id;
+    const razorpayPaymentId = req.body.razorpayPaymentId || req.body.razorpay_payment_id;
+    const razorpaySignature = req.body.razorpaySignature || req.body.razorpay_signature;
+
+    if (razorpaySignature && razorpayOrderId) {
+      const v = await paymentService.verifySignature({
+        orderId: razorpayOrderId,
+        paymentId: razorpayPaymentId,
+        signature: razorpaySignature
+      });
+      if (!v.isValid) {
+        return error(res, 'Razorpay signature verification failed. Payment not confirmed.', 400);
+      }
+    }
+
     const progId = reg.program_id || reg.course_id || 1;
     const pFee = BPUT_PROGRAM_FEES[progId] || BPUT_PROGRAM_FEES[1];
     const examFeeAmount = parseFloat(req.body.amount) || pFee.examFeePerSem || 1550;
 
     const receiptNo = req.body.receiptNo || `EXAM-REC-2026-${String(rid).padStart(4, '0')}-${String(sid).padStart(4, '0')}`;
-    const gatewayTxnId = req.body.gatewayTxnId || req.body.transactionId || `TXN_PG_2026_${Date.now().toString().slice(-8)}`;
+    const gatewayTxnId = razorpayPaymentId || req.body.gatewayTxnId || req.body.transactionId || `TXN_PG_2026_${Date.now().toString().slice(-8)}`;
     const paymentNo = `PAY-GATEWAY-${Date.now().toString().slice(-6)}`;
-    const paymentMethod = req.body.paymentMethod || 'PAYMENT_GATEWAY (Razorpay/Online)';
+    const paymentMethod = req.body.paymentMethod || (razorpayPaymentId ? 'RAZORPAY_ONLINE' : 'PAYMENT_GATEWAY (Razorpay/Online)');
 
     // 1. Record payment in payments register
     await query(
@@ -1764,6 +1836,7 @@ module.exports = {
   directorReject,
   accountsGetRegistrations,
   accountsFinalize,
+  createExamFeeOrder,
   payExamFee,
   examSectionGetRegistrations,
   examSectionMarkReceived,

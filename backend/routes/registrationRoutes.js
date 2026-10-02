@@ -16,6 +16,7 @@ router.get('/metadata', ctrl.getProgramsAndDepartments);
 router.get('/eligibility', authenticateToken, requireRole('STUDENT'), ctrl.getEligibility);
 router.get('/subjects', authenticateToken, ctrl.getSubjects);
 router.post('/submit', authenticateToken, requireRole('STUDENT'), ctrl.submitRegistration);
+router.post('/:id/create-exam-order', authenticateToken, requireRole('STUDENT'), ctrl.createExamFeeOrder);
 router.post('/:id/pay-exam-fee', authenticateToken, requireRole('STUDENT'), ctrl.payExamFee);
 router.get('/my', authenticateToken, requireRole('STUDENT'), ctrl.getMyRegistrations);
 

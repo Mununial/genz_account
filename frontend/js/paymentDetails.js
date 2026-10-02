@@ -462,13 +462,73 @@ const paymentDetails = {
         amount,
         paymentMethod: methodLabel
       });
-      const orderId = (orderRes && orderRes.data) ? orderRes.data.orderId : `order_${Date.now()}`;
 
-      // 2. Simulate gateway handshake
+      // ── Official Razorpay Popup Checkout ────────────────────────────────────
+      if (typeof Razorpay !== 'undefined' && orderRes?.data?.key && orderRes?.data?.orderId) {
+        const ord = orderRes.data;
+        const options = {
+          key: ord.key,
+          amount: Math.round(amount * 100),
+          currency: 'INR',
+          name: 'Bhubaneswar Engineering College',
+          description: `College Fee Payment - ${s.full_name || s.student_name || 'Student'}`,
+          order_id: ord.orderId,
+          prefill: {
+            name: s.full_name || s.student_name || '',
+            email: s.email || 'accounts@bec.ac.in',
+            contact: '9876543210'
+          },
+          theme: {
+            color: '#006644'
+          },
+          handler: async (response) => {
+            try {
+              ui.showToast('Verifying Razorpay payment signature...', 'info');
+              await api.post('/payments/verify', {
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                invoiceId: s.id,
+                paymentMethod: 'RAZORPAY_TEST_ONLINE'
+              });
+
+              ui.closeModal('checkoutModal');
+              ui.showToast(`Fee payment of ${ui.formatCurrency(amount)} verified successfully!`, 'success');
+              if (s) {
+                s.total_paid = (parseFloat(s.total_paid) || 0) + amount;
+                s.total_outstanding = Math.max(0, (parseFloat(s.total_outstanding) || 115000) - amount);
+              }
+              this.renderTable();
+            } catch (verr) {
+              ui.showToast('Payment verification failed: ' + verr.message, 'error');
+            } finally {
+              payBtn.disabled = false;
+              payBtn.textContent = 'Authorize Payment';
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              payBtn.disabled = false;
+              payBtn.textContent = 'Authorize Payment';
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', (resp) => {
+          ui.showToast('Payment cancelled or failed: ' + (resp?.error?.description || ''), 'error');
+          payBtn.disabled = false;
+          payBtn.textContent = 'Authorize Payment';
+        });
+        rzp.open();
+        return;
+      }
+
+      // ── Fallback simulation ────────────────────────────────────────────────
+      const orderId = (orderRes && orderRes.data) ? orderRes.data.orderId : `order_${Date.now()}`;
       ui.showToast('Connecting to payment gateway...', 'info', 1000);
       await new Promise(r => setTimeout(r, 1000));
 
-      // 3. Verify payment
       await api.post('/payments/verify', {
         orderId,
         paymentId: `pay_gw_${Date.now()}`,
