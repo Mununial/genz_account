@@ -1,6 +1,6 @@
 /**
  * Verification of Partial Payment, Gateway Integration & Real-Time Account Updates
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * GEN-Z UNIVERSITY Accounts System
  */
 
 const http = require('http');
@@ -40,14 +40,14 @@ function request(path, options = {}) {
 
 async function verifyPartialPaymentFlow() {
   console.log('================================================================');
-  console.log('BEC REAL-TIME PARTIAL PAYMENT & GATEWAY VERIFICATION');
+  console.log('GENZ REAL-TIME PARTIAL PAYMENT & GATEWAY VERIFICATION');
   console.log('================================================================\n');
 
   // 1. Student Login
-  console.log('[1/6] Logging in as student (barsha.priyadarshini@bec.ac.in)...');
+  console.log('[1/6] Logging in as student (student@genz)...');
   const loginRes = await request('/api/auth/login', {
     method: 'POST',
-    body: { email: 'barsha.priyadarshini@bec.ac.in', password: 'Student@BEC2026!' }
+    body: { email: 'student@genz', password: 'Ayush#@26' }
   });
   if (loginRes.status !== 200 || !loginRes.data.data.token) {
     throw new Error('Student login failed: ' + JSON.stringify(loginRes.data));

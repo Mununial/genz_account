@@ -1,7 +1,7 @@
 /**
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  * Real Operational Accounts Modules (Student Fee Details, Receipts Search, ADHOC Fees)
- * Modeled after BEC Institutional Accounts Workflow
+ * Modeled after GENZ Institutional Accounts Workflow
  */
 
 const becRealFee = {
@@ -163,13 +163,13 @@ const becRealFee = {
     // Default robust cohort fallback so search and pickers never fail
     if (!this.allStudentsCache || this.allStudentsCache.length === 0) {
       this.allStudentsCache = [
-        { id: 1, full_name: 'Barsha Priyadarshini Sahoo', roll_no: 'BEC-26-001', reg_no: '2026BEC01001', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 },
-        { id: 2, full_name: 'Shradhasuman Pradhan', roll_no: 'BEC-26-002', reg_no: '2026BEC01002', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 95000, total_paid: 40000, total_invoiced: 135000 },
-        { id: 3, full_name: 'Jitendra Nial', roll_no: 'BEC-26-003', reg_no: '2026BEC01003', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 43500, total_paid: 20000, total_invoiced: 68500 },
-        { id: 4, full_name: 'Om Prakash Sahoo', roll_no: 'BEC-26-004', reg_no: '2026BEC02004', branch_code: 'CSE_DS', branch_name: 'CSE (Data Science)', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 },
-        { id: 5, full_name: 'Biswa Ranjan Rout', roll_no: 'BEC-26-005', reg_no: '2026BEC02005', branch_code: 'CSE_DS', branch_name: 'CSE (Data Science)', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 85000, total_paid: 50000, total_invoiced: 135000 },
-        { id: 6, full_name: 'Priyanka Mohapatra', roll_no: 'BEC-26-006', reg_no: '2026BEC01006', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 },
-        { id: 83, full_name: 'Rajkishore Parida', roll_no: 'BEC-26-083', reg_no: '2026BEC03083', branch_code: 'AGRI', branch_name: 'Agricultural Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 }
+        { id: 1, full_name: 'Barsha Priyadarshini Sahoo', roll_no: 'GENZ-26-001', reg_no: '2026GENZ01001', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 },
+        { id: 2, full_name: 'Shradhasuman Pradhan', roll_no: 'GENZ-26-002', reg_no: '2026GENZ01002', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 95000, total_paid: 40000, total_invoiced: 135000 },
+        { id: 3, full_name: 'Jitendra Nial', roll_no: 'GENZ-26-003', reg_no: '2026GENZ01003', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 43500, total_paid: 20000, total_invoiced: 68500 },
+        { id: 4, full_name: 'Om Prakash Sahoo', roll_no: 'GENZ-26-004', reg_no: '2026GENZ02004', branch_code: 'CSE_DS', branch_name: 'CSE (Data Science)', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 },
+        { id: 5, full_name: 'Biswa Ranjan Rout', roll_no: 'GENZ-26-005', reg_no: '2026GENZ02005', branch_code: 'CSE_DS', branch_name: 'CSE (Data Science)', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 85000, total_paid: 50000, total_invoiced: 135000 },
+        { id: 6, full_name: 'Priyanka Mohapatra', roll_no: 'GENZ-26-006', reg_no: '2026GENZ01006', branch_code: 'CSE', branch_name: 'Computer Science & Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 },
+        { id: 83, full_name: 'Rajkishore Parida', roll_no: 'GENZ-26-083', reg_no: '2026GENZ03083', branch_code: 'AGRI', branch_name: 'Agricultural Engineering', admission_year: 2026, session_name: '2026-27', course_name: 'Bachelor of Technology (B.Tech)', semester_label: '1st Semester', total_outstanding: 115000, total_paid: 20000, total_invoiced: 135000 }
       ];
     }
     this.renderQuickPicks();
@@ -474,7 +474,7 @@ const becRealFee = {
         this.studentFeeElements = [
           { id: 101, periodMonth: '2026-Aug', elementName: 'Tuition Fee (Annual Academic)', amount: 85000, paidAmount: paidTuition, updateAmount: Math.max(0, 85000 - paidTuition), status: paidTuition >= 85000 ? 'PAID' : (paidTuition > 0 ? 'PARTIAL' : 'UNPAID') },
           { id: 102, periodMonth: '2026-Aug', elementName: 'Institutional Development Fee', amount: 15000, paidAmount: 0, updateAmount: 15000, status: 'UNPAID' },
-          { id: 103, periodMonth: '2026-Aug', elementName: 'BPUT University Examination Fee', amount: 5000, paidAmount: 0, updateAmount: 5000, status: 'UNPAID' },
+          { id: 103, periodMonth: '2026-Aug', elementName: 'Gen-Z University Examination Fee', amount: 5000, paidAmount: 0, updateAmount: 5000, status: 'UNPAID' },
           { id: 104, periodMonth: '2026-Aug', elementName: 'Advanced Engineering Lab & Computing', amount: 5000, paidAmount: 0, updateAmount: 5000, status: 'UNPAID' },
           { id: 105, periodMonth: '2026-Aug', elementName: 'University Registration & Caution Deposit', amount: 5000, paidAmount: 0, updateAmount: 5000, status: 'UNPAID' }
         ];
@@ -724,7 +724,7 @@ const becRealFee = {
     }
 
     const s = this.activeStudent;
-    const certNo = `BEC/ACC/NODUES/2026/${s.reg_no || s.roll_no || s.id}`;
+    const certNo = `GENZ/ACC/NODUES/2026/${s.reg_no || s.roll_no || s.id}`;
     const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 
     let modal = document.getElementById('noDuesCertificateModal');
@@ -758,13 +758,13 @@ const becRealFee = {
             <!-- College Crest Header -->
             <div style="text-align: center; border-bottom: 2px solid #1E3A8A; padding-bottom: 1rem; margin-bottom: 1.5rem;">
               <h2 style="margin: 0; color: #1E3A8A; font-size: 1.45rem; font-weight: 900; letter-spacing: 0.03em;">
-                BHUBANESWAR ENGINEERING COLLEGE
+                GEN-Z UNIVERSITY
               </h2>
               <div style="font-size: 0.82rem; color: #475569; margin-top: 0.25rem;">
-                Affiliated to BPUT, Rourkela | Approved by AICTE, New Delhi
+                Autonomous Gen-Z University, Rourkela | Approved by AICTE, New Delhi
               </div>
               <div style="font-size: 0.78rem; color: #64748B;">
-                At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha - 752054 &bull; accounts@bec.ac.in
+                At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha - 752054 &bull; accounts@genz.edu.in
               </div>
             </div>
 
@@ -783,7 +783,7 @@ const becRealFee = {
             <p style="font-size: 0.95rem; line-height: 1.8; color: #1E293B; text-align: justify; margin-bottom: 1.5rem;">
               This is to formally certify that <strong>${escapeHtml(s.full_name)}</strong>, 
               bearing College Roll Number <strong style="color: #2563EB;">${escapeHtml(s.roll_no || '-')}</strong> 
-              and BPUT Registration Number <strong style="color: #1E3A8A;">${escapeHtml(s.reg_no)}</strong>, 
+              and Gen-Z Registration Number <strong style="color: #1E3A8A;">${escapeHtml(s.reg_no)}</strong>, 
               enrolled in <strong>${escapeHtml(s.course_name || 'Bachelor of Technology')}</strong> 
               (Branch: <strong>${escapeHtml(s.branch_name || 'Engineering')}</strong>, 
               Semester: <strong>${escapeHtml(s.semester_label || '1st Semester')}</strong>, 
@@ -814,7 +814,7 @@ const becRealFee = {
               <div>
                 <div style="border-bottom: 1.5px dashed #475569; margin-bottom: 0.4rem; height: 35px;"></div>
                 <div style="font-weight: 700; color: #1E293B;">Bursar / Accounts Head</div>
-                <div style="font-size: 0.72rem; color: #64748B;">Bhubaneswar Engineering College</div>
+                <div style="font-size: 0.72rem; color: #64748B;">Gen-Z University</div>
               </div>
             </div>
           </div>
@@ -1395,14 +1395,14 @@ const becRealFee = {
         <div class="receipt-foil student-foil">
           <div class="foil-badge">OFFICIAL STUDENT COPY</div>
           <div class="receipt-header-row">
-            <img src="/assets/logo.svg" class="receipt-logo" alt="BEC Crest" onerror="this.style.display='none'">
+            <img src="/assets/logo.svg" class="receipt-logo" alt="Gen-Z University Crest" onerror="this.style.display='none'">
             <div class="receipt-college-text">
-              <h2 class="receipt-college-title">BHUBANESWAR ENGINEERING COLLEGE</h2>
-              <div class="receipt-college-sub">Affiliated to BPUT, Rourkela | Approved by AICTE, New Delhi</div>
+              <h2 class="receipt-college-title">GEN-Z UNIVERSITY</h2>
+              <div class="receipt-college-sub">Autonomous Gen-Z University, Rourkela | Approved by AICTE, New Delhi</div>
               <div class="receipt-college-addr">At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha - 752054</div>
             </div>
             <div class="receipt-stamp-placeholder">
-              <div class="official-seal-box">BEC<br>ACCOUNTS<br>SEAL</div>
+              <div class="official-seal-box">GENZ<br>ACCOUNTS<br>SEAL</div>
             </div>
           </div>
 
@@ -1413,7 +1413,7 @@ const becRealFee = {
             <div><span class="lbl">Date &amp; Time:</span> <strong class="val">${dateStr}, ${timeStr}</strong></div>
             <div><span class="lbl">Student Name:</span> <strong class="val" style="font-size:0.95rem;">${studentName}</strong></div>
             <div><span class="lbl">College Roll No:</span> <strong class="val-mono" style="color:#2563EB;">${rollNo}</strong></div>
-            <div><span class="lbl">BPUT / Regn No:</span> <strong class="val-mono">${regNo}</strong></div>
+            <div><span class="lbl">Gen-Z / Regn No:</span> <strong class="val-mono">${regNo}</strong></div>
             <div><span class="lbl">Course &amp; Branch:</span> <strong class="val">${course} — ${branch}</strong></div>
             <div><span class="lbl">Batch / Year / Sem:</span> <strong class="val">${yearLabel} (${semester}) | Sess: ${session}</strong></div>
             <div><span class="lbl">Payment Mode:</span> <span class="badge badge-info" style="font-weight:700;">${mode}</span></div>
@@ -1509,7 +1509,7 @@ const becRealFee = {
           <div class="foil-badge foil-badge-secondary">COLLEGE ACCOUNTS COUNTERFOIL</div>
           <div class="receipt-header-row compact-header">
             <div>
-              <strong style="color: #1E3A8A; font-size: 1rem;">BHUBANESWAR ENGINEERING COLLEGE</strong>
+              <strong style="color: #1E3A8A; font-size: 1rem;">GEN-Z UNIVERSITY</strong>
               <div style="font-size: 0.72rem; color: #64748B;">Central Accounts Directorate, Paniora, Bhubaneswar - 752054</div>
             </div>
             <div style="text-align: right;">
@@ -1552,8 +1552,8 @@ const becRealFee = {
         <!-- ==================== 3-INCH THERMAL POS RECEIPT ==================== -->
         <div class="receipt-thermal-pos" style="display: none; max-width: 320px; margin: 0 auto; background: #ffffff; border: 1.5px dashed #475569; border-radius: 4px; padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #000000; line-height: 1.35; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 8px;">
-            <div style="font-weight: 800; font-size: 13px; letter-spacing: -0.02em;">BHUBANESWAR ENGINEERING COLLEGE</div>
-            <div style="font-size: 9px; color: #334155;">Affiliated to BPUT | AICTE Approved</div>
+            <div style="font-weight: 800; font-size: 13px; letter-spacing: -0.02em;">GEN-Z UNIVERSITY</div>
+            <div style="font-size: 9px; color: #334155;">Affiliated to Gen-Z | AICTE Approved</div>
             <div style="font-size: 8.5px; color: #475569;">At-Paniora, NK Nagar, Bhubaneswar - 752054</div>
             <div style="margin: 6px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 3px 0; font-weight: 800; font-size: 11px; text-transform: uppercase;">
               * OFFICIAL FEE POS RECEIPT *
@@ -1783,7 +1783,7 @@ const becRealFee = {
       <html>
       <head>
         <meta charset="utf-8">
-        <title>e-Receipt ${receiptNo} - Bhubaneswar Engineering College</title>
+        <title>e-Receipt ${receiptNo} - Gen-Z University</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: 20px; background: #fff; color: #1E293B; margin: 0; }
           ${document.querySelector('link[href*="becReal.css"]')?.outerHTML || ''}
@@ -2204,7 +2204,7 @@ const becRealFee = {
     const box = document.getElementById('fastUpiQrBox');
     if (!box) return;
     const rollNo = this.fastStudent ? (this.fastStudent.roll_no || this.fastStudent.reg_no) : 'STUDENT';
-    const note = `BEC Fee Deposit ${rollNo}`;
+    const note = `GENZ Fee Deposit ${rollNo}`;
     const upiUri = `upi://pay?pa=accounts.bec@sbi&pn=Bhubaneswar%20Engineering%20College&am=${amount}&tn=${encodeURIComponent(note)}&cu=INR`;
     const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiUri)}`;
 
@@ -2325,7 +2325,7 @@ const becRealFee = {
       });
 
       const receipt = (res.data && res.data.receipt) || {};
-      const receiptNo = receipt.receiptNo || `BEC-REC-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+      const receiptNo = receipt.receiptNo || `GENZ-REC-2026-${Math.floor(10000 + Math.random() * 90000)}`;
 
       // Add to recent counter list
       const receiptRecord = {

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to BEC ERP Management System - Bhubaneswar Engineering College</title>
-  <meta name="description" content="Official Bhubaneswar Engineering College (BEC) ERP Portal: Secure Sign In for Students, Staff, Faculty, and Administration.">
+  <title>Welcome to Gen-Z University ERP Management System - Gen-Z University</title>
+  <meta name="description" content="Official Gen-Z University ERP Portal: Secure Sign In for Students, Staff, Faculty, and Administration.">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background: url('/assets/college-campus.jpg') no-repeat center center fixed;
+      background: #0B132B url('/assets/genz-campus.jpg?v=zoomed_out') no-repeat center bottom fixed;
       background-size: cover;
       display: flex;
       flex-direction: column;
@@ -408,11 +408,11 @@
   <!-- TOP HEADER BANNER (Exact Replica from Screenshot) -->
   <header class="top-banner-card">
     <div class="top-banner-logo-box">
-      <img src="/assets/bec-logo.jpg" alt="Bhubaneswar Engineering College Logo">
+      <img src="/assets/genz-logo.jpg" alt="Gen-Z University Logo">
     </div>
     <div class="top-banner-content">
-      <div class="top-banner-sub">BHUBANESWAR ENGINEERING COLLEGE</div>
-      <h1 class="top-banner-title">Welcome to BEC ERP Management System</h1>
+      <div class="top-banner-sub">GEN-Z UNIVERSITY</div>
+      <h1 class="top-banner-title">Welcome to Gen-Z University ERP Management System</h1>
       <p class="top-banner-desc">A unified digital workspace for students, staff, faculty, and administration.</p>
     </div>
   </header>
@@ -424,7 +424,7 @@
       <!-- Card Center Emblem -->
       <div class="card-emblem-wrap">
         <div class="card-emblem-box">
-          <img src="/assets/bec-logo.jpg" alt="BEC Crest">
+          <img src="/assets/genz-logo.jpg" alt="Gen-Z University Crest">
         </div>
       </div>
 
@@ -443,7 +443,7 @@
               type="text" 
               id="loginEmail" 
               class="input-field-text" 
-              placeholder="Enter username / email / roll" 
+              placeholder="e.g. admin@genz or account@genz" 
               required 
               autocomplete="username"
             >
@@ -476,8 +476,8 @@
           <label class="input-field-label" for="loginInstitute">Institute</label>
           <div class="input-field-box">
             <select id="loginInstitute" class="input-field-text" style="cursor: pointer; appearance: auto;">
-              <option value="BEC_MAIN">BEC Branch</option>
-              <option value="BEC_ACAD">Bhubaneswar Engineering College (Campus 1)</option>
+              <option value="BEC_MAIN">Gen-Z Main Campus</option>
+              <option value="BEC_ACAD">Gen-Z University (Campus 1)</option>
             </select>
           </div>
         </div>
@@ -488,7 +488,7 @@
             <input type="checkbox" id="rememberMe">
             <span>Remember me</span>
           </label>
-          <a href="javascript:void(0)" onclick="ui.showToast('Please contact ERP Accounts Office at accounts@bec.ac.in', 'info')" class="forgot-link">
+          <a href="javascript:void(0)" onclick="ui.showToast('Please contact ERP Accounts Office at accounts@genz.edu.in', 'info')" class="forgot-link">
             Forgot Password?
           </a>
         </div>
@@ -500,60 +500,7 @@
 
       </form>
 
-      <!-- Super Admin Master Control Link -->
-      <a href="/master-login.html" class="master-access-pill">
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
-          <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; box-shadow: 0 0 6px #F59E0B;"></span>
-          <span>⚡ Super Admin Root Console</span>
-        </div>
-        <span style="font-size: 0.72rem; color: #60A5FA;">Access Console &rarr;</span>
-      </a>
 
-      <!-- Quick 1-Click Access for Real Institutional Users -->
-      <details class="quick-access-details">
-        <summary class="quick-access-summary">
-          <span>⚡ 1-Click Institutional Access</span>
-          <span style="font-size: 0.7rem; color: #60A5FA;">Click to Expand &darr;</span>
-        </summary>
-        <div class="quick-chips-grid">
-          <button type="button" class="quick-chip" onclick="quickLogin('ayush', 'Bec@Ayush2026!')" style="border-color: #F59E0B; color: #FCD34D;">
-            👑 Ayush (Admin)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('director', 'Bec@Biswal2026!')" style="border-color: #C084FC; color: #E9D5FF;">
-            🏛️ Dr. Biswal (Director)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('harihara', 'Bec@Harihara2026!')" style="border-color: #38BDF8; color: #BAE6FD;">
-            💼 Harihara (Acc.)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('manoj', 'Bec@Manoj2026!')" style="border-color: #34D399; color: #A7F3D0;">
-            📋 Manoj Pati (Exam)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('anita', 'Bec@Anita2026!')">
-            👔 Anita (HOD CSE&amp;DS)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('saswat', 'Bec@Saswat2026!')">
-            🏗️ Saswat (HOD Civil)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('ananyaa', 'Bec@Ananyaa2026!')">
-            🌾 Ananyaa (HOD Agri)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('bishnu', 'Bec@Bishnu2026!')">
-            ⚙️ Dr. Bishnu (Mech)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('binaya', 'Bec@Binaya2026!')">
-            ⚡ Dr. Binaya (EEE)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('sangram', 'Bec@Sangram2026!')">
-            ✈️ Dr. Sangram (Aero)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('ashis', 'Bec@Ashis2026!')">
-            📈 Ashis (HOD MBA)
-          </button>
-          <button type="button" class="quick-chip" onclick="quickLogin('bablubag@becbbsr.ac.in', '03082026')" style="border-color: #FBBF24; color: #FEF08A;">
-            🎓 Bablu Bag (Student)
-          </button>
-        </div>
-      </details>
 
     </div>
   </main>

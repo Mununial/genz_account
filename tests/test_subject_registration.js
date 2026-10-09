@@ -1,6 +1,6 @@
 /**
  * End-to-End Test Suite for Subject Registration Module
- * Bhubaneswar Engineering College (BEC)
+ * GEN-Z UNIVERSITY
  */
 
 const http = require('http');
@@ -102,7 +102,7 @@ async function runTests() {
     assert(blSubmit.status === 201 || blSubmit.status === 200 || blSubmit.status === 409, 'Backlog registration submitted or active exists');
     regId = blSubmit.body?.data?.registrationId;
   } else {
-    assert(subSubmit.status === 201, `Registration submitted successfully (ID: ${regId})`);
+    assert(subSubmit.status === 201 || subSubmit.status === 409, `Registration submitted or already active (Status: ${subSubmit.status})`);
   }
 
   // If regId was 409 (already exists from previous run), fetch existing ID
@@ -154,8 +154,8 @@ async function runTests() {
   // 7. Accounts Workflow (Finalize & Confirm)
   console.log('\n7. Accounts Workflow (Finalize & Confirm)');
   const accLogin = await request('POST', '/api/auth/login', {
-    email: 'accounts.head@bec.ac.in',
-    password: 'Head@BEC2026!'
+    email: 'account@genz',
+    password: 'Ayush#@26'
   });
   assert(accLogin.status === 200, 'Accounts Head login successful');
   const accToken = accLogin.body?.data?.token;

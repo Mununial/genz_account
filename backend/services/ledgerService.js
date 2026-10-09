@@ -1,6 +1,6 @@
 /**
  * Financial Ledger & Calculation Engine
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');
@@ -146,9 +146,18 @@ async function postPaymentToLedger(connection, { invoiceId, studentId, amountPai
   for (const item of items) {
     if (remainingPayment <= 0) break;
 
-    const itemDue = parseFloat(item.amount) - parseFloat(item.paid_amount);
-    if (itemDue > 0) {
-      const allocate = Math.min(remainingPayment, itemDue);
+    const [ledgerRows] = await connection.query(
+      `SELECT id, amount_charged, scholarship_amount, discount_amount, amount_paid, outstanding_amount 
+       FROM student_fee_ledgers 
+       WHERE invoice_id = ? AND fee_category_id = ? FOR UPDATE`,
+      [invoiceId, item.fee_category_id]
+    );
+
+    const led = ledgerRows[0];
+    const maxAllocatable = led ? Math.max(0, parseFloat(led.outstanding_amount)) : (parseFloat(item.amount) - parseFloat(item.paid_amount));
+
+    if (maxAllocatable > 0) {
+      const allocate = Math.min(remainingPayment, maxAllocatable);
       const updatedItemPaid = parseFloat(item.paid_amount) + allocate;
 
       await connection.query(
@@ -156,16 +165,7 @@ async function postPaymentToLedger(connection, { invoiceId, studentId, amountPai
         [updatedItemPaid, item.id]
       );
 
-      // 3. Update corresponding ledger record
-      const [ledgerRows] = await connection.query(
-        `SELECT id, amount_charged, amount_paid, outstanding_amount 
-         FROM student_fee_ledgers 
-         WHERE invoice_id = ? AND fee_category_id = ? FOR UPDATE`,
-        [invoiceId, item.fee_category_id]
-      );
-
-      if (ledgerRows.length > 0) {
-        const led = ledgerRows[0];
+      if (led) {
         const newLedgerPaid = parseFloat(led.amount_paid) + allocate;
         const newLedgerOutstanding = Math.max(0, parseFloat(led.outstanding_amount) - allocate);
         const newLedgerStatus = newLedgerOutstanding <= 0 ? 'PAID' : 'PARTIALLY_PAID';

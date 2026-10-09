@@ -1,6 +1,6 @@
 /**
  * Accounts Office — Registration Fee Collections & Ledger Audit Controller
- * Bhubaneswar Engineering College (BEC) — Finance & Ledger Reconciliation
+ * Gen-Z University — Finance & Ledger Reconciliation
  */
 
 const accountsRegistrations = {
@@ -154,7 +154,7 @@ const accountsRegistrations = {
               <div style="font-size:0.72rem;color:#64748B;">${escapeHtml(r.candidate_year || '')}</div>
             </td>
             <td style="padding:12px;font-size:0.82rem;">
-              <span style="font-weight:600;color:#1E293B;display:block;">BPUT Semester Reg Fee</span>
+              <span style="font-weight:600;color:#1E293B;display:block;">Gen-Z Semester Reg Fee</span>
               <span style="font-size:0.72rem;color:#64748B;">Category: EXAM_FEE (100% Cleared)</span>
             </td>
             <td style="padding:12px;text-align:center;">
@@ -231,7 +231,7 @@ const accountsRegistrations = {
             <!-- Header -->
             <div style="background:linear-gradient(135deg, #0B63C5, #1D4ED8);padding:1.1rem 1.5rem;color:#ffffff;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
               <div>
-                <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;opacity:0.9;">Bhubaneswar Engineering College</div>
+                <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;opacity:0.9;">Gen-Z University</div>
                 <h3 style="margin:0.2rem 0 0 0;font-size:1.15rem;font-weight:800;">Official Accounts Subject Registration &amp; Fee Clearance Voucher</h3>
               </div>
               <button onclick="document.getElementById('accVoucherModal').remove()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:700;">✕</button>
@@ -270,7 +270,7 @@ const accountsRegistrations = {
               <!-- 3 Financial Cards ("Kitna Payment Kya" & "Total Kitna He") -->
               <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:0.75rem;margin-bottom:1.25rem;">
                 <div style="background:#ffffff;border:1px solid #CBD5E1;border-radius:8px;padding:0.85rem;border-left:4px solid #16A34A;">
-                  <div style="font-size:0.72rem;color:#64748B;font-weight:700;">BPUT EXAM FEE</div>
+                  <div style="font-size:0.72rem;color:#64748B;font-weight:700;">Gen-Z EXAM FEE</div>
                   <div style="font-size:1.25rem;font-weight:800;color:#0F172A;margin:2px 0;">₹${feeAmount.toLocaleString('en-IN')}</div>
                   <div style="font-size:0.75rem;color:#15803D;font-weight:700;">${feePaid ? '✓ PAID & POSTED' : 'PENDING'}</div>
                 </div>
@@ -327,8 +327,8 @@ const accountsRegistrations = {
               <!-- Signatures Section -->
               <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;font-size:0.75rem;color:#64748B;">
                 <div>
-                  <div>Accounts &amp; Finance Department, BEC</div>
-                  <div style="font-size:0.7rem;color:#94A3B8;">Digitally Certified Ledger Voucher &bull; BPUT Regulation Compliance</div>
+                  <div>Accounts &amp; Finance Department, GENZ</div>
+                  <div style="font-size:0.7rem;color:#94A3B8;">Digitally Certified Ledger Voucher &bull; Gen-Z Regulation Compliance</div>
                 </div>
                 <div style="text-align:right;">
                   <div style="border-bottom:1px solid #64748B;width:120px;margin-bottom:4px;"></div>

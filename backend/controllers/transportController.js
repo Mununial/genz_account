@@ -1,6 +1,6 @@
 /**
  * Student Transport Management Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  * Matches Reference Screens: Student Transport Fee
  */
 
@@ -287,7 +287,7 @@ async function collectTransportFee(req, res) {
 
     // Create receipt
     const recId = mockDb.receipts.length + 1;
-    const receiptNo = `BEC-TR-REC-2026-${String(recId).padStart(4, '0')}`;
+    const receiptNo = `GENZ-TR-REC-2026-${String(recId).padStart(4, '0')}`;
     const receiptObj = {
       id: recId,
       receipt_no: receiptNo,
@@ -381,7 +381,7 @@ async function exportTransportCSV(req, res) {
     const csvContent = [headers, ...rows].join('\n');
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="BEC_Bus_List_Export_${Date.now()}.csv"`);
+    res.setHeader('Content-Disposition', `attachment; filename="GENZ_Bus_List_Export_${Date.now()}.csv"`);
     return res.status(200).send(csvContent);
   } catch (err) {
     console.error('exportTransportCSV error:', err);

@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC) - ADMINISTRATION & AUDIT CONTROLLER
+ * GEN-Z UNIVERSITY (GZU) - ADMINISTRATION & AUDIT CONTROLLER
  * Users & Staff Master, 8-Role RBAC Matrix, Fee Configuration, Audit Trail
  * ==============================================================================
  */
@@ -48,11 +48,11 @@ const adminSettings = {
 
       if (this.users.length === 0) {
         this.users = [
-          { id: 1, email: 'admin@bec.ac.in', full_name: 'Ayush Mallick', role_name: 'ADMIN', department: 'Central IT & Administration', is_active: 1, last_login_at: 'Today, 09:42 AM' },
-          { id: 2, email: 'accounts.head@bec.ac.in', full_name: 'Harihara Parida', role_name: 'ACCOUNTS_HEAD', department: 'Finance & Accounts', is_active: 1, last_login_at: 'Today, 09:15 AM' },
-          { id: 19, email: 'director@bec.ac.in', full_name: 'Dr. B.N. Biswal', role_name: 'DIRECTOR', department: 'Directorate', is_active: 1, last_login_at: 'Today, 08:50 AM' },
-          { id: 20, email: 'exam.section@bec.ac.in', full_name: 'Mr. Manoj Kumar Pati', role_name: 'EXAM_CELL', department: 'Examination Section', is_active: 1, last_login_at: 'Today, 09:00 AM' },
-          { id: 10, email: 'hod.cse@bec.ac.in', full_name: 'Anita Behera', role_name: 'HOD', department: 'CSE & Data Science', is_active: 1, last_login_at: 'Yesterday, 04:30 PM' }
+          { id: 1, email: 'admin@genz.edu.in', full_name: 'Ayush Mallick', role_name: 'ADMIN', department: 'Central IT & Administration', is_active: 1, last_login_at: 'Today, 09:42 AM' },
+          { id: 2, email: 'accounts.head@genz.edu.in', full_name: 'Harihara Parida', role_name: 'ACCOUNTS_HEAD', department: 'Finance & Accounts', is_active: 1, last_login_at: 'Today, 09:15 AM' },
+          { id: 19, email: 'director@genz.edu.in', full_name: 'Dr. B.N. Biswal', role_name: 'DIRECTOR', department: 'Directorate', is_active: 1, last_login_at: 'Today, 08:50 AM' },
+          { id: 20, email: 'exam.section@genz.edu.in', full_name: 'Mr. Manoj Kumar Pati', role_name: 'EXAM_CELL', department: 'Examination Section', is_active: 1, last_login_at: 'Today, 09:00 AM' },
+          { id: 10, email: 'hod.cse@genz.edu.in', full_name: 'Anita Behera', role_name: 'HOD', department: 'CSE & Data Science', is_active: 1, last_login_at: 'Yesterday, 04:30 PM' }
         ];
       }
 
@@ -145,7 +145,7 @@ const adminSettings = {
       { name: 'Daily Cash Drawer Balancing & Closing', admin: 1, head: 1, staff: 1, cashier: 1, auditor: 1, exam: 0, mgmt: 0, student: 0 },
       { name: 'Bank Accounts Management & BRS', admin: 1, head: 1, staff: 0, cashier: 0, auditor: 1, exam: 0, mgmt: 1, student: 0 },
       { name: 'Approve Refunds & Fee Reversals', admin: 1, head: 1, staff: 0, cashier: 0, auditor: 0, exam: 0, mgmt: 0, student: 0 },
-      { name: 'BPUT Examination Dues Clearance Override', admin: 1, head: 1, staff: 0, cashier: 0, auditor: 0, exam: 1, mgmt: 0, student: 0 },
+      { name: 'Gen-Z Examination Dues Clearance Override', admin: 1, head: 1, staff: 0, cashier: 0, auditor: 0, exam: 1, mgmt: 0, student: 0 },
       { name: 'Export Statutory Reports & Excel/CSV', admin: 1, head: 1, staff: 1, cashier: 0, auditor: 1, exam: 0, mgmt: 1, student: 0 },
       { name: 'View Immutable Audit Trail', admin: 1, head: 1, staff: 0, cashier: 0, auditor: 1, exam: 0, mgmt: 1, student: 0 },
       { name: 'User Management & Role Permissions', admin: 1, head: 0, staff: 0, cashier: 0, auditor: 0, exam: 0, mgmt: 0, student: 0 },
@@ -177,7 +177,7 @@ const adminSettings = {
     const feeHeads = [
       { name: 'Tuition Fee (Annual Academic)', code: 'TUI', rate: 85000, class: 'ACADEMIC_CORE', ref: false, due: '31-Oct-2026' },
       { name: 'Institutional Development Fee', code: 'DEV', rate: 15000, class: 'INFRASTRUCTURE', ref: false, due: '31-Oct-2026' },
-      { name: 'BPUT University Examination Fee', code: 'EXAM', rate: 5000, class: 'UNIVERSITY_AFFILIATION', ref: false, due: '31-Oct-2026' },
+      { name: 'Gen-Z University Examination Fee', code: 'EXAM', rate: 5000, class: 'UNIVERSITY_AFFILIATION', ref: false, due: '31-Oct-2026' },
       { name: 'Computing & Advanced Engineering Lab', code: 'LAB', rate: 5000, class: 'ACADEMIC_LAB', ref: false, due: '31-Oct-2026' },
       { name: 'University Caution Deposit (Security)', code: 'CAUTION', rate: 5000, class: 'INSTITUTIONAL_DEPOSIT', ref: true, due: '31-Oct-2026' },
       { name: 'Hostel & Residence Accommodation', code: 'HOSTEL', rate: 45000, class: 'RESIDENTIAL', ref: false, due: '31-Jul-2026' },

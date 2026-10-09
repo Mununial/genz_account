@@ -1,5 +1,5 @@
 -- ==============================================================================
--- BEC ACCOUNTS SYSTEM — DEPARTMENT-WISE SUBJECT REGISTRATION SYSTEM MIGRATION
+-- GENZ ACCOUNTS SYSTEM — DEPARTMENT-WISE SUBJECT REGISTRATION SYSTEM MIGRATION
 -- BPUT College Program + Department + Semester Structured
 -- ==============================================================================
 
@@ -143,16 +143,16 @@ ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
 -- Staff records for HODs
 INSERT INTO `staff` (`user_id`, `staff_code`, `full_name`, `designation`, `department`, `phone`) VALUES
-(10, 'BEC-HOD-CSE-001', 'Dr. Rajesh Kumar Mohanty', 'Head of Department', 'Computer Science & Engineering', '+91-9437000010'),
-(11, 'BEC-HOD-CSD-001', 'Dr. Priyadarshi Biswal', 'Head of Department', 'Computer Science & Data Science', '+91-9437000011'),
-(12, 'BEC-HOD-MEC-001', 'Prof. Manoranjan Pradhan', 'Head of Department', 'Mechanical Engineering', '+91-9437000012'),
-(13, 'BEC-HOD-AER-001', 'Wing Cdr. (Retd) K. N. Das', 'Head of Department', 'Aeronautical Engineering', '+91-9437000013'),
-(14, 'BEC-HOD-CIV-001', 'Dr. Subhashree Senapati', 'Head of Department', 'Civil Engineering', '+91-9437000014'),
-(15, 'BEC-HOD-EEE-001', 'Prof. Ashis Kumar Panda', 'Head of Department', 'Electrical & Electronics Engineering', '+91-9437000015'),
-(16, 'BEC-HOD-AGR-001', 'Dr. Bijay Ketan Nayak', 'Head of Department', 'Agriculture Engineering', '+91-9437000016'),
-(17, 'BEC-HOD-DIP-001', 'Er. Chandan Kumar Rout', 'Head of Department', 'Diploma Engineering Wing', '+91-9437000017'),
-(18, 'BEC-HOD-MBA-001', 'Dr. Smruti Rekha Jena', 'Head of Department', 'Master of Business Administration', '+91-9437000018'),
-(19, 'BEC-DIR-001', 'Prof. S. K. Rath', 'Director', 'Administration', '+91-9437000099')
+(10, 'GENZ-HOD-CSE-001', 'Dr. Rajesh Kumar Mohanty', 'Head of Department', 'Computer Science & Engineering', '+91-9437000010'),
+(11, 'GENZ-HOD-CSD-001', 'Dr. Priyadarshi Biswal', 'Head of Department', 'Computer Science & Data Science', '+91-9437000011'),
+(12, 'GENZ-HOD-MEC-001', 'Prof. Manoranjan Pradhan', 'Head of Department', 'Mechanical Engineering', '+91-9437000012'),
+(13, 'GENZ-HOD-AER-001', 'Wing Cdr. (Retd) K. N. Das', 'Head of Department', 'Aeronautical Engineering', '+91-9437000013'),
+(14, 'GENZ-HOD-CIV-001', 'Dr. Subhashree Senapati', 'Head of Department', 'Civil Engineering', '+91-9437000014'),
+(15, 'GENZ-HOD-EEE-001', 'Prof. Ashis Kumar Panda', 'Head of Department', 'Electrical & Electronics Engineering', '+91-9437000015'),
+(16, 'GENZ-HOD-AGR-001', 'Dr. Bijay Ketan Nayak', 'Head of Department', 'Agriculture Engineering', '+91-9437000016'),
+(17, 'GENZ-HOD-DIP-001', 'Er. Chandan Kumar Rout', 'Head of Department', 'Diploma Engineering Wing', '+91-9437000017'),
+(18, 'GENZ-HOD-MBA-001', 'Dr. Smruti Rekha Jena', 'Head of Department', 'Master of Business Administration', '+91-9437000018'),
+(19, 'GENZ-DIR-001', 'Prof. S. K. Rath', 'Director', 'Administration', '+91-9437000099')
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 
 -- 10. MAP DEPARTMENT HODS

@@ -1,6 +1,6 @@
 /**
  * Central REST API Client Wrapper
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const API_BASE = '/api';

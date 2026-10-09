@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC) - STUDENT PROFILE CONTROLLER (CMS)
+ * GEN-Z UNIVERSITY (GZU) - STUDENT PROFILE CONTROLLER (CMS)
  * Senior UX Architecture: 100% Real Reporting Cohort & Production Polish
  * ==============================================================================
  */
@@ -14,14 +14,14 @@ const studentProfile = {
 
   // Star / Featured Quick Students for instant 1-click access
   quickFeaturedStudents: [
-    { name: 'BABLU BAG', reg: '2026BEC01080', branch: 'CSE', badge: 'SC' },
-    { name: 'Barsha Priyadarshini Sahoo', reg: '2026BEC01001', branch: 'CSE', badge: 'GEN' },
-    { name: 'Shradhasuman Pradhan', reg: '2026BEC01002', branch: 'CSE', badge: 'GEN' },
-    { name: 'Om Prakash Sahoo', reg: '2026BEC02004', branch: 'CSE (DS)', badge: 'GEN' },
-    { name: 'Rajkishore Parida', reg: '2026BEC03083', branch: 'AGRI', badge: 'OBC' },
-    { name: 'NARENDRA KUMAR MAHALIK', reg: '2026BEC05134', branch: 'MECH', badge: 'SC' },
-    { name: 'JASHOBANTA PRADHAN', reg: '2026BEC04120', branch: 'EE', badge: 'OBC' },
-    { name: 'UTTAMA PARIDA', reg: '2026BEC07164', branch: 'CIVIL', badge: 'OBC' }
+    { name: 'BABLU BAG', reg: '2026GENZ01080', branch: 'CSE', badge: 'SC' },
+    { name: 'Barsha Priyadarshini Sahoo', reg: '2026GENZ01001', branch: 'CSE', badge: 'GEN' },
+    { name: 'Shradhasuman Pradhan', reg: '2026GENZ01002', branch: 'CSE', badge: 'GEN' },
+    { name: 'Om Prakash Sahoo', reg: '2026GENZ02004', branch: 'CSE (DS)', badge: 'GEN' },
+    { name: 'Rajkishore Parida', reg: '2026GENZ03083', branch: 'AGRI', badge: 'OBC' },
+    { name: 'NARENDRA KUMAR MAHALIK', reg: '2026GENZ05134', branch: 'MECH', badge: 'SC' },
+    { name: 'JASHOBANTA PRADHAN', reg: '2026GENZ04120', branch: 'EE', badge: 'OBC' },
+    { name: 'UTTAMA PARIDA', reg: '2026GENZ07164', branch: 'CIVIL', badge: 'OBC' }
   ],
 
   sidebarCollapsed: false,
@@ -358,10 +358,10 @@ const studentProfile = {
     if (nameEl) nameEl.textContent = s.full_name;
 
     const regEl = document.getElementById('s360Reg');
-    if (regEl) regEl.textContent = s.reg_no || '2026BEC01080';
+    if (regEl) regEl.textContent = s.reg_no || '2026GENZ01080';
 
     const rollEl = document.getElementById('s360Roll');
-    if (rollEl) rollEl.textContent = s.roll_no || 'BEC-26-080';
+    if (rollEl) rollEl.textContent = s.roll_no || 'GENZ-26-080';
 
     const branchEl = document.getElementById('s360Branch');
     if (branchEl) branchEl.textContent = s.branch_name || s.branch_code || 'Computer Science & Engineering';
@@ -480,7 +480,7 @@ const studentProfile = {
         <tbody>
           <tr>
             <td class="attr-key">Registration No</td>
-            <td class="attr-val"><strong style="color: #0284C7; font-family: monospace; font-size: 0.88rem;">${escapeHtml(s.reg_no || '2026BEC01080')}</strong></td>
+            <td class="attr-val"><strong style="color: #0284C7; font-family: monospace; font-size: 0.88rem;">${escapeHtml(s.reg_no || '2026GENZ01080')}</strong></td>
           </tr>
           <tr>
             <td class="attr-key">Serial No.</td>
@@ -754,9 +754,9 @@ const studentProfile = {
           </tr>
           <tr>
             <td class="col-lbl">Affiliated University</td>
-            <td class="col-data">Biju Patnaik University of Technology (BPUT), Odisha</td>
+            <td class="col-data">Gen-Z University (Autonomous), Odisha</td>
             <td class="col-lbl">Institution Code</td>
-            <td class="col-data">BEC (College Code: 01)</td>
+            <td class="col-data">GENZ (University Code: 01)</td>
           </tr>
           <tr>
             <td class="col-lbl">Admission Quota</td>
@@ -833,9 +833,9 @@ const studentProfile = {
             </tr>
             <tr>
               <td class="col-lbl">Alumni Membership ID</td>
-              <td class="col-data"><code style="font-weight: 700; color: #7C3AED;">BEC-ALU-${escapeHtml(String(s.passout_year || '2024'))}-${String(s.id).padStart(4, '0')}</code></td>
+              <td class="col-data"><code style="font-weight: 700; color: #7C3AED;">GENZ-ALU-${escapeHtml(String(s.passout_year || '2024'))}-${String(s.id).padStart(4, '0')}</code></td>
               <td class="col-lbl">Alumni Association</td>
-              <td class="col-data">BEC Alumni Global Network (Life Member)</td>
+              <td class="col-data">GENZ Alumni Global Network (Life Member)</td>
             </tr>
           </tbody>
         </table>
@@ -906,7 +906,7 @@ const studentProfile = {
         <tbody>
           <tr>
             <td class="col-lbl">Present / Communication Address</td>
-            <td class="col-data-full" colspan="3">${escapeHtml(s.address || 'At-Paniora, NK Nagar, Near BEC Campus, Bhubaneswar, Odisha - 752054')}</td>
+            <td class="col-data-full" colspan="3">${escapeHtml(s.address || 'At-Paniora, NK Nagar, Near GENZ Campus, Bhubaneswar, Odisha - 752054')}</td>
           </tr>
           <tr>
             <td class="col-lbl">Permanent Native Address</td>
@@ -939,7 +939,7 @@ const studentProfile = {
       { name: '10th (HSC) Certificate & Marksheet', url: s.marksheet_10th_url, board: 'BSE Odisha / CBSE', type: 'Academic' },
       { name: '12th / Diploma (+2 Science) Certificate', url: s.certificate_12th_url, board: 'CHSE Odisha / SCTE&VT', type: 'Academic' },
       { name: 'JEE Main / OJEE Rank Allotment Card', url: s.rank_card_url, board: 'Central Counselling / OJEE', type: 'Admission' },
-      { name: 'College Admission Allotment Letter', url: s.allotment_letter_url, board: 'Bhubaneswar Engineering College', type: 'Admission' },
+      { name: 'College Admission Allotment Letter', url: s.allotment_letter_url, board: 'Gen-Z University', type: 'Admission' },
       { name: 'Aadhaar Card Copy', url: s.aadhaar_doc_url, board: `UIDAI: ${escapeHtml(s.aadhaar_no || 'Verified')}`, type: 'Identity' },
       { name: 'College Leaving Certificate (CLC) / TC', url: s.tc_clc_url, board: 'Original Institutional Transfer', type: 'Mandatory' },
       { name: 'Conduct Certificate', url: s.conduct_url, board: 'Original Issued by School/College', type: 'Mandatory' },
@@ -1079,7 +1079,7 @@ const studentProfile = {
           </tr>
           <tr>
             <td>3</td>
-            <td><strong>BPUT University Examination Fee</strong><br><span style="font-size: 0.75rem; color: #64748B;">Mid-Term, End-Term semester evaluation charges</span></td>
+            <td><strong>Gen-Z University Examination Fee</strong><br><span style="font-size: 0.75rem; color: #64748B;">Mid-Term, End-Term semester evaluation charges</span></td>
             <td>31-Oct-2026</td>
             <td style="text-align: right; font-weight: 600;">₹5,000.00</td>
             <td style="text-align: right; color: #10B981;">₹0.00</td>
@@ -1097,7 +1097,7 @@ const studentProfile = {
           </tr>
           <tr>
             <td>5</td>
-            <td><strong>University Registration &amp; Caution Deposit</strong><br><span style="font-size: 0.75rem; color: #64748B;">BPUT central registration and institutional security</span></td>
+            <td><strong>University Registration &amp; Caution Deposit</strong><br><span style="font-size: 0.75rem; color: #64748B;">Gen-Z central registration and institutional security</span></td>
             <td>31-Oct-2026</td>
             <td style="text-align: right; font-weight: 600;">₹5,000.00</td>
             <td style="text-align: right; color: #10B981;">₹0.00</td>
@@ -1180,7 +1180,7 @@ const studentProfile = {
         combinedTxns.push(
           { date: '2026-07-15', refNo: 'INV-2026-001', particulars: 'Annual Tuition Fee (Semester 1 & 2)', debit: 85000, credit: 0 },
           { date: '2026-07-15', refNo: 'INV-2026-002', particulars: 'Institutional Development & Amenities', debit: 15000, credit: 0 },
-          { date: '2026-07-15', refNo: 'INV-2026-003', particulars: 'BPUT Semester Examination Fee', debit: 5000, credit: 0 },
+          { date: '2026-07-15', refNo: 'INV-2026-003', particulars: 'Gen-Z Semester Examination Fee', debit: 5000, credit: 0 },
           { date: '2026-07-15', refNo: 'INV-2026-004', particulars: 'Engineering Lab & Computing Facility', debit: 5000, credit: 0 },
           { date: '2026-07-15', refNo: 'INV-2026-005', particulars: 'University Caution Deposit (Refundable)', debit: 5000, credit: 0 }
         );
@@ -1374,7 +1374,7 @@ const studentProfile = {
     }
   },
 
-  // Tab: BPUT Exam Registration & Clearance
+  // Tab: Gen-Z Exam Registration & Clearance
   async renderExamTab(s, container) {
     const totalDue = s.total_outstanding !== undefined ? s.total_outstanding : 115000;
     const isEligible = totalDue <= 10000;
@@ -1383,7 +1383,7 @@ const studentProfile = {
       <div class="cms-section-heading" style="justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 0.55rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-          BPUT University Semester Examination Clearance Status
+          Gen-Z University Semester Examination Clearance Status
         </div>
         <div>
           <button class="btn btn-secondary btn-sm" onclick="window.print()">
@@ -1397,10 +1397,10 @@ const studentProfile = {
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div>
             <div style="font-weight: 800; font-size: 1.1rem; color: ${isEligible ? '#15803D' : '#BE123C'};">
-              ${isEligible ? '✓ ELIGIBLE FOR BPUT EXAM REGISTRATION' : '⚠ REGISTRATION HOLD: OUTSTANDING DUES EXCEED THRESHOLD'}
+              ${isEligible ? '✓ ELIGIBLE FOR Gen-Z EXAM REGISTRATION' : '⚠ REGISTRATION HOLD: OUTSTANDING DUES EXCEED THRESHOLD'}
             </div>
             <div style="font-size: 0.85rem; color: #64748B; margin-top: 0.35rem;">
-              As per BPUT &amp; BEC Academic Regulation Section 14, student accounts with dues &le; ₹10,000 are eligible for admit cards.
+              As per Gen-Z &amp; GENZ Academic Regulation Section 14, student accounts with dues &le; ₹10,000 are eligible for admit cards.
               Current Outstanding Balance: <strong>${ui.formatCurrency(totalDue)}</strong>.
             </div>
           </div>
@@ -1411,7 +1411,7 @@ const studentProfile = {
               </a>
             ` : `
               <button class="btn btn-primary btn-sm" style="background: #15803D; border-color: #15803D;" onclick="studentProfile.approveExamRegistration(${s.id})">
-                ✓ Approve &amp; Issue BPUT Hall Clearance
+                ✓ Approve &amp; Issue Gen-Z Hall Clearance
               </button>
             `}
           </div>
@@ -1465,7 +1465,7 @@ const studentProfile = {
         <tbody>
           <tr>
             <td class="col-lbl">Assigned Transport Route</td>
-            <td class="col-data"><strong>Route #4: Master Canteen &rarr; Rasulgarh &rarr; Khandagiri &rarr; BEC Campus</strong></td>
+            <td class="col-data"><strong>Route #4: Master Canteen &rarr; Rasulgarh &rarr; Khandagiri &rarr; GENZ Campus</strong></td>
             <td class="col-lbl">Designated Pickup Stop</td>
             <td class="col-data"><strong>Rasulgarh Square (Morning Pickup: 07:45 AM)</strong></td>
           </tr>
@@ -1541,10 +1541,10 @@ const studentProfile = {
         <tbody>
           <tr>
             <td>
-              <strong>${isReserved ? 'Prerana Post-Matric SC/ST Scholarship Scheme' : 'BEC Academic Merit Concession (Rank 1-50)'}</strong>
+              <strong>${isReserved ? 'Prerana Post-Matric SC/ST Scholarship Scheme' : 'GENZ Academic Merit Concession (Rank 1-50)'}</strong>
               <br><span style="font-size: 0.75rem; color: #64748B;">Govt. of Odisha ST &amp; SC Development Department</span>
             </td>
-            <td><code style="font-weight: 700; color: #0284C7;">${isReserved ? 'DHE/SCH/2026/8941' : 'BEC/MERIT/2026/012'}</code></td>
+            <td><code style="font-weight: 700; color: #0284C7;">${isReserved ? 'DHE/SCH/2026/8941' : 'GENZ/MERIT/2026/012'}</code></td>
             <td>Tuition Fee (Annual)</td>
             <td>14-Aug-2026</td>
             <td style="text-align: right; font-weight: 800; color: #8B5CF6; font-size: 1rem;">₹25,000.00</td>
@@ -1684,7 +1684,7 @@ const studentProfile = {
     const modal = document.getElementById('refundRequestModal');
     const infoInput = document.getElementById('refundStudentInfo');
     if (infoInput) {
-      infoInput.value = `${s.full_name} (${s.reg_no || '2026BEC01080'}) - Due: ${ui.formatCurrency(s.total_outstanding || 0)}`;
+      infoInput.value = `${s.full_name} (${s.reg_no || '2026GENZ01080'}) - Due: ${ui.formatCurrency(s.total_outstanding || 0)}`;
     }
     if (modal) modal.style.display = 'flex';
   },
@@ -1745,11 +1745,11 @@ const studentProfile = {
     }
   },
 
-  // BPUT Exam Registration Approval
+  // Gen-Z Exam Registration Approval
   async approveExamRegistration(studentId) {
     try {
       await api.post(`/admin/exam-registrations/1`, { registrationStatus: 'REGISTERED' });
-      ui.showToast('BPUT Semester Examination Clearance approved & Hall Ticket Clearance issued!', 'success');
+      ui.showToast('Gen-Z Semester Examination Clearance approved & Hall Ticket Clearance issued!', 'success');
       this.renderTabBody();
     } catch (err) {
       ui.showToast('Exam registration clearance marked active.', 'success');
@@ -1818,7 +1818,7 @@ const studentProfile = {
             <td class="col-lbl">Known Allergies / Chronic Conditions</td>
             <td class="col-data">None Reported</td>
             <td class="col-lbl">Emergency Medical Contact</td>
-            <td class="col-data"><strong>BEC Health Center: 108 / 0674-2970000</strong></td>
+            <td class="col-data"><strong>GENZ Health Center: 108 / 0674-2970000</strong></td>
           </tr>
         </tbody>
       </table>
@@ -1837,8 +1837,8 @@ const studentProfile = {
 
       <div class="cms-id-card-wrap">
         <div class="cms-id-card-top">
-          <div class="cms-id-college-name">BHUBANESWAR ENGINEERING COLLEGE</div>
-          <div class="cms-id-college-sub">Approved by AICTE | Affiliated to BPUT, Odisha</div>
+          <div class="cms-id-college-name">GEN-Z UNIVERSITY</div>
+          <div class="cms-id-college-sub">Approved by AICTE | Approved by UGC / AICTE</div>
         </div>
 
         <div class="cms-id-card-content">
@@ -1847,8 +1847,8 @@ const studentProfile = {
           </div>
           <div class="cms-id-meta-slot">
             <div class="cms-id-student-name">${escapeHtml(s.full_name)}</div>
-            <div class="cms-id-row"><strong>Roll No:</strong> ${escapeHtml(s.roll_no || 'BEC-26-080')}</div>
-            <div class="cms-id-row"><strong>Reg No:</strong> ${escapeHtml(s.reg_no || '2026BEC01080')}</div>
+            <div class="cms-id-row"><strong>Roll No:</strong> ${escapeHtml(s.roll_no || 'GENZ-26-080')}</div>
+            <div class="cms-id-row"><strong>Reg No:</strong> ${escapeHtml(s.reg_no || '2026GENZ01080')}</div>
             <div class="cms-id-row"><strong>Course:</strong> B.Tech - ${escapeHtml(s.branch_code || 'CSE')}</div>
             <div class="cms-id-row"><strong>Validity:</strong> 2026 - 2030</div>
             <div class="cms-id-row"><strong>Blood Group:</strong> ${escapeHtml(s.bloodgroup || 'B+')}</div>
@@ -1856,7 +1856,7 @@ const studentProfile = {
         </div>
 
         <div class="cms-id-card-bottom">
-          <div>ID: <code>${escapeHtml(s.reg_no || '2026BEC01080')}</code></div>
+          <div>ID: <code>${escapeHtml(s.reg_no || '2026GENZ01080')}</code></div>
           <div style="font-weight: 700; color: #0F172A;">Principal Signature</div>
         </div>
       </div>
@@ -2156,7 +2156,7 @@ const studentProfile = {
 
     if (countLabel) {
       if (isAlumniActiveView) {
-        countLabel.textContent = `Showing ${list.length} graduated BEC Alumni records with placement and institutional No Dues clearance status`;
+        countLabel.textContent = `Showing ${list.length} graduated GENZ Alumni records with placement and institutional No Dues clearance status`;
       } else {
         countLabel.textContent = `Showing ${list.length} student records matching filter criteria`;
       }

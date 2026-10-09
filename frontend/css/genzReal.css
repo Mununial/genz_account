@@ -1,6 +1,6 @@
 /**
- * Styles for BEC Institutional Accounts Workflow
- * Matches Real Bhubaneswar Engineering College Accounts ERP Interface
+ * Styles for GENZ Institutional Accounts Workflow
+ * Matches Real Gen-Z University Accounts ERP Interface
  */
 
 /* Top Action Bar matching Screenshot 2 */
@@ -664,7 +664,7 @@
 }
 
 /* ========================================================================= */
-/* BEC INTERACTIVE PAYMENT GATEWAY & PARTIAL PAYMENT STYLES                  */
+/* GENZ INTERACTIVE PAYMENT GATEWAY & PARTIAL PAYMENT STYLES                  */
 /* ========================================================================= */
 
 .bec-pay-dialog {
@@ -1252,7 +1252,7 @@
 }
 
 /* ========================================================================= */
-/* OFFICIAL BEC FEE RECEIPT (AUTHENTIC DOCUMENT STYLING)                     */
+/* OFFICIAL GENZ FEE RECEIPT (AUTHENTIC DOCUMENT STYLING)                     */
 /* ========================================================================= */
 .bec-official-receipt-frame {
   background: #FFFFFF;

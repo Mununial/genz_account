@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC) - MASTER CONTROL CONSOLE CONTROLLER
+ * GEN-Z UNIVERSITY (GZU) - MASTER CONTROL CONSOLE CONTROLLER
  * Full System Authority: Edit All Roles, IDs, Passwords, Windows, & Permissions
  * ==============================================================================
  */
@@ -504,7 +504,7 @@ const masterControl = {
       { name: 'Fast e-Receipt Cutting & Cash Drawer', roles: [1, 1, 1, 1, 0, 0, 0, 0] },
       { name: 'Edit & Create Invoices / Ledgers', roles: [1, 1, 1, 0, 0, 0, 0, 0] },
       { name: 'Approve Refunds & Fee Adjustments', roles: [1, 1, 0, 0, 0, 0, 0, 0] },
-      { name: 'Verify BPUT Subject Registrations (HOD)', roles: [1, 0, 0, 0, 0, 1, 0, 0] },
+      { name: 'Verify Gen-Z Subject Registrations (HOD)', roles: [1, 0, 0, 0, 0, 1, 0, 0] },
       { name: 'Academic Director Final Clearance', roles: [1, 0, 0, 0, 0, 0, 1, 0] },
       { name: 'Examination Section Admit Card & Window Control', roles: [1, 0, 0, 0, 1, 0, 0, 0] },
       { name: 'Edit All User Roles & Reset Passwords', roles: [1, 0, 0, 0, 0, 0, 0, 0] },

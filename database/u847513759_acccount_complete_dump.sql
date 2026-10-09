@@ -1,5 +1,5 @@
 -- ==============================================================================
--- BHUBANESWAR ENGINEERING COLLEGE (BEC) & BPUT REGISTRATION
+-- GEN-Z UNIVERSITY (GZU) & BPUT REGISTRATION
 -- Target Database: u847513759_acccount
 -- Target User:     u847513759_erp_account
 -- Generated:       2026-10-01T19:34:11.310Z
@@ -13,7 +13,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ------------------------------------------------------
 
 -- ==============================================================================
--- BHUBANESWAR ENGINEERING COLLEGE (BEC) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
+-- GEN-Z UNIVERSITY (GZU) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
 -- Complete Relational Database Schema (MySQL 8.0+ / Hostinger Compatible)
 -- ==============================================================================
 
@@ -505,7 +505,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ------------------------------------------------------
 
 -- ==============================================================================
--- BEC ACCOUNTS SYSTEM — DEPARTMENT-WISE SUBJECT REGISTRATION SYSTEM MIGRATION
+-- GENZ ACCOUNTS SYSTEM — DEPARTMENT-WISE SUBJECT REGISTRATION SYSTEM MIGRATION
 -- BPUT College Program + Department + Semester Structured
 -- ==============================================================================
 
@@ -649,16 +649,16 @@ ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
 -- Staff records for HODs
 INSERT INTO `staff` (`user_id`, `staff_code`, `full_name`, `designation`, `department`, `phone`) VALUES
-(10, 'BEC-HOD-CSE-001', 'Dr. Rajesh Kumar Mohanty', 'Head of Department', 'Computer Science & Engineering', '+91-9437000010'),
-(11, 'BEC-HOD-CSD-001', 'Dr. Priyadarshi Biswal', 'Head of Department', 'Computer Science & Data Science', '+91-9437000011'),
-(12, 'BEC-HOD-MEC-001', 'Prof. Manoranjan Pradhan', 'Head of Department', 'Mechanical Engineering', '+91-9437000012'),
-(13, 'BEC-HOD-AER-001', 'Wing Cdr. (Retd) K. N. Das', 'Head of Department', 'Aeronautical Engineering', '+91-9437000013'),
-(14, 'BEC-HOD-CIV-001', 'Dr. Subhashree Senapati', 'Head of Department', 'Civil Engineering', '+91-9437000014'),
-(15, 'BEC-HOD-EEE-001', 'Prof. Ashis Kumar Panda', 'Head of Department', 'Electrical & Electronics Engineering', '+91-9437000015'),
-(16, 'BEC-HOD-AGR-001', 'Dr. Bijay Ketan Nayak', 'Head of Department', 'Agriculture Engineering', '+91-9437000016'),
-(17, 'BEC-HOD-DIP-001', 'Er. Chandan Kumar Rout', 'Head of Department', 'Diploma Engineering Wing', '+91-9437000017'),
-(18, 'BEC-HOD-MBA-001', 'Dr. Smruti Rekha Jena', 'Head of Department', 'Master of Business Administration', '+91-9437000018'),
-(19, 'BEC-DIR-001', 'Prof. S. K. Rath', 'Director', 'Administration', '+91-9437000099')
+(10, 'GENZ-HOD-CSE-001', 'Dr. Rajesh Kumar Mohanty', 'Head of Department', 'Computer Science & Engineering', '+91-9437000010'),
+(11, 'GENZ-HOD-CSD-001', 'Dr. Priyadarshi Biswal', 'Head of Department', 'Computer Science & Data Science', '+91-9437000011'),
+(12, 'GENZ-HOD-MEC-001', 'Prof. Manoranjan Pradhan', 'Head of Department', 'Mechanical Engineering', '+91-9437000012'),
+(13, 'GENZ-HOD-AER-001', 'Wing Cdr. (Retd) K. N. Das', 'Head of Department', 'Aeronautical Engineering', '+91-9437000013'),
+(14, 'GENZ-HOD-CIV-001', 'Dr. Subhashree Senapati', 'Head of Department', 'Civil Engineering', '+91-9437000014'),
+(15, 'GENZ-HOD-EEE-001', 'Prof. Ashis Kumar Panda', 'Head of Department', 'Electrical & Electronics Engineering', '+91-9437000015'),
+(16, 'GENZ-HOD-AGR-001', 'Dr. Bijay Ketan Nayak', 'Head of Department', 'Agriculture Engineering', '+91-9437000016'),
+(17, 'GENZ-HOD-DIP-001', 'Er. Chandan Kumar Rout', 'Head of Department', 'Diploma Engineering Wing', '+91-9437000017'),
+(18, 'GENZ-HOD-MBA-001', 'Dr. Smruti Rekha Jena', 'Head of Department', 'Master of Business Administration', '+91-9437000018'),
+(19, 'GENZ-DIR-001', 'Prof. S. K. Rath', 'Director', 'Administration', '+91-9437000099')
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 
 -- 10. MAP DEPARTMENT HODS
@@ -685,7 +685,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ------------------------------------------------------
 
 -- ==============================================================================
--- BHUBANESWAR ENGINEERING COLLEGE (BEC) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
+-- GEN-Z UNIVERSITY (GZU) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
 -- Baseline Seed Data (Roles, Permissions, Academic, Fee Categories, Settings)
 -- ==============================================================================
 
@@ -804,8 +804,8 @@ ON DUPLICATE KEY UPDATE `fine_value` = VALUES(`fine_value`);
 
 -- 10. SYSTEM SETTINGS
 INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VALUES
-('college_name', 'Bhubaneswar Engineering College', 'Official college name'),
-('college_code', 'BEC', 'College short code'),
+('college_name', 'Gen-Z University', 'Official college name'),
+('college_code', 'GENZ', 'College short code'),
 ('college_address', 'At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha 752054', 'Postal address'),
 ('college_affiliation', 'Affiliated to BPUT, Odisha & Approved by AICTE, New Delhi', 'Accreditation details'),
 ('college_email', 'accounts@bec.ac.in', 'Official finance email'),
@@ -833,10 +833,10 @@ ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
 -- 12. STAFF RECORDS
 INSERT INTO `staff` (`id`, `user_id`, `staff_code`, `full_name`, `designation`, `department`, `phone`) VALUES
-(1, 1, 'BEC-ADM-001', 'System Administrator', 'Senior IT Administrator', 'IT & Systems', '+91-9437000001'),
-(2, 2, 'BEC-ACC-001', 'Prof. B. K. Mohapatra', 'Accounts Head & CFO', 'Accounts & Finance', '+91-9437000002'),
-(3, 3, 'BEC-ACC-002', 'Sujit Kumar Das', 'Senior Accounts Officer', 'Accounts & Finance', '+91-9437000003'),
-(4, 4, 'BEC-AUD-001', 'K. R. Panda & Associates', 'Statutory Financial Auditor', 'Internal Audit', '+91-9437000004')
+(1, 1, 'GENZ-ADM-001', 'System Administrator', 'Senior IT Administrator', 'IT & Systems', '+91-9437000001'),
+(2, 2, 'GENZ-ACC-001', 'Prof. B. K. Mohapatra', 'Accounts Head & CFO', 'Accounts & Finance', '+91-9437000002'),
+(3, 3, 'GENZ-ACC-002', 'Sujit Kumar Das', 'Senior Accounts Officer', 'Accounts & Finance', '+91-9437000003'),
+(4, 4, 'GENZ-AUD-001', 'K. R. Panda & Associates', 'Statutory Financial Auditor', 'Internal Audit', '+91-9437000004')
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 
 -- 13. TEST STUDENT RECORD (Jitendra Nial)
@@ -894,13 +894,13 @@ ON DUPLICATE KEY UPDATE `amount` = VALUES(`amount`);
 
 -- Digital Receipt for the counter payment
 INSERT INTO `receipts` (`id`, `receipt_no`, `payment_id`, `student_id`, `invoice_id`, `amount_paid`, `payment_method`, `transaction_id`, `issued_date`, `receipt_data_json`, `created_by`) VALUES
-(1, 'BEC-REC-2026-0001', 1, 1, 1, 20000.00, 'CASH', 'COUNTER-RCP-001', NOW(), '{"particulars": "Tuition Fee Initial Installment", "student_name": "Jitendra Nial", "branch": "Computer Science & Engineering", "course": "B.Tech", "semester": "1st Semester"}', 3)
+(1, 'GZU-REC-2026-0001', 1, 1, 1, 20000.00, 'CASH', 'COUNTER-RCP-001', NOW(), '{"particulars": "Tuition Fee Initial Installment", "student_name": "Jitendra Nial", "branch": "Computer Science & Engineering", "course": "B.Tech", "semester": "1st Semester"}', 3)
 ON DUPLICATE KEY UPDATE `receipt_no` = VALUES(`receipt_no`);
 
 -- Notification for student
 INSERT INTO `notifications` (`user_id`, `title`, `message`, `category`, `is_read`) VALUES
 (5, 'Admission Fee Invoice Issued', 'Invoice INV-2026-0001 of ₹63,500 for B.Tech 1st Semester has been issued with due date 31-Oct-2026.', 'INVOICE', 0),
-(5, 'Payment Receipt Generated', 'Payment of ₹20,000 received. Digital receipt BEC-REC-2026-0001 is ready for download.', 'RECEIPT', 0);
+(5, 'Payment Receipt Generated', 'Payment of ₹20,000 received. Digital receipt GZU-REC-2026-0001 is ready for download.', 'RECEIPT', 0);
 
 
 

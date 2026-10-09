@@ -1,6 +1,6 @@
 /**
  * Student Financial Portal Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');
@@ -432,7 +432,7 @@ async function getHealth(req, res) {
       special_medical_needs: data.special_medical_needs || '',
       medical_fitness_status: data.medical_fitness_status || 'Certified Fit',
       insurance_policy_no: data.insurance_policy_no || ('BPUT-STU-MED-' + (data.reg_no || studentId)),
-      emergency_health_center: 'BEC Campus Health Center: 108 / 0674-2970000',
+      emergency_health_center: 'GENZ Campus Health Center: 108 / 0674-2970000',
       last_updated_at: data.updated_at || data.created_at || new Date()
     };
 
@@ -508,6 +508,285 @@ async function updateHealth(req, res) {
   }
 }
 
+/**
+ * Submit Education Loan Assistance Request
+ * POST /api/student/loan-request
+ */
+async function submitLoanRequest(req, res) {
+  const studentId = req.user.studentId;
+  const {
+    bank_name,
+    bank_branch,
+    bank_ifsc,
+    loan_amount,
+    loan_purpose,
+    co_applicant_name,
+    co_applicant_relation,
+    co_applicant_phone,
+    co_applicant_income,
+    student_remarks
+  } = req.body;
+
+  if (!bank_name || !loan_amount) {
+    return error(res, 'Bank name and requested loan amount are required.', 400);
+  }
+
+  try {
+    const [students] = await query(
+      `SELECT s.*, 
+              c.name AS course_name, 
+              b.name AS branch_name, 
+              sem.label AS semester_label, 
+              a.name AS session_name 
+       FROM students s
+       JOIN courses c ON s.course_id = c.id
+       JOIN branches b ON s.branch_id = b.id
+       JOIN semesters sem ON s.current_semester_id = sem.id
+       JOIN academic_sessions a ON s.academic_session_id = a.id
+       WHERE s.id = ? LIMIT 1`,
+      [studentId]
+    );
+
+    if (students.length === 0) {
+      return error(res, 'Student record not found.', 404);
+    }
+
+    const s = students[0];
+
+    const [existing] = await query(
+      `SELECT id FROM education_loan_requests WHERE student_id = ? AND status = 'PENDING'`,
+      [studentId]
+    );
+
+    if (existing.length > 0) {
+      return error(res, 'You already have a pending education loan request under Director review.', 400);
+    }
+
+    const [result] = await query(
+      `INSERT INTO education_loan_requests (
+        student_id, reg_no, student_name, father_name, course_name, branch_name,
+        current_semester, academic_year, bank_name, bank_branch, bank_ifsc,
+        loan_amount, loan_purpose, co_applicant_name, co_applicant_relation,
+        co_applicant_phone, co_applicant_income, student_remarks, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')`,
+      [
+        studentId,
+        s.reg_no,
+        s.full_name,
+        s.parent_name || s.father_name || 'Father',
+        s.course_name,
+        s.branch_name,
+        s.semester_label,
+        s.session_name || '2026-2027',
+        bank_name,
+        bank_branch || 'Main Branch',
+        bank_ifsc || '',
+        parseFloat(loan_amount),
+        loan_purpose || 'Tuition & Academic Fees',
+        co_applicant_name || s.parent_name || '',
+        co_applicant_relation || 'Father',
+        co_applicant_phone || s.parent_phone || '',
+        co_applicant_income ? parseFloat(co_applicant_income) : 0,
+        student_remarks || ''
+      ]
+    );
+
+    const newId = result.insertId;
+    const refNo = `GZU/DIR/LOAN/2026/${String(newId).padStart(4, '0')}`;
+    await query(`UPDATE education_loan_requests SET reference_no = ? WHERE id = ?`, [refNo, newId]);
+
+    await logAudit(
+      req.user.id,
+      'LOAN_REQUEST_SUBMITTED',
+      'STUDENT',
+      studentId,
+      { requestId: newId, bank_name, loan_amount: parseFloat(loan_amount), reference_no: refNo }
+    );
+
+    try {
+      const [dirUsers] = await query(
+        `SELECT u.id FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name = 'DIRECTOR'`
+      );
+      for (const du of dirUsers) {
+        await query(
+          `INSERT INTO notifications (user_id, title, message, category, is_read) 
+           VALUES (?, ?, ?, 'ALERT', 0)`,
+          [
+            du.id,
+            'New Education Loan Application',
+            `Student ${s.full_name} (${s.reg_no}) requested education loan for ${bank_name} (₹${parseFloat(loan_amount).toLocaleString('en-IN')}).`
+          ]
+        );
+      }
+    } catch (notifErr) {
+      console.warn('Could not insert director notification:', notifErr.message);
+    }
+
+    return success(
+      res,
+      { id: newId, reference_no: refNo, status: 'PENDING' },
+      'Education loan request successfully forwarded to College Directorate.'
+    );
+  } catch (err) {
+    console.error('submitLoanRequest error:', err);
+    return error(res, 'Failed to submit loan request.', 500);
+  }
+}
+
+/**
+ * Get Student's Education Loan Requests
+ * GET /api/student/loan-requests
+ */
+async function getLoanRequests(req, res) {
+  const studentId = req.user.studentId;
+
+  try {
+    const [requests] = await query(
+      `SELECT * FROM education_loan_requests WHERE student_id = ? ORDER BY created_at DESC`,
+      [studentId]
+    );
+    return success(res, requests, 'Loan requests retrieved.');
+  } catch (err) {
+    console.error('getLoanRequests error:', err);
+    return error(res, 'Failed to retrieve loan requests.', 500);
+  }
+}
+
+/**
+ * Get 3 Official Bank Loan Letters
+ * GET /api/student/loan-letters/:id
+ */
+async function getLoanLetters(req, res) {
+  const studentId = req.user.studentId;
+  const requestId = req.params.id;
+
+  try {
+    const [requests] = await query(
+      `SELECT * FROM education_loan_requests WHERE id = ? AND student_id = ? LIMIT 1`,
+      [requestId, studentId]
+    );
+
+    if (requests.length === 0) {
+      return error(res, 'Loan request not found.', 404);
+    }
+
+    const reqData = requests[0];
+    if (reqData.status !== 'APPROVED') {
+      return error(res, 'Loan request has not been approved by the Directorate yet. Letters are generated upon approval.', 400);
+    }
+
+    const [studentRows] = await query(
+      `SELECT s.*, c.name AS course_name, b.name AS branch_name, sem.label AS semester_label, a.name AS session_name
+       FROM students s
+       JOIN courses c ON s.course_id = c.id
+       JOIN branches b ON s.branch_id = b.id
+       JOIN semesters sem ON s.current_semester_id = sem.id
+       JOIN academic_sessions a ON s.academic_session_id = a.id
+       WHERE s.id = ? LIMIT 1`,
+      [studentId]
+    );
+    const s = studentRows[0] || {};
+
+    let totalBilled = 0;
+    let totalPaid = 0;
+    try {
+      const [finRows] = await query(
+        `SELECT 
+           COALESCE(SUM(total_payable), 0) AS billed,
+           COALESCE(SUM(paid_amount), 0) AS paid
+         FROM invoices WHERE student_id = ? AND status != 'CANCELLED'`,
+        [studentId]
+      );
+      if (finRows.length > 0) {
+        totalBilled = parseFloat(finRows[0].billed) || 0;
+        totalPaid = parseFloat(finRows[0].paid) || 0;
+      }
+    } catch (e) {}
+
+    const courseDuration = s.course_name && s.course_name.toLowerCase().includes('diploma') ? 3 : 4;
+    const annualTuition = 55000;
+    const annualDev = 12000;
+    const annualExam = 6000;
+    const annualHostel = 35000;
+    const annualTotal = annualTuition + annualDev + annualExam + annualHostel;
+
+    const yearlyBreakdown = [];
+    for (let yr = 1; yr <= courseDuration; yr++) {
+      yearlyBreakdown.push({
+        year_number: yr,
+        year_label: `Year ${yr} (Sem ${yr * 2 - 1} & ${yr * 2})`,
+        tuition: annualTuition,
+        development_lab: annualDev,
+        exam_reg: annualExam,
+        hostel_mess: annualHostel,
+        total: annualTotal
+      });
+    }
+
+    const institutionalGrandTotal = annualTotal * courseDuration;
+
+    const letters = {
+      reference_no: reqData.reference_no,
+      approved_at: reqData.approved_at || new Date().toISOString(),
+      director_remarks: reqData.director_remarks || 'Recommended and Approved for Bank Education Loan Scheme.',
+      university: {
+        name: 'GEN-Z UNIVERSITY',
+        sub_title: 'Approved by UGC & AICTE | Autonomous Higher Technical Education Institution',
+        campus: 'Gen-Z Knowledge City, InfoValley-II, Bhubaneswar, Odisha - 752054',
+        email: 'director@genz.edu.in | accounts@genz.edu.in',
+        phone: '+91-674-2970000 / +91-674-2970001',
+        website: 'https://genz.edu.in',
+        bank_details: {
+          beneficiary_name: 'GEN-Z UNIVERSITY ACCOUNTS',
+          bank_name: 'State Bank of India (SBI)',
+          branch: 'Capital Commercial Branch, Bhubaneswar',
+          account_number: '398200140029',
+          account_type: 'Current Account',
+          ifsc_code: 'SBIN0001234',
+          micr_code: '751002018'
+        }
+      },
+      student: {
+        id: s.id,
+        name: s.full_name,
+        reg_no: s.reg_no,
+        roll_no: s.roll_no || s.reg_no,
+        father_name: reqData.father_name || s.parent_name || 'Father',
+        course: s.course_name,
+        branch: s.branch_name,
+        current_semester: s.semester_label,
+        session: s.session_name || '2026-2027',
+        duration_years: courseDuration,
+        address: s.permanent_address || s.address || 'Bhubaneswar, Odisha'
+      },
+      loan: {
+        id: reqData.id,
+        bank_name: reqData.bank_name,
+        bank_branch: reqData.bank_branch,
+        bank_ifsc: reqData.bank_ifsc,
+        loan_amount: parseFloat(reqData.loan_amount),
+        loan_purpose: reqData.loan_purpose,
+        co_applicant_name: reqData.co_applicant_name,
+        co_applicant_relation: reqData.co_applicant_relation,
+        co_applicant_phone: reqData.co_applicant_phone,
+        status: reqData.status
+      },
+      fee_structure: {
+        yearlyBreakdown,
+        grandTotal: institutionalGrandTotal,
+        totalPaid: totalPaid,
+        netEstimatedBalance: institutionalGrandTotal - totalPaid,
+        requestedLoanAmount: parseFloat(reqData.loan_amount)
+      }
+    };
+
+    return success(res, letters, '3 Official Education Loan Letters ready for download/print.');
+  } catch (err) {
+    console.error('getLoanLetters error:', err);
+    return error(res, 'Failed to generate loan letters.', 500);
+  }
+}
+
 module.exports = {
   getProfile,
   getDashboard,
@@ -520,5 +799,8 @@ module.exports = {
   submitRequest,
   getNotifications,
   getHealth,
-  updateHealth
+  updateHealth,
+  submitLoanRequest,
+  getLoanRequests,
+  getLoanLetters
 };

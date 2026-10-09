@@ -1,6 +1,6 @@
 /**
  * Department-Wise Subject Registration Controller
- * BPUT College Structure: Program + Department + Semester
+ * Gen-Z College Structure: Program + Department + Semester
  * Multi-Level Workflow: Student → HOD (Department) → Director (All) → Accounts (Finalize) → CONFIRMED
  * Every action is timestamped, reference-numbered, and audit logged.
  */
@@ -14,7 +14,7 @@ const paymentService = require('../services/paymentService');
 const MIN_CREDITS = 20;
 const MAX_CREDITS = 28;
 
-// BPUT Real Fee Structure Map
+// Gen-Z Real Fee Structure Map
 const BPUT_PROGRAM_FEES = {
   1: { // B.Tech (4 years, 8 semesters)
     name: 'B.Tech',
@@ -46,7 +46,7 @@ const BPUT_PROGRAM_FEES = {
 };
 
 /**
- * Calculate BPUT Real Category and Semester Fee Eligibility
+ * Calculate Gen-Z Real Category and Semester Fee Eligibility
  */
 function calcBputEligibility(feeData, programId, semester) {
   const pFee = BPUT_PROGRAM_FEES[programId] || BPUT_PROGRAM_FEES[1];
@@ -413,19 +413,22 @@ async function getSubjects(req, res) {
     const progId = req.query.program_id ? parseInt(req.query.program_id) : null;
     const branch = req.query.branch || null;
 
-    let sql = `SELECT * FROM subjects WHERE semester = ? AND is_active = 1`;
+    let sql = `SELECT s.*, d.code AS department_code, d.name AS department_name
+               FROM subjects s
+               LEFT JOIN departments d ON s.department_id = d.id
+               WHERE s.semester = ? AND s.is_active = 1`;
     const params = [sem];
 
     if (deptId) {
-      sql += ` AND department_id = ?`;
+      sql += ` AND s.department_id = ?`;
       params.push(deptId);
-    } else if (branch) {
-      sql += ` AND (department_code = ? OR branch = ? OR branch = 'ALL')`;
+    } else if (branch && branch !== 'ALL') {
+      sql += ` AND (d.code = ? OR d.short_name = ?)`;
       params.push(branch, branch);
     }
 
     if (progId) {
-      sql += ` AND program_id = ?`;
+      sql += ` AND s.program_id = ?`;
       params.push(progId);
     }
 
@@ -528,7 +531,7 @@ async function submitRegistration(req, res) {
 
     const totalCredits = subs.reduce((sum, s) => sum + (s.credits || 0), 0);
     if (registrationType === 'REGULAR' && (totalCredits < MIN_CREDITS || totalCredits > MAX_CREDITS)) {
-      return error(res, `Total credits (${totalCredits}) must be within BPUT range ${MIN_CREDITS}–${MAX_CREDITS}.`, 400);
+      return error(res, `Total credits (${totalCredits}) must be within Gen-Z range ${MIN_CREDITS}–${MAX_CREDITS}.`, 400);
     }
 
     const rollNo = student.reg_no || '';
@@ -828,7 +831,7 @@ async function hodGetDetail(req, res) {
           : (rows[0].status === 'DIRECTOR_REJECTED' ? 'REJECTED' : 'PENDING'),
         officer: rows[0].director_name || (rows[0].director_id ? 'College Directorate' : 'Director / Dean Academic'),
         actionAt: rows[0].director_action_at,
-        remarks: rows[0].director_remarks || (['DIRECTOR_APPROVED', 'CONFIRMED'].includes(rows[0].status) ? 'Institutional approval granted under BPUT academic guidelines.' : 'Pending Directorate endorsement.'),
+        remarks: rows[0].director_remarks || (['DIRECTOR_APPROVED', 'CONFIRMED'].includes(rows[0].status) ? 'Institutional approval granted under Gen-Z academic guidelines.' : 'Pending Directorate endorsement.'),
         ok: ['DIRECTOR_APPROVED', 'CONFIRMED'].includes(rows[0].status)
       },
       accounts: {
@@ -849,7 +852,7 @@ async function hodGetDetail(req, res) {
         officer: rows[0].exam_section_name || (rows[0].status === 'CONFIRMED' ? 'Controller of Examinations (Exam Cell)' : 'Exam Cell Officer'),
         actionAt: rows[0].exam_section_action_at,
         receiptNo: rows[0].exam_receipt_no,
-        remarks: rows[0].exam_section_remarks || (rows[0].status === 'CONFIRMED' ? 'University form fillup verified. Examination Roll & Hall Ticket generation active.' : (isExamPaid ? 'BPUT Exam fee received. Ready for final Exam Section confirmation.' : 'Exam registration fee payment pending.')),
+        remarks: rows[0].exam_section_remarks || (rows[0].status === 'CONFIRMED' ? 'University form fillup verified. Examination Roll & Hall Ticket generation active.' : (isExamPaid ? 'Gen-Z Exam fee received. Ready for final Exam Section confirmation.' : 'Exam registration fee payment pending.')),
         ok: rows[0].status === 'CONFIRMED'
       }
     };
@@ -1078,15 +1081,15 @@ async function directorApprove(req, res) {
       `UPDATE subject_registrations
        SET status = 'DIRECTOR_APPROVED', director_id = ?, director_action_at = NOW(), director_remarks = ?, updated_at = NOW()
        WHERE id = ?`,
-      [uid, remarks || 'Approved by Director. Cleared for BPUT semester exam fee payment.', rid]
+      [uid, remarks || 'Approved by Director. Cleared for Gen-Z semester exam fee payment.', rid]
     );
 
-    // Notify Student to pay BPUT Exam Fee
+    // Notify Student to pay Gen-Z Exam Fee
     const [su] = await query(`SELECT user_id FROM students WHERE id = ? LIMIT 1`, [r[0].student_id]);
     if (su.length) {
       await query(
         `INSERT INTO notifications (user_id, title, message, category) VALUES (?, ?, ?, 'REGISTRATION')`,
-        [su[0].user_id, 'Academic Clearance Approved - Pay Exam Fee', `Director approved your subjects for ${r[0].reference_number || rid}. Please pay BPUT semester exam fee ₹1,550 to proceed to Exam Section.`]
+        [su[0].user_id, 'Academic Clearance Approved - Pay Exam Fee', `Director approved your subjects for ${r[0].reference_number || rid}. Please pay Gen-Z semester exam fee ₹1,550 to proceed to Exam Section.`]
       ).catch(() => {});
     }
 
@@ -1219,7 +1222,7 @@ async function accountsGetRegistrations(req, res) {
       r.subjects = subs || [];
       r.total_credits = r.total_credits || r.subjects.reduce((sum, s) => sum + (parseInt(s.credits) || 0), 0);
       r.candidate_year = `${Math.ceil(r.semester / 2)}${Math.ceil(r.semester / 2) === 1 ? 'st' : Math.ceil(r.semester / 2) === 2 ? 'nd' : Math.ceil(r.semester / 2) === 3 ? 'rd' : 'th'} Year`;
-      r.fee_head = `BPUT Semester ${r.semester} Registration Fee`;
+      r.fee_head = `Gen-Z Semester ${r.semester} Registration Fee`;
       r.payment_channel = r.exam_receipt_no ? 'Online Payment Gateway (Razorpay/UPI)' : 'Pending';
     }
 
@@ -1290,7 +1293,7 @@ async function accountsFinalize(req, res) {
 
 /**
  * 14B. POST /api/registration/:id/create-exam-order
- * Initiates Razorpay Order for BPUT Exam Fee
+ * Initiates Razorpay Order for Gen-Z Exam Fee
  */
 async function createExamFeeOrder(req, res) {
   try {
@@ -1345,7 +1348,7 @@ async function createExamFeeOrder(req, res) {
 
 /**
  * 15. POST /api/registration/:id/pay-exam-fee
- * Student pays BPUT semester exam fee (₹1,550 for B.Tech, ₹1,000 for Diploma, ₹2,000 for MBA)
+ * Student pays Gen-Z semester exam fee (₹1,550 for B.Tech, ₹1,000 for Diploma, ₹2,000 for MBA)
  * Automatically advances application to College Examination Section queue!
  */
 async function payExamFee(req, res) {
@@ -1404,7 +1407,7 @@ async function payExamFee(req, res) {
     await query(
       `INSERT INTO receipts (receipt_no, student_id, amount, payment_mode, semester, remarks, created_by)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [receiptNo, sid, examFeeAmount, paymentMethod, `Semester ${reg.semester}`, `BPUT Semester Registration Fee [PG: ${gatewayTxnId}]`, req.user.id]
+      [receiptNo, sid, examFeeAmount, paymentMethod, `Semester ${reg.semester}`, `Gen-Z Semester Registration Fee [PG: ${gatewayTxnId}]`, req.user.id]
     ).catch(() => {});
 
     // 3. Update subject_registrations
@@ -1419,7 +1422,7 @@ async function payExamFee(req, res) {
     await query(
       `INSERT INTO ledgers (student_id, entry_type, category, amount, description, reference_no, created_at)
        VALUES (?, 'CREDIT', 'EXAM_FEE', ?, ?, ?, NOW())`,
-      [sid, examFeeAmount, `BPUT Semester ${reg.semester} Registration Fee (Paid via Gateway: ${gatewayTxnId})`, receiptNo]
+      [sid, examFeeAmount, `Gen-Z Semester ${reg.semester} Registration Fee (Paid via Gateway: ${gatewayTxnId})`, receiptNo]
     ).catch(() => {});
 
     // 4. Update or create in exam_registrations table for reporting
@@ -1599,7 +1602,7 @@ async function examSectionToggleWindow(req, res) {
 
 /**
  * 17. PUT /api/registration/exam-section/:id/mark-received
- * College Examination Section marks form Received & Completed (Official BPUT University Confirmation)
+ * College Examination Section marks form Received & Completed (Official Gen-Z University Confirmation)
  */
 async function examSectionMarkReceived(req, res) {
   try {
@@ -1617,14 +1620,14 @@ async function examSectionMarkReceived(req, res) {
       `UPDATE subject_registrations
        SET status = 'CONFIRMED', exam_section_id = ?, exam_section_action_at = NOW(), exam_section_remarks = ?, updated_at = NOW()
        WHERE id = ?`,
-      [uid, remarks || 'BPUT University form fillup and exam fee verified. Marked Received & Confirmed.', rid]
+      [uid, remarks || 'Gen-Z University form fillup and exam fee verified. Marked Received & Confirmed.', rid]
     );
 
     const [su] = await query(`SELECT user_id FROM students WHERE id = ? LIMIT 1`, [r[0].student_id]);
     if (su.length) {
       await query(
         `INSERT INTO notifications (user_id, title, message, category) VALUES (?, ?, ?, 'REGISTRATION')`,
-        [su[0].user_id, '🎉 BPUT Registration Officially CONFIRMED!', `College Examination Section has marked your subject registration (${r[0].reference_number || rid}) Received & Confirmed! Your BPUT Slip is ready.`]
+        [su[0].user_id, '🎉 Gen-Z Registration Officially CONFIRMED!', `College Examination Section has marked your subject registration (${r[0].reference_number || rid}) Received & Confirmed! Your Gen-Z Slip is ready.`]
       ).catch(() => {});
     }
 

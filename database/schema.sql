@@ -1,5 +1,5 @@
 -- ==============================================================================
--- BHUBANESWAR ENGINEERING COLLEGE (BEC) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
+-- GEN-Z UNIVERSITY (GZU) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
 -- Complete Relational Database Schema (MySQL 8.0+ / Hostinger Compatible)
 -- ==============================================================================
 

@@ -1,6 +1,6 @@
 /**
  * UI Utilities, Modal Manager, Toast Notifications, & Native Canvas Charts
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const ui = {
@@ -63,6 +63,35 @@ const ui = {
       el.classList.remove('active');
       document.body.style.overflow = '';
     }
+  },
+
+  /**
+   * Global Loading Overlay
+   */
+  showLoading(msg = 'Processing...') {
+    let overlay = document.getElementById('uiGlobalLoadingOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'uiGlobalLoadingOverlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);z-index:99999;display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML = `
+        <div style="background:#fff;padding:1.25rem 2rem;border-radius:12px;display:flex;align-items:center;gap:0.75rem;box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+          <div style="width:24px;height:24px;border:3px solid #CBD5E1;border-top-color:#0B63C5;border-radius:50%;animation:uiSpin 0.8s linear infinite;"></div>
+          <span id="uiGlobalLoadingText" style="font-weight:700;color:#0F172A;font-size:0.95rem;">${msg}</span>
+        </div>
+        <style>@keyframes uiSpin { to { transform: rotate(360deg); } }</style>
+      `;
+      document.body.appendChild(overlay);
+    } else {
+      const txt = document.getElementById('uiGlobalLoadingText');
+      if (txt) txt.textContent = msg;
+      overlay.style.display = 'flex';
+    }
+  },
+
+  hideLoading() {
+    const overlay = document.getElementById('uiGlobalLoadingOverlay');
+    if (overlay) overlay.style.display = 'none';
   },
 
   /**

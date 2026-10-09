@@ -37,7 +37,7 @@ async function fixRolesAndUsers() {
   // Insert staff record for Exam Section
   await conn.query(`
     INSERT INTO staff (user_id, staff_code, full_name, designation, department, phone)
-    VALUES (20, 'BEC-EXAM-001', 'Dr. Ramesh Chandra Sahoo', 'Controller of Examinations', 'Examination Section', '+91-9437000020')
+    VALUES (20, 'GENZ-EXAM-001', 'Dr. Ramesh Chandra Sahoo', 'Controller of Examinations', 'Examination Section', '+91-9437000020')
     ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), designation = VALUES(designation);
   `);
 

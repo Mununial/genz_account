@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC) - CASH & BANK CONTROLLER
+ * GEN-Z UNIVERSITY (GZU) - CASH & BANK CONTROLLER
  * Daily Cash Drawer Closing, Denomination Verification, Bank Master & BRS
  * ==============================================================================
  */
@@ -186,7 +186,7 @@ const cashBank = {
       tbody.innerHTML = `
         <tr>
           <td>Today</td>
-          <td>Accounts Staff (BEC-CASHIER-1)</td>
+          <td>Accounts Staff (GENZ-CASHIER-1)</td>
           <td style="text-align: right; font-family: monospace;">₹25,000.00</td>
           <td style="text-align: right; font-family: monospace; color: #15803D;">₹0.00</td>
           <td style="text-align: right; font-family: monospace; color: #BE123C;">₹0.00</td>
@@ -227,7 +227,7 @@ const cashBank = {
         {
           id: 1,
           bank_name: 'State Bank of India',
-          account_name: 'Bhubaneswar Engineering College - Fee Collection A/c',
+          account_name: 'Gen-Z University - Fee Collection A/c',
           account_no: '31980244192',
           ifsc: 'SBIN0001023',
           branch: 'Baramunda Branch, Bhubaneswar',
@@ -237,7 +237,7 @@ const cashBank = {
         {
           id: 2,
           bank_name: 'Punjab National Bank',
-          account_name: 'BEC Operational & Expenditure A/c',
+          account_name: 'GENZ Operational & Expenditure A/c',
           account_no: '0421002100054321',
           ifsc: 'PUNB0042100',
           branch: 'Khandagiri, Bhubaneswar',
@@ -247,7 +247,7 @@ const cashBank = {
         {
           id: 3,
           bank_name: 'HDFC Bank Ltd',
-          account_name: 'BEC Digital Gateway Nodal Escrow A/c',
+          account_name: 'GENZ Digital Gateway Nodal Escrow A/c',
           account_no: '50200045612344',
           ifsc: 'HDFC0000240',
           branch: 'Saheed Nagar, Bhubaneswar',
@@ -286,7 +286,7 @@ const cashBank = {
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: #64748B; margin-top: 0.25rem;">
               <span>IFSC: <strong style="font-family: monospace;">${escapeHtml(b.ifsc)}</strong></span>
-              <span>BEC Designated</span>
+              <span>GENZ Designated</span>
             </div>
           </div>
         </div>
@@ -317,7 +317,7 @@ const cashBank = {
       { date: '2026-09-23', bank: 'SBI Fee Collection A/c', ref: 'SBIN26266019921', desc: 'Counter Cash Deposit (Slip #49102)', cr: 115000, dr: 0, rec: true },
       { date: '2026-09-23', bank: 'HDFC Digital Escrow', ref: 'HDFC26266044101', desc: 'Online Semester Gateway Settlement (Tushar Mhato)', cr: 25000, dr: 0, rec: true },
       { date: '2026-09-22', bank: 'PNB Operational A/c', ref: 'CHQ-890124', desc: 'Odisha State Electricity Board Campus Power Bill', cr: 0, dr: 45000, rec: true },
-      { date: '2026-09-22', bank: 'SBI Fee Collection A/c', ref: 'NEFT-AXIS2026-004', desc: 'Direct NEFT Admission Fee - Bablu Bag (2026BEC01080)', cr: 115000, dr: 0, rec: false },
+      { date: '2026-09-22', bank: 'SBI Fee Collection A/c', ref: 'NEFT-AXIS2026-004', desc: 'Direct NEFT Admission Fee - Bablu Bag (2026GENZ01080)', cr: 115000, dr: 0, rec: false },
       { date: '2026-09-21', bank: 'PNB Operational A/c', ref: 'CHQ-890125', desc: 'Apex High-Speed Campus Fiber Leased Line Sept 2026', cr: 0, dr: 18500, rec: false }
     ];
 

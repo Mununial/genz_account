@@ -1,5 +1,5 @@
 /**
- * Bhubaneswar Engineering College (BEC) - Finance System
+ * Gen-Z University - Finance System
  * Master Unified Navigation, AppShell & Universal Search Controller
  * Implements Requirement 25 practical sidebar order and Requirement 16 Universal Search
  */
@@ -135,7 +135,7 @@ const navigation = {
       'hod-registrations': { section: 'Department Desk', title: 'HOD Subject Approvals' },
       'director-registrations': { section: 'Directorate Approvals', title: 'Director Academic Approvals' },
       'accounts-registrations': { section: 'Student Accounts', title: 'Registration Finalization' },
-      'admin-subjects': { section: 'Curriculum & Academic', title: 'BPUT Subject Catalog' }
+      'admin-subjects': { section: 'Curriculum & Academic', title: 'Gen-Z Subject Catalog' }
     };
 
     const role = this.currentUser ? this.currentUser.role : '';
@@ -149,7 +149,7 @@ const navigation = {
       homeLabel = 'Directorate';
     }
 
-    const info = titles[this.activePage] || { section: 'BEC Portal', title: document.title.split('-')[0].trim() };
+    const info = titles[this.activePage] || { section: 'GENZ Portal', title: document.title.split('-')[0].trim() };
     const breadcrumbHtml = `
       <div class="bec-breadcrumb-nav" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: #64748B; margin-bottom: 1.25rem;">
         <a href="${homeHref}" style="color: #64748B; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
@@ -237,7 +237,7 @@ const navigation = {
 
       // 3. Strict Isolation for Director (Only academic executive pages allowed)
       if (user.role === 'DIRECTOR') {
-        const dirAllowed = ['/director-registrations.html', '/admin-subjects.html', '/students.html'];
+        const dirAllowed = ['/director-registrations.html', '/director-loans.html', '/admin-subjects.html', '/students.html'];
         if (!dirAllowed.some(p => currentPath.endsWith(p))) {
           window.location.replace('/director-registrations.html');
           return;
@@ -292,7 +292,7 @@ const navigation = {
     // ==========================================
     if (role === 'HOD') {
       const deptName = (user && user.staff && user.staff.department) ? user.staff.department : 'Academic Department';
-      if (brandTitle) brandTitle.textContent = 'BEC ACADEMICS';
+      if (brandTitle) brandTitle.textContent = 'GENZ ACADEMICS';
       if (brandSubtitle) brandSubtitle.textContent = deptName;
       if (brandLink) brandLink.href = '/hod-registrations.html';
 
@@ -306,7 +306,7 @@ const navigation = {
         <div class="nav-section-title">Academic Curriculum</div>
         <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>BPUT Subject Catalog</span>
+          <span>Gen-Z Subject Catalog</span>
         </a>
 
         <div class="nav-section-title">Department Cohort</div>
@@ -322,7 +322,7 @@ const navigation = {
     // SEPARATE DIRECTOR PORTAL SIDEBAR
     // ==========================================
     if (role === 'DIRECTOR') {
-      if (brandTitle) brandTitle.textContent = 'BEC DIRECTORATE';
+      if (brandTitle) brandTitle.textContent = 'GENZ DIRECTORATE';
       if (brandSubtitle) brandSubtitle.textContent = 'Executive Academic Office';
       if (brandLink) brandLink.href = '/director-registrations.html';
 
@@ -332,11 +332,15 @@ const navigation = {
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span>Director Academic Approvals</span>
         </a>
+        <a href="/director-loans.html" class="nav-item ${p === 'director-loans' ? 'active' : ''}" data-page="director-loans">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
+          <span>Education Loan Approvals</span>
+        </a>
 
         <div class="nav-section-title">Institutional Overview</div>
         <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>BPUT Subject Catalog</span>
+          <span>Gen-Z Subject Catalog</span>
         </a>
 
         <a href="/students.html" class="nav-item ${p === 'students' ? 'active' : ''}" data-page="students">
@@ -351,7 +355,7 @@ const navigation = {
     // SEPARATE EXAMINATION CELL PORTAL SIDEBAR
     // ==========================================
     if (role === 'EXAM_CELL' || role === 'EXAM_SECTION') {
-      if (brandTitle) brandTitle.textContent = 'BEC EXAM CELL';
+      if (brandTitle) brandTitle.textContent = 'GENZ EXAM CELL';
       if (brandSubtitle) brandSubtitle.textContent = 'University Exam Section';
       if (brandLink) brandLink.href = '/exam-registrations.html';
 
@@ -365,7 +369,7 @@ const navigation = {
         <div class="nav-section-title">University Curriculum</div>
         <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>BPUT Subject Catalog</span>
+          <span>Gen-Z Subject Catalog</span>
         </a>
 
         <div class="nav-section-title">Enrolled Candidates</div>
@@ -381,7 +385,7 @@ const navigation = {
     // 4. SUPER ADMINISTRATOR / MASTER CONTROL SIDEBAR
     // ==========================================
     if (isSuperAdmin) {
-      if (brandTitle) brandTitle.textContent = 'BEC MASTER ADMIN';
+      if (brandTitle) brandTitle.textContent = 'GEN-Z MASTER ADMIN';
       if (brandSubtitle) brandSubtitle.textContent = 'System Control Console';
       if (brandLink) brandLink.href = '/master-control.html';
 
@@ -405,7 +409,7 @@ const navigation = {
         </a>
         <a href="/admin-subjects.html" class="nav-item ${p === 'admin-subjects' ? 'active' : ''}" data-page="admin-subjects">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>BPUT Subject Catalog</span>
+          <span>Gen-Z Subject Catalog</span>
         </a>
 
         <!-- REGISTRATION APPROVAL FLOW -->
@@ -449,7 +453,7 @@ const navigation = {
     // 5. AUDITOR READ-ONLY SIDEBAR
     // ==========================================
     if (isAuditor) {
-      if (brandTitle) brandTitle.textContent = 'BEC AUDIT';
+      if (brandTitle) brandTitle.textContent = 'GENZ AUDIT';
       if (brandSubtitle) brandSubtitle.textContent = 'Financial Oversight Desk';
       if (brandLink) brandLink.href = '/dashboard.html';
 
@@ -478,7 +482,7 @@ const navigation = {
     // ==========================================
     // 6. ACCOUNTS STAFF / CASHIER / ACCOUNTS MANAGER SIDEBAR
     // ==========================================
-    if (brandTitle) brandTitle.textContent = 'BEC ACCOUNTS';
+    if (brandTitle) brandTitle.textContent = 'GENZ ACCOUNTS';
     if (brandSubtitle) brandSubtitle.textContent = 'Finance & Fee Desk';
     if (brandLink) brandLink.href = '/dashboard.html';
 
@@ -557,6 +561,9 @@ const navigation = {
    * Load topbar pending counters and alerts
    */
   async loadHeaderAlerts() {
+    if (this.currentUser && ['STUDENT', 'DIRECTOR'].includes(this.currentUser.role)) {
+      return;
+    }
     try {
       const res = await api.get('/admin/dashboard');
       if (res && res.data && res.data.kpis) {

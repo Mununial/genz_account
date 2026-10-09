@@ -1,6 +1,6 @@
 /**
  * Immutable Financial Audit Log Viewer
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const auditModule = {

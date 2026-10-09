@@ -1,6 +1,6 @@
 /**
  * Administrative & Accounts Executive Operations Routes
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const express = require('express');
@@ -17,7 +17,7 @@ router.use(authenticateToken);
 // Executive Dashboard & Intelligence
 router.get(
   '/dashboard',
-  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY'),
+  requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN', 'AUDITOR_READ_ONLY', 'DIRECTOR'),
   adminController.getDashboard
 );
 router.get(
@@ -182,6 +182,23 @@ router.post(
   '/exam-registrations/:id/status',
   requireRole('ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'ADMIN'),
   adminController.updateExamRegistration
+);
+
+// Education Loan Applications (Director & Admin Approval)
+router.get(
+  '/loan-requests',
+  requireRole('DIRECTOR', 'ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF'),
+  adminController.getLoanRequests
+);
+router.patch(
+  '/loan-requests/:id/status',
+  requireRole('DIRECTOR', 'ADMIN'),
+  adminController.updateLoanRequestStatus
+);
+router.post(
+  '/loan-requests/:id/status',
+  requireRole('DIRECTOR', 'ADMIN'),
+  adminController.updateLoanRequestStatus
 );
 
 module.exports = router;

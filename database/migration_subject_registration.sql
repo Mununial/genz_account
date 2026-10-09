@@ -1,5 +1,5 @@
 ﻿-- ==============================================================================
--- BEC ACCOUNTS SYSTEM — SUBJECT REGISTRATION MODULE MIGRATION
+-- GENZ ACCOUNTS SYSTEM — SUBJECT REGISTRATION MODULE MIGRATION
 -- Run AFTER base schema.sql and seed.sql. DO NOT modify existing tables.
 -- ==============================================================================
 
@@ -54,12 +54,12 @@ FROM `roles` r WHERE r.name = 'DIRECTOR'
 ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`);
 
 INSERT INTO `staff` (`user_id`, `staff_code`, `full_name`, `designation`, `department`, `phone`)
-SELECT u.id, 'BEC-HOD-CSE-001', 'Dr. Rajesh Kumar Mohanty', 'Head of Department', 'Computer Science & Engineering', '+91-9437000010'
+SELECT u.id, 'GENZ-HOD-CSE-001', 'Dr. Rajesh Kumar Mohanty', 'Head of Department', 'Computer Science & Engineering', '+91-9437000010'
 FROM `users` u WHERE u.email = 'hod.cse@bec.ac.in'
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 
 INSERT INTO `staff` (`user_id`, `staff_code`, `full_name`, `designation`, `department`, `phone`)
-SELECT u.id, 'BEC-DIR-001', 'Prof. S. K. Rath', 'Director', 'Administration', '+91-9437000011'
+SELECT u.id, 'GENZ-DIR-001', 'Prof. S. K. Rath', 'Director', 'Administration', '+91-9437000011'
 FROM `users` u WHERE u.email = 'director@bec.ac.in'
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 

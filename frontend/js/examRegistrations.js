@@ -1,6 +1,6 @@
 /**
- * College Examination Section Controller — BPUT University Exam Cell
- * Bhubaneswar Engineering College (BEC)
+ * College Examination Section Controller — Gen-Z University Exam Cell
+ * Gen-Z University
  */
 
 const examRegistrations = {
@@ -359,7 +359,7 @@ const examRegistrations = {
               ${isConfirmed ? `
                 <span style="color: #006644; font-size: 0.78rem; font-weight: 700; margin-right: 4px;">Confirmed ✓</span>
               ` : ''}
-              <button class="btn btn-sm btn-secondary" onclick="examRegistrations.viewDetail(${r.id})" style="padding: 0.35rem 0.6rem; font-size: 0.78rem;" title="View official BPUT registration card &amp; slip">
+              <button class="btn btn-sm btn-secondary" onclick="examRegistrations.viewDetail(${r.id})" style="padding: 0.35rem 0.6rem; font-size: 0.78rem;" title="View official Gen-Z registration card &amp; slip">
                 📄 View Slip
               </button>
             </div>
@@ -374,8 +374,8 @@ const examRegistrations = {
     const stuName = reg ? reg.full_name : 'Candidate';
 
     const confirmed = confirm(
-      `Mark BPUT Examination Form as RECEIVED & CONFIRMED for ${stuName}?\n\n` +
-      `• Verified BPUT Exam Fee: ₹1,550 (Receipt: ${reg?.exam_receipt_no || 'Paid'})\n` +
+      `Mark Gen-Z Examination Form as RECEIVED & CONFIRMED for ${stuName}?\n\n` +
+      `• Verified Gen-Z Exam Fee: ₹1,550 (Receipt: ${reg?.exam_receipt_no || 'Paid'})\n` +
       `• Verified HOD & Director Academic Clearances\n` +
       `• Digital University Exam Slip will be issued to student.`
     );
@@ -383,7 +383,7 @@ const examRegistrations = {
 
     try {
       const res = await api.put(`/registration/exam-section/${regId}/mark-received`, {
-        remarks: 'BPUT University examination form fillup and board fee verified. Application officially Received & Confirmed by Examination Cell.'
+        remarks: 'Gen-Z University examination form fillup and board fee verified. Application officially Received & Confirmed by Examination Cell.'
       });
 
       if (res && res.success) {
@@ -463,7 +463,7 @@ const examRegistrations = {
     const examFeePaidAt = fin.examFeePaidAt ? new Date(fin.examFeePaidAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
     const totalOverallPaid = fin.totalPaidOverall || (totalCollegePaid + (isExamPaid ? examFeeAmount : 0));
 
-    if (title) title.textContent = `BPUT University Registration & Clearance Dossier — ${r.full_name}`;
+    if (title) title.textContent = `Gen-Z University Registration & Clearance Dossier — ${r.full_name}`;
 
     modal.style.display = 'flex';
 
@@ -473,11 +473,11 @@ const examRegistrations = {
         <div style="border-bottom: 2px solid #006644; padding-bottom: 0.85rem; margin-bottom: 1.15rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
           <div style="display:flex; align-items:center; gap: 0.85rem;">
             <div style="width: 48px; height: 48px; border-radius: 50%; background: #006644; color: #fff; font-weight: 900; display:flex; align-items:center; justify-content:center; font-size: 1.25rem;">
-              BEC
+              GENZ
             </div>
             <div>
-              <h2 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #0F172A;">BHUBANESWAR ENGINEERING COLLEGE</h2>
-              <div style="font-size: 0.75rem; color: #475569;">Affiliated to Biju Patnaik University of Technology (BPUT), Rourkela, Odisha</div>
+              <h2 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #0F172A;">GEN-Z UNIVERSITY</h2>
+              <div style="font-size: 0.75rem; color: #475569;">Affiliated to Gen-Z Autonomous University, Rourkela, Odisha</div>
               <div style="font-size: 0.82rem; font-weight: 700; color: #006644; margin-top: 2px;">OFFICIAL SEMESTER SUBJECT REGISTRATION &amp; CLEARANCE CARD</div>
             </div>
           </div>
@@ -513,7 +513,7 @@ const examRegistrations = {
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.5rem;">
             <div style="font-weight:800; color:#0F172A; font-size:0.92rem; display:flex; align-items:center; gap:0.45rem;">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#006644" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-              1. BPUT Registered Subjects Particulars (${totalSubs} Subjects, ${totalCredits} Credits)
+              1. Gen-Z Registered Subjects Particulars (${totalSubs} Subjects, ${totalCredits} Credits)
             </div>
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap; font-size:0.75rem;">
               <span style="background:#EFF6FF;color:#1D4ED8;padding:2px 8px;border-radius:12px;font-weight:700;">Theory: ${theorySubs}</span>
@@ -542,7 +542,7 @@ const examRegistrations = {
                 <tr style="background:#F8FAFC; font-weight:800; border-top:2px solid #006644; color:#0F172A;">
                   <td colspan="4" style="padding:7px 12px; text-align:right;">TOTAL REGISTERED CREDITS:</td>
                   <td style="padding:7px 10px; text-align:center; color:#006644; font-size:0.95rem;">${totalCredits}</td>
-                  <td style="padding:7px 10px; text-align:center; font-size:0.75rem; color:#64748B;">BPUT Approved</td>
+                  <td style="padding:7px 10px; text-align:center; font-size:0.75rem; color:#64748B;">Gen-Z Approved</td>
                 </tr>
               </tfoot>
             </table>
@@ -585,10 +585,10 @@ const examRegistrations = {
               </div>
             </div>
 
-            <!-- BPUT Exam Fee Card -->
+            <!-- Gen-Z Exam Fee Card -->
             <div style="background:#ffffff; border:1px solid #E2E8F0; border-radius:8px; padding:0.95rem; border-left:4px solid #16A34A; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-size:0.72rem; text-transform:uppercase; color:#64748B; font-weight:700; letter-spacing:0.5px;">BPUT Exam Registration Fee</div>
+                <div style="font-size:0.72rem; text-transform:uppercase; color:#64748B; font-weight:700; letter-spacing:0.5px;">Gen-Z Exam Registration Fee</div>
                 ${isExamPaid 
                   ? '<span style="background:#DCFCE7;color:#15803D;font-weight:800;font-size:0.72rem;padding:2px 6px;border-radius:4px;border:1px solid #86EFAC;">✓ PAID</span>' 
                   : '<span style="background:#FEF2F2;color:#DC2626;font-weight:800;font-size:0.72rem;padding:2px 6px;border-radius:4px;border:1px solid #FECACA;">PENDING</span>'
@@ -659,7 +659,7 @@ const examRegistrations = {
             <!-- Stage 3: Directorate Approval -->
             <div style="background:#ffffff; border:1px solid #E2E8F0; border-radius:6px; padding:0.75rem; border-top:3px solid ${trail.director && trail.director.status === 'APPROVED' ? '#16A34A' : '#F59E0B'};">
               <div style="font-size:0.7rem; font-weight:800; color:${trail.director && trail.director.status === 'APPROVED' ? '#16A34A' : '#D97706'}; text-transform:uppercase;">3. Directorate Approval</div>
-              <div style="font-weight:700; color:#0F172A; font-size:0.8rem; margin-top:2px;">${escapeHtml((trail.director && trail.director.officer) || r.director_name || 'Director BEC')}</div>
+              <div style="font-weight:700; color:#0F172A; font-size:0.8rem; margin-top:2px;">${escapeHtml((trail.director && trail.director.officer) || r.director_name || 'Director GENZ')}</div>
               <div style="font-size:0.72rem; color:#64748B; margin-top:3px;">${trail.director && trail.director.date ? new Date(trail.director.date).toLocaleDateString('en-IN') : 'Cleared'}</div>
               <div style="font-size:0.7rem; color:${trail.director && trail.director.status === 'APPROVED' ? '#16A34A' : '#D97706'}; font-weight:600; margin-top:4px;">
                 ${trail.director && trail.director.status === 'APPROVED' ? '✓ Director Approved' : 'Pending Approval'}
@@ -676,11 +676,11 @@ const examRegistrations = {
 
             <!-- Stage 5: Exam Cell Confirmation -->
             <div style="background:#ffffff; border:1px solid #E2E8F0; border-radius:6px; padding:0.75rem; border-top:3px solid ${r.status === 'CONFIRMED' ? '#16A34A' : '#3B82F6'};">
-              <div style="font-size:0.7rem; font-weight:800; color:${r.status === 'CONFIRMED' ? '#16A34A' : '#2563EB'}; text-transform:uppercase;">5. BPUT Exam Cell</div>
+              <div style="font-size:0.7rem; font-weight:800; color:${r.status === 'CONFIRMED' ? '#16A34A' : '#2563EB'}; text-transform:uppercase;">5. Gen-Z Exam Cell</div>
               <div style="font-weight:700; color:#0F172A; font-size:0.8rem; margin-top:2px;">Controller of Exams</div>
               <div style="font-size:0.72rem; color:#64748B; margin-top:3px;">${r.status === 'CONFIRMED' ? 'Confirmed &amp; Dispatched' : 'Desk Processing'}</div>
               <div style="font-size:0.7rem; color:${r.status === 'CONFIRMED' ? '#16A34A' : '#2563EB'}; font-weight:600; margin-top:4px;">
-                ${r.status === 'CONFIRMED' ? '✓ BPUT Confirmed' : 'Ready to Confirm'}
+                ${r.status === 'CONFIRMED' ? '✓ Gen-Z Confirmed' : 'Ready to Confirm'}
               </div>
             </div>
           </div>
@@ -698,7 +698,7 @@ const examRegistrations = {
           </div>
           <div style="text-align: center;">
             <div style="font-weight: 700; color: #006644;">Dr. Ramesh Chandra Sahoo</div>
-            <div style="border-top: 1px dashed #64748B; width: 160px; margin: 4px auto 0;">Controller of Examinations, BEC</div>
+            <div style="border-top: 1px dashed #64748B; width: 160px; margin: 4px auto 0;">Controller of Examinations, GENZ</div>
           </div>
         </div>
       </div>
@@ -730,7 +730,7 @@ const examRegistrations = {
     printWin.document.write(`
       <html>
         <head>
-          <title>BPUT Registration Slip</title>
+          <title>Gen-Z Registration Slip</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 25px; }
             table { width: 100%; border-collapse: collapse; }
@@ -870,7 +870,7 @@ const examRegistrations = {
         'Total Credits': r.total_credits || 0,
         'HOD Clearance': r.hod_name || 'Verified',
         'Director Approval': r.director_name || 'Approved',
-        'BPUT Exam Fee Status': r.exam_fee_status || (['EXAM_FEE_PAID', 'CONFIRMED'].includes(r.status) ? 'PAID' : 'PENDING'),
+        'Gen-Z Exam Fee Status': r.exam_fee_status || (['EXAM_FEE_PAID', 'CONFIRMED'].includes(r.status) ? 'PAID' : 'PENDING'),
         'Exam Fee Amount (INR)': r.exam_fee_amount || 1550,
         'Receipt No': r.exam_receipt_no || '',
         'Gateway Txn ID': r.exam_transaction_id || '',

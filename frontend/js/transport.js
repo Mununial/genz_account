@@ -1,5 +1,5 @@
 /**
- * Bhubaneswar Engineering College (BEC) - Transport Module Controller
+ * Gen-Z University - Transport Module Controller
  * Handles Student Transport Fee management, filtering, student picking, fee collection and export
  */
 

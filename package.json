@@ -1,12 +1,15 @@
 {
-  "name": "bec-accounts-system",
+  "name": "genz-accounts-system",
   "version": "1.0.0",
-  "description": "Bhubaneswar Engineering College Accounts & Finance Management System",
+  "description": "Gen-Z University Accounts & Finance Management System",
   "scripts": {
+    "build": "cd backend && npm install",
+    "postinstall": "cd backend && npm install",
     "start": "cd backend && node server.js",
     "dev": "cd backend && node --watch server.js",
-    "test": "cd backend && node ../tests/run_tests.js"
+    "test": "cd backend && node ../tests/run_tests.js",
+    "deploy:firebase": "npx firebase-tools deploy --only hosting"
   },
-  "author": "Bhubaneswar Engineering College",
+  "author": "Gen-Z University",
   "license": "ISC"
 }

@@ -1,5 +1,5 @@
 /**
- * System Constants for Bhubaneswar Engineering College Accounts System
+ * System Constants for Gen-Z University Accounts System
  */
 
 const ROLES = {

@@ -1,6 +1,6 @@
 /**
  * Accounts Executive & Administrative Intelligence Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const bcrypt = require('bcryptjs');
@@ -1021,7 +1021,7 @@ async function passOutStudentToAlumni(req, res) {
     return success(
       res,
       graduatedStudent,
-      `Student ${graduatedStudent.full_name} successfully graduated to BEC Alumni (${graduatedStudent.passout_year || passoutYear})!`
+      `Student ${graduatedStudent.full_name} successfully graduated to GENZ Alumni (${graduatedStudent.passout_year || passoutYear})!`
     );
   } catch (err) {
     console.error('passOutStudentToAlumni error:', err);
@@ -1052,14 +1052,14 @@ async function batchPassOutToAlumni(req, res) {
       action: 'BATCH_ALUMNI_GRADUATION',
       module: 'ALUMNI',
       recordId: null,
-      reason: `Bulk graduated ${result.affected} students to BEC Alumni (Class of ${result.passoutYear}). Institutional No Dues & Caution Deposit settlements processed.`,
+      reason: `Bulk graduated ${result.affected} students to GENZ Alumni (Class of ${result.passoutYear}). Institutional No Dues & Caution Deposit settlements processed.`,
       ipAddress: req.ip
     });
 
     return success(
       res,
       result,
-      `Successfully graduated ${result.affected} students to BEC Alumni Class of ${result.passoutYear}!`
+      `Successfully graduated ${result.affected} students to GENZ Alumni Class of ${result.passoutYear}!`
     );
   } catch (err) {
     console.error('batchPassOutToAlumni error:', err);
@@ -1107,6 +1107,107 @@ async function updateAlumniProfile(req, res) {
   }
 }
 
+/**
+ * Get All Education Loan Requests (Director / Admin)
+ * GET /api/admin/loan-requests
+ */
+async function getLoanRequests(req, res) {
+  const { status } = req.query;
+  try {
+    let sql = `SELECT * FROM education_loan_requests`;
+    const params = [];
+    if (status && status !== 'ALL') {
+      sql += ` WHERE status = ?`;
+      params.push(status);
+    }
+    sql += ` ORDER BY created_at DESC`;
+    const [requests] = await query(sql, params);
+    return success(res, requests, 'Education loan applications retrieved.');
+  } catch (err) {
+    console.error('admin getLoanRequests error:', err);
+    return error(res, 'Failed to retrieve loan applications.', 500);
+  }
+}
+
+/**
+ * Update Education Loan Request Status (Approve / Reject)
+ * PATCH /api/admin/loan-requests/:id/status
+ */
+async function updateLoanRequestStatus(req, res) {
+  const requestId = req.params.id;
+  const { status, director_remarks } = req.body;
+
+  if (!['APPROVED', 'REJECTED', 'PENDING'].includes(status)) {
+    return error(res, 'Invalid status value.', 400);
+  }
+
+  try {
+    const [existing] = await query(`SELECT * FROM education_loan_requests WHERE id = ? LIMIT 1`, [requestId]);
+    if (existing.length === 0) {
+      return error(res, 'Loan request not found.', 404);
+    }
+    const current = existing[0];
+    const refNo = current.reference_no || `GZU/DIR/LOAN/2026/${String(requestId).padStart(4, '0')}`;
+
+    await query(
+      `UPDATE education_loan_requests 
+       SET status = ?, 
+           director_remarks = ?, 
+           approved_by = ?, 
+           approved_at = NOW(),
+           reference_no = ?
+       WHERE id = ?`,
+      [
+        status,
+        director_remarks || (status === 'APPROVED' ? 'Approved by Directorate for Bank Loan processing.' : 'Request rejected.'),
+        req.user.id,
+        refNo,
+        requestId
+      ]
+    );
+
+    // Audit log
+    await logAudit(
+      req.user.id,
+      `LOAN_REQUEST_${status}`,
+      'EDUCATION_LOAN',
+      requestId,
+      { student_id: current.student_id, bank: current.bank_name, status, remarks: director_remarks }
+    );
+
+    // Find student's user id to notify them
+    try {
+      const [stuUser] = await query(`SELECT user_id FROM students WHERE id = ? LIMIT 1`, [current.student_id]);
+      if (stuUser.length > 0) {
+        await query(
+          `INSERT INTO notifications (user_id, title, message, category, is_read) 
+           VALUES (?, ?, ?, 'ALERT', 0)`,
+          [
+            stuUser[0].user_id,
+            status === 'APPROVED' ? '🎉 Education Loan Approved by Director!' : 'Education Loan Request Update',
+            status === 'APPROVED'
+              ? `Your Education Loan request for ${current.bank_name} has been APPROVED by the Directorate. 3 Official Bank Letters are ready to print!`
+              : `Your Education Loan request for ${current.bank_name} was reviewed by the Directorate: ${director_remarks || 'Not approved.'}`
+          ]
+        );
+      }
+    } catch (notifErr) {
+      console.warn('Student notification insert error:', notifErr.message);
+    }
+
+    return success(
+      res,
+      { id: requestId, status, reference_no: refNo },
+      status === 'APPROVED'
+        ? 'Education loan approved! 3 Official Bank Letters have been generated.'
+        : `Education loan request status updated to ${status}.`
+    );
+  } catch (err) {
+    console.error('updateLoanRequestStatus error:', err);
+    return error(res, 'Failed to update loan request status.', 500);
+  }
+}
+
 module.exports = {
   getDashboard,
   getIntelligence,
@@ -1133,5 +1234,7 @@ module.exports = {
   getAlumni,
   passOutStudentToAlumni,
   batchPassOutToAlumni,
-  updateAlumniProfile
+  updateAlumniProfile,
+  getLoanRequests,
+  updateLoanRequestStatus
 };

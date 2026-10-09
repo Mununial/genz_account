@@ -1,6 +1,6 @@
 /**
  * Expense & Accounts Master Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  * Matches Reference Screens: Search Expenses, Party Master, Day Book, Profit & Loss
  */
 
@@ -273,7 +273,7 @@ async function getProfitLoss(req, res) {
     const netSurplus = totalIncome - totalExpense;
 
     return success(res, {
-      college: 'Bhubaneswar Engineering College',
+      college: 'Gen-Z University',
       financial_year: '2026-27',
       total_income: totalIncome,
       total_expense: totalExpense,
@@ -375,7 +375,7 @@ async function exportExpensesCSV(req, res) {
     const csvContent = [headers, ...rows].join('\n');
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="BEC_Expenses_Report_2026.csv"');
+    res.setHeader('Content-Disposition', 'attachment; filename="GENZ_Expenses_Report_2026.csv"');
     return res.status(200).send(csvContent);
   } catch (err) {
     return error(res, 'Failed to export expenses.', 500);

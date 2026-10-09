@@ -1,6 +1,6 @@
 /**
  * Student Portal Routes (Protected & Isolated)
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const express = require('express');
@@ -25,5 +25,8 @@ router.post('/requests', studentController.submitRequest);
 router.get('/notifications', studentController.getNotifications);
 router.get('/health', studentController.getHealth);
 router.post('/health', studentController.updateHealth);
+router.post('/loan-request', studentController.submitLoanRequest);
+router.get('/loan-requests', studentController.getLoanRequests);
+router.get('/loan-letters/:id', studentController.getLoanLetters);
 
 module.exports = router;

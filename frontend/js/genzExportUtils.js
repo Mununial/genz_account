@@ -1,15 +1,15 @@
 /**
- * Bhubaneswar Engineering College (BEC) - Master Unified Export & Reporting Engine
+ * Gen-Z University - Master Unified Export & Reporting Engine
  * Provides standard, institutional-grade Excel (.xlsx / CSV) and PDF / Print generation
  * with official college letterheads, verified metadata, summary KPIs, and audit blocks.
  */
 
 const becExportUtils = {
   institution: {
-    name: 'BHUBANESWAR ENGINEERING COLLEGE (BEC)',
-    affiliation: 'Affiliated to BPUT, Odisha & Approved by AICTE, New Delhi',
-    address: 'At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha 752054',
-    contact: 'Email: accounts@bec.ac.in | Phone: +91-674-2970000 | Web: www.becbbsr.ac.in',
+    name: 'GEN-Z UNIVERSITY (GZU)',
+    affiliation: 'Autonomous Private University & Approved by UGC / AICTE',
+    address: 'Gen-Z Knowledge City Campus, Bhubaneswar, Odisha 752054',
+    contact: 'Email: accounts@genz.edu.in | Phone: +91-674-2970000 | Web: www.genz.edu.in',
     session: 'Academic Session: 2026-27'
   },
 
@@ -26,7 +26,7 @@ const becExportUtils = {
   /**
    * Export structured dataset to Excel (CSV with UTF-8 BOM and Institutional Header)
    */
-  exportToExcel({ filename = 'BEC_Report', title = 'OFFICIAL REPORT', filterSummary = 'All Records', stats = {}, headers = [], rows = [] }) {
+  exportToExcel({ filename = 'GENZ_Report', title = 'OFFICIAL REPORT', filterSummary = 'All Records', stats = {}, headers = [], rows = [] }) {
     if (!rows || rows.length === 0) {
       if (typeof ui !== 'undefined') ui.showToast('No records available to export.', 'warning');
       return;
@@ -102,7 +102,7 @@ const becExportUtils = {
   /**
    * Export structured dataset to PDF / High-Resolution Official Printable Register
    */
-  exportToPDF({ title = 'OFFICIAL REPORT', subtitle = '', filterSummary = 'All Records', stats = {}, headers = [], rows = [], filename = 'BEC_Report' }) {
+  exportToPDF({ title = 'OFFICIAL REPORT', subtitle = '', filterSummary = 'All Records', stats = {}, headers = [], rows = [], filename = 'GENZ_Report' }) {
     if (!rows || rows.length === 0) {
       if (typeof ui !== 'undefined') ui.showToast('No records available to export to PDF.', 'warning');
       return;
@@ -110,7 +110,7 @@ const becExportUtils = {
 
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const docRef = `BEC/ACC/REP/${now.getFullYear()}/${String(Math.floor(1000 + Math.random() * 9000))}`;
+    const docRef = `GENZ/ACC/REP/${now.getFullYear()}/${String(Math.floor(1000 + Math.random() * 9000))}`;
 
     let statCardsHtml = '';
     if (Object.keys(stats).length > 0) {
@@ -294,14 +294,12 @@ const becExportUtils = {
         <table class="header-table">
           <tr>
             <td class="bec-logo-cell">
-              <div style="width: 52px; height: 52px; border-radius: 8px; background: #1E3A8A; color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900;">
-                🎓
-              </div>
+              <img src="/assets/genz-logo.jpg" style="width: 56px; height: 56px; border-radius: 50%; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
             </td>
             <td class="bec-title-cell">
               <h1 class="inst-name">${this.institution.name}</h1>
               <div class="inst-affil">${this.institution.affiliation}</div>
-              <div class="inst-addr">${this.institution.address} &bull; accounts@bec.ac.in</div>
+              <div class="inst-addr">${this.institution.address} &bull; accounts@genz.edu.in</div>
             </td>
             <td class="bec-meta-cell">
               <div><strong>DOC REF:</strong> ${docRef}</div>
@@ -385,7 +383,7 @@ const becExportUtils = {
         <div class="signature-section">
           <div class="sign-box">
             <div>Prepared by: Cashier / Desk Operator</div>
-            <div class="sign-sub">Official Cash Desk &bull; BEC Accounts</div>
+            <div class="sign-sub">Official Cash Desk &bull; Gen-Z University Accounts</div>
           </div>
           <div class="sign-box">
             <div>Verified by: Senior Accounts Officer</div>
@@ -393,7 +391,7 @@ const becExportUtils = {
           </div>
           <div class="sign-box">
             <div>Approved by: Accounts Head / Principal</div>
-            <div class="sign-sub">Bhubaneswar Engineering College</div>
+            <div class="sign-sub">Gen-Z University</div>
           </div>
         </div>
       </body>

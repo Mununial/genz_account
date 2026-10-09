@@ -1,6 +1,6 @@
 /**
  * Fee Adjustment Controller (Scholarship & Waivers)
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query, withTransaction } = require('../config/db');

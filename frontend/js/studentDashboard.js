@@ -1,6 +1,6 @@
 /**
  * Student Financial Portal Logic
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const studentDashboard = {
@@ -347,12 +347,12 @@ const studentDashboard = {
           key: ord.key,
           amount: Math.round(amount * 100),
           currency: ord.currency || 'INR',
-          name: 'Bhubaneswar Engineering College',
+          name: 'Gen-Z University',
           description: `Fee Payment (${ord.invoiceNo || 'College Fee'})`,
           order_id: ord.orderId,
           prefill: {
             name: u.full_name || u.name || '',
-            email: u.email || 'accounts@bec.ac.in',
+            email: u.email || 'accounts@genz.edu.in',
             contact: '9876543210'
           },
           theme: {
@@ -442,11 +442,11 @@ const studentDashboard = {
 
       const receiptHtml = `
         <div class="receipt-document">
-          <div class="receipt-watermark">BEC PAID</div>
+          <div class="receipt-watermark">GENZ PAID</div>
           <div class="receipt-header">
-            <div class="receipt-college-title">Bhubaneswar Engineering College</div>
-            <div class="receipt-college-sub">Affiliated to BPUT, Odisha &bull; Approved by AICTE, New Delhi</div>
-            <div class="receipt-college-sub">At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha 752054</div>
+            <div class="receipt-college-title">Gen-Z University</div>
+            <div class="receipt-college-sub">Approved by UGC / AICTE &bull; Approved by AICTE, New Delhi</div>
+            <div class="receipt-college-sub">Gen-Z Knowledge City Campus, Bhubaneswar, Odisha 752054</div>
             <div class="receipt-badge-title">OFFICIAL FEE PAYMENT RECEIPT</div>
           </div>
 
@@ -496,7 +496,7 @@ const studentDashboard = {
           </div>
 
           <div class="receipt-footer-note">
-            This is an electronically generated official digital receipt of Bhubaneswar Engineering College (BEC).
+            This is an electronically generated official digital receipt of Gen-Z University.
             Verify authenticity at https://bec.ac.in/verify-receipt/${escapeHtml(r.receipt_no)}
           </div>
         </div>

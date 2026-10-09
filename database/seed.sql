@@ -1,5 +1,5 @@
 -- ==============================================================================
--- BHUBANESWAR ENGINEERING COLLEGE (BEC) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
+-- GEN-Z UNIVERSITY (GZU) - ACCOUNTS & FINANCE MANAGEMENT SYSTEM
 -- Baseline Seed Data (Roles, Permissions, Academic, Fee Categories, Settings)
 -- ==============================================================================
 
@@ -127,8 +127,8 @@ ON DUPLICATE KEY UPDATE `fine_value` = VALUES(`fine_value`);
 
 -- 10. SYSTEM SETTINGS
 INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VALUES
-('college_name', 'Bhubaneswar Engineering College', 'Official college name'),
-('college_code', 'BEC', 'College short code'),
+('college_name', 'Gen-Z University', 'Official college name'),
+('college_code', 'GENZ', 'College short code'),
 ('college_address', 'At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha 752054', 'Postal address'),
 ('college_affiliation', 'Affiliated to BPUT, Odisha & Approved by AICTE, New Delhi', 'Accreditation details'),
 ('college_email', 'accounts@bec.ac.in', 'Official finance email'),
@@ -156,10 +156,10 @@ ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
 -- 12. STAFF RECORDS
 INSERT INTO `staff` (`id`, `user_id`, `staff_code`, `full_name`, `designation`, `department`, `phone`) VALUES
-(1, 1, 'BEC-ADM-001', 'System Administrator', 'Senior IT Administrator', 'IT & Systems', '+91-9437000001'),
-(2, 2, 'BEC-ACC-001', 'Prof. B. K. Mohapatra', 'Accounts Head & CFO', 'Accounts & Finance', '+91-9437000002'),
-(3, 3, 'BEC-ACC-002', 'Sujit Kumar Das', 'Senior Accounts Officer', 'Accounts & Finance', '+91-9437000003'),
-(4, 4, 'BEC-AUD-001', 'K. R. Panda & Associates', 'Statutory Financial Auditor', 'Internal Audit', '+91-9437000004')
+(1, 1, 'GENZ-ADM-001', 'System Administrator', 'Senior IT Administrator', 'IT & Systems', '+91-9437000001'),
+(2, 2, 'GENZ-ACC-001', 'Prof. B. K. Mohapatra', 'Accounts Head & CFO', 'Accounts & Finance', '+91-9437000002'),
+(3, 3, 'GENZ-ACC-002', 'Sujit Kumar Das', 'Senior Accounts Officer', 'Accounts & Finance', '+91-9437000003'),
+(4, 4, 'GENZ-AUD-001', 'K. R. Panda & Associates', 'Statutory Financial Auditor', 'Internal Audit', '+91-9437000004')
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 
 -- 13. TEST STUDENT RECORD (Jitendra Nial)
@@ -217,10 +217,10 @@ ON DUPLICATE KEY UPDATE `amount` = VALUES(`amount`);
 
 -- Digital Receipt for the counter payment
 INSERT INTO `receipts` (`id`, `receipt_no`, `payment_id`, `student_id`, `invoice_id`, `amount_paid`, `payment_method`, `transaction_id`, `issued_date`, `receipt_data_json`, `created_by`) VALUES
-(1, 'BEC-REC-2026-0001', 1, 1, 1, 20000.00, 'CASH', 'COUNTER-RCP-001', NOW(), '{"particulars": "Tuition Fee Initial Installment", "student_name": "Jitendra Nial", "branch": "Computer Science & Engineering", "course": "B.Tech", "semester": "1st Semester"}', 3)
+(1, 'GZU-REC-2026-0001', 1, 1, 1, 20000.00, 'CASH', 'COUNTER-RCP-001', NOW(), '{"particulars": "Tuition Fee Initial Installment", "student_name": "Jitendra Nial", "branch": "Computer Science & Engineering", "course": "B.Tech", "semester": "1st Semester"}', 3)
 ON DUPLICATE KEY UPDATE `receipt_no` = VALUES(`receipt_no`);
 
 -- Notification for student
 INSERT INTO `notifications` (`user_id`, `title`, `message`, `category`, `is_read`) VALUES
 (5, 'Admission Fee Invoice Issued', 'Invoice INV-2026-0001 of ₹63,500 for B.Tech 1st Semester has been issued with due date 31-Oct-2026.', 'INVOICE', 0),
-(5, 'Payment Receipt Generated', 'Payment of ₹20,000 received. Digital receipt BEC-REC-2026-0001 is ready for download.', 'RECEIPT', 0);
+(5, 'Payment Receipt Generated', 'Payment of ₹20,000 received. Digital receipt GZU-REC-2026-0001 is ready for download.', 'RECEIPT', 0);

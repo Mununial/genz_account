@@ -1,6 +1,6 @@
 /**
  * Authentication Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const bcrypt = require('bcryptjs');
@@ -31,53 +31,53 @@ async function login(req, res) {
     // Support login by email, username shortcut, student registration number, or staff phone
     let lookupTerm = normalizedEmail;
     // Super Admin shortcuts
-    if (['admin', 'master', 'superadmin', 'root', 'ayush', 'ayush mallick', 'ayush.mallick@bec.ac.in', 'ayushmallick'].includes(normalizedEmail)) {
-      lookupTerm = 'admin@bec.ac.in';
+    if (['admin', 'master', 'superadmin', 'root', 'ayush', 'ayush mallick', 'ayush.mallick@genz.edu.in', 'ayushmallick', 'admin@genz', 'admin@genz.edu.in'].includes(normalizedEmail)) {
+      lookupTerm = 'admin@genz';
     }
     // Accountant shortcuts
-    else if (['staff', 'account', 'accounts', 'accountant', 'harihara', 'harihara parida', 'harihara.parida@bec.ac.in'].includes(normalizedEmail)) {
-      lookupTerm = 'accounts.head@bec.ac.in';
+    else if (['staff', 'account', 'accounts', 'accountant', 'harihara', 'harihara parida', 'harihara.parida@genz.edu.in', 'account@genz', 'accounts@genz', 'accounts.head@genz.edu.in'].includes(normalizedEmail)) {
+      lookupTerm = 'account@genz';
     }
-    else if (normalizedEmail === 'head') lookupTerm = 'accounts.head@bec.ac.in';
-    else if (normalizedEmail === 'auditor') lookupTerm = 'auditor@bec.ac.in';
+    else if (normalizedEmail === 'head') lookupTerm = 'account@genz';
+    else if (['auditor', 'auditor@genz', 'auditor@genz.edu.in'].includes(normalizedEmail)) lookupTerm = 'auditor@genz';
     // Director shortcuts
-    else if (['director', 'principal', 'biswal', 'dr biswal', 'dr. biswal', 'dr b.n biswal', 'dr b n biswal', 'b.n biswal', 'bn.biswal@bec.ac.in'].includes(normalizedEmail)) {
-      lookupTerm = 'director@bec.ac.in';
+    else if (['director', 'principal', 'biswal', 'dr biswal', 'dr. biswal', 'dr b.n biswal', 'dr b n biswal', 'b.n biswal', 'bn.biswal@genz.edu.in', 'director@genz', 'director@genz.edu.in'].includes(normalizedEmail)) {
+      lookupTerm = 'director@genz';
     }
     // Examiner shortcuts
-    else if (['exam', 'exam.section', 'examcell', 'examiner', 'manoj', 'manoj pati', 'manoj kumar pati', 'manoj.pati@bec.ac.in'].includes(normalizedEmail)) {
-      lookupTerm = 'exam.section@bec.ac.in';
+    else if (['exam', 'exam.section', 'examcell', 'examiner', 'manoj', 'manoj pati', 'manoj kumar pati', 'manoj.pati@genz.edu.in', 'exam@genz', 'exam.section@genz.edu.in'].includes(normalizedEmail)) {
+      lookupTerm = 'exam@genz';
     }
     // 6 Real HOD shortcuts
-    else if (['anita', 'anita behera', 'anita.behera@bec.ac.in', 'cse', 'cseds', 'cse.hod', 'hod.cse', 'hod.csd'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.cse@bec.ac.in';
+    else if (['anita', 'anita behera', 'anita.behera@genz.edu.in', 'cse', 'cseds', 'cse.hod', 'hod.cse', 'hod.csd', 'hod', 'hod@genz', 'hod.cse@genz', 'cse@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.cse@genz';
     }
-    else if (['ananyaa', 'ananyaa mohanty', 'ananyaa.mohanty@bec.ac.in', 'agri', 'agriculture', 'agri.hod', 'hod.agri'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.agri@bec.ac.in';
+    else if (['ananyaa', 'ananyaa mohanty', 'ananyaa.mohanty@genz.edu.in', 'agri', 'agriculture', 'agri.hod', 'hod.agri', 'hod.agri@genz', 'agri@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.agri@genz';
     }
-    else if (['bishnu', 'dr bishnu', 'bishnu prasad', 'dr bishnu prasad mishra', 'bishnu.mishra@bec.ac.in', 'mech', 'mechatronics', 'mech.hod', 'hod.mech'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.mech@bec.ac.in';
+    else if (['bishnu', 'dr bishnu', 'bishnu prasad', 'dr bishnu prasad mishra', 'bishnu.mishra@genz.edu.in', 'mech', 'mechatronics', 'mech.hod', 'hod.mech', 'hod.mech@genz', 'mech@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.mech@genz';
     }
-    else if (['binaya', 'dr binaya', 'binaya kumar', 'binaya kumar malika', 'binaya kumar mallick', 'binaya.malika@bec.ac.in', 'binaya.mallick@bec.ac.in', 'eee', 'ece', 'eee.hod', 'hod.eee'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.eee@bec.ac.in';
+    else if (['binaya', 'dr binaya', 'binaya kumar', 'binaya kumar malika', 'binaya kumar mallick', 'binaya.malika@genz.edu.in', 'binaya.mallick@genz.edu.in', 'eee', 'ece', 'eee.hod', 'hod.eee', 'hod.eee@genz', 'eee@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.eee@genz';
     }
-    else if (['sangram', 'dr sangram', 'sangram keshari', 'sangram keshari samal', 'sangram.samal@bec.ac.in', 'aero', 'ame', 'aero.hod', 'hod.aero'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.aero@bec.ac.in';
+    else if (['sangram', 'dr sangram', 'sangram keshari', 'sangram keshari samal', 'sangram.samal@genz.edu.in', 'aero', 'ame', 'aero.hod', 'hod.aero', 'hod.aero@genz', 'aero@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.aero@genz';
     }
-    else if (['ashis', 'ashis behera', 'ashis kumar behera', 'ashis.behera@bec.ac.in', 'mba', 'mba.hod', 'hod.mba'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.mba@bec.ac.in';
+    else if (['ashis', 'ashis behera', 'ashis kumar behera', 'ashis.behera@genz.edu.in', 'mba', 'mba.hod', 'hod.mba', 'hod.mba@genz', 'mba@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.mba@genz';
     }
-    else if (['saswat', 'saswat mohanty', 'saswat.mohanty@bec.ac.in', 'civil', 'environmental', 'cee', 'civil.hod', 'hod.civil'].includes(normalizedEmail)) {
-      lookupTerm = 'hod.civil@bec.ac.in';
+    else if (['saswat', 'saswat mohanty', 'saswat.mohanty@genz.edu.in', 'civil', 'environmental', 'cee', 'civil.hod', 'hod.civil', 'hod.civil@genz', 'civil@genz'].includes(normalizedEmail)) {
+      lookupTerm = 'hod.civil@genz';
     }
-    else if (normalizedEmail.startsWith('hod.') && !normalizedEmail.includes('@')) lookupTerm = `${normalizedEmail}@bec.ac.in`;
-    else if (normalizedEmail === 'tushar' || normalizedEmail === 'tushar2644' || normalizedEmail === '2644') lookupTerm = 'tushar.mhato@bec.ac.in';
-    else if (normalizedEmail === 'student' || normalizedEmail === 'bablu' || normalizedEmail === 'bablu bag') lookupTerm = 'bablubag@becbbsr.ac.in';
+    else if (normalizedEmail.startsWith('hod.') && !normalizedEmail.includes('@')) lookupTerm = `${normalizedEmail}@genz`;
+    else if (normalizedEmail === 'tushar' || normalizedEmail === 'tushar2644' || normalizedEmail === '2644') lookupTerm = 'tushar.mhato@genz.edu.in';
+    else if (normalizedEmail === 'student' || normalizedEmail === 'student@genz') lookupTerm = 'student@genz';
+    else if (normalizedEmail === 'bablu' || normalizedEmail === 'bablu bag') lookupTerm = 'bablubag@genz.edu.in';
 
-    // Cross-domain support (@bec.ac.in <-> @becbbsr.ac.in)
-    const altDomainEmail = normalizedEmail.endsWith('@bec.ac.in')
-      ? `${emailPrefix}@becbbsr.ac.in`
-      : (normalizedEmail.endsWith('@becbbsr.ac.in') ? `${emailPrefix}@bec.ac.in` : null);
+    // Cross-domain support (@genz <-> @genz.edu.in <-> @genz.edu.in)
+    const genzVariant = `${emailPrefix}@genz`;
+    const becVariant = `${emailPrefix}@genz.edu.in`;
 
     let [users] = await query(
       `SELECT u.id, u.email, u.password_hash, u.role_id, u.must_change_password, u.is_active,
@@ -89,10 +89,11 @@ async function login(req, res) {
        LEFT JOIN students s ON s.user_id = u.id
        LEFT JOIN staff st ON st.user_id = u.id
        WHERE u.email = ? 
-          OR (u.email = ?)
+          OR u.email = ?
+          OR u.email = ?
           OR (u.email LIKE ?)
        LIMIT 1`,
-      [lookupTerm, altDomainEmail || lookupTerm, `${emailPrefix}@%`]
+      [lookupTerm, genzVariant, becVariant, `${emailPrefix}@%`]
     );
 
     // If not found by email, try matching by staff phone, staff name, or student reg_no/name

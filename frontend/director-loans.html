@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Director Education Loan Approvals - Gen-Z University</title>
+  <meta name="description" content="Director Education Loan Clearance and 3 Official Letters Generation - Gen-Z University">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/genzReal.css">
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printableDirectorLettersContainer, #printableDirectorLettersContainer * {
+        visibility: visible;
+      }
+      #printableDirectorLettersContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      .print-page-break {
+        page-break-after: always;
+        break-after: page;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <div class="app-container">
+    <!-- 1. SIDEBAR -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <a href="/director-registrations.html" class="brand-link">
+          <img src="/assets/logo.svg" alt="Gen-Z University Crest" class="sidebar-logo">
+          <div class="brand-text">
+            <span class="brand-title">GENZ DIRECTORATE</span>
+            <span class="brand-subtitle">Executive Academic Office</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div id="adminNavGroup">
+          <!-- Populated dynamically by navigation.js -->
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatar">DIR</div>
+          <div class="user-meta">
+            <div class="user-name" id="userDisplayName">College Director</div>
+            <div class="user-role-tag" id="userDisplayRole">DIRECTOR</div>
+          </div>
+          <button class="btn btn-icon btn-ghost-danger" onclick="auth.logout()" title="Secure Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN APPLICATION CONTENT -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="topbar-title-wrap">
+            <div class="topbar-clock" id="topbarClock"></div>
+          </div>
+        </div>
+        <div class="topbar-right" style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-sm btn-secondary" onclick="directorLoans.loadLoansQueue()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh Applications
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page-content" style="padding: 1.5rem;">
+        <!-- Header Banner -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="background: linear-gradient(135deg, #0B63C5, #1E40AF); width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(11,99,197,0.25);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <h1 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #0F172A;">Directorate — Education Loan Approvals</h1>
+                <span style="background: #EFF6FF; color: #1D4ED8; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #BFDBFE;">Direct-to-Bank Letters</span>
+              </div>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #64748B;">Executive Authority: Approving a request generates all 3 official signed letters (Bonafide, Fee Estimate, University NOC &amp; Account Details).</p>
+            </div>
+          </div>
+          <div>
+            <span id="loanPendingBadge" style="background: #FEF3C7; color: #B45309; font-weight: 800; font-size: 0.85rem; padding: 0.4rem 1.1rem; border-radius: 20px; border: 1px solid #FCD34D;">0 Awaiting Sanction</span>
+          </div>
+        </div>
+
+        <!-- Directorate Fast Nav Switcher -->
+        <div style="display: flex; gap: 0.6rem; margin-bottom: 1.25rem;">
+          <a href="/director-registrations.html" style="background: #ffffff; color: #334155; border: 1px solid #CBD5E1; padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.15s;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            &larr; Subject Registrations
+          </a>
+          <a href="/director-loans.html" style="background: #0B63C5; color: #fff; padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(11,99,197,0.25);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
+            Education Loan Approvals &amp; 3-Letter Dossier
+          </a>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="font-size: 0.75rem; color: #64748B; text-transform: uppercase; font-weight: 700;">Total Applications</div>
+            <div id="statTotalLoans" style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="font-size: 0.75rem; color: #B45309; text-transform: uppercase; font-weight: 700;">Awaiting Director Review</div>
+            <div id="statPendingLoans" style="font-size: 1.6rem; font-weight: 800; color: #D97706; margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="font-size: 0.75rem; color: #166534; text-transform: uppercase; font-weight: 700;">Sanctioned &amp; Letters Issued</div>
+            <div id="statApprovedLoans" style="font-size: 1.6rem; font-weight: 800; color: #15803D; margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="font-size: 0.75rem; color: #991B1B; text-transform: uppercase; font-weight: 700;">Not Sanctioned</div>
+            <div id="statRejectedLoans" style="font-size: 1.6rem; font-weight: 800; color: #DC2626; margin-top: 0.25rem;">0</div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.85rem 1.25rem; margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <button class="btn btn-sm btn-secondary filter-status-btn active" id="btnFilterAll" onclick="directorLoans.setStatusFilter('ALL')" style="font-weight: 700; background: #0B63C5; color: #fff; border-color: #0B63C5;">All Applications</button>
+            <button class="btn btn-sm btn-secondary filter-status-btn" id="btnFilterPending" onclick="directorLoans.setStatusFilter('PENDING')" style="font-weight: 600;">Pending Review</button>
+            <button class="btn btn-sm btn-secondary filter-status-btn" id="btnFilterApproved" onclick="directorLoans.setStatusFilter('APPROVED')" style="font-weight: 600;">Approved / Issued</button>
+            <button class="btn btn-sm btn-secondary filter-status-btn" id="btnFilterRejected" onclick="directorLoans.setStatusFilter('REJECTED')" style="font-weight: 600;">Rejected</button>
+          </div>
+
+          <div style="position: relative; width: 280px; max-width: 100%;">
+            <input type="text" id="loanSearchInput" oninput="directorLoans.filterTable()" placeholder="Search student, reg no, bank..." style="width: 100%; padding: 0.4rem 0.75rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <!-- Loan Applications Table Card -->
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div style="overflow-x: auto;">
+            <table class="table" style="width: 100%; border-collapse: collapse; margin: 0;">
+              <thead>
+                <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; font-size: 0.75rem; text-transform: uppercase; color: #475569;">
+                  <th style="padding: 10px 14px; text-align: left;">Application Ref &bull; Date</th>
+                  <th style="padding: 10px 14px; text-align: left;">Student Name &amp; Reg No</th>
+                  <th style="padding: 10px 14px; text-align: left;">Course &amp; Branch</th>
+                  <th style="padding: 10px 14px; text-align: left;">Target Bank &amp; Branch</th>
+                  <th style="padding: 10px 14px; text-align: right;">Amount &bull; Purpose</th>
+                  <th style="padding: 10px 14px; text-align: left;">Co-Applicant</th>
+                  <th style="padding: 10px 14px; text-align: center;">Status</th>
+                  <th style="padding: 10px 14px; text-align: center;">Director Action</th>
+                </tr>
+              </thead>
+              <tbody id="loanTableBody">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 2.5rem; color: #94A3B8; font-size: 0.9rem;">
+                    Loading education loan applications...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- APPROVAL CONFIRMATION MODAL -->
+  <div id="directorApproveModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 580px; width: 94%;">
+      <div class="modal-header" style="background: #15803D; color: #fff; padding: 1.1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="modal-title" style="color: #fff; font-weight: 800; font-size: 1.05rem;">Sanction Education Loan &amp; Issue Letters</div>
+        </div>
+        <button class="bec-modal-close-icon" onclick="ui.closeModal('directorApproveModal')" style="color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.4rem;">
+        <div id="approveModalDetails" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.88rem;"></div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">Director Remarks / Endorsement Note</label>
+          <textarea id="directorApproveRemarks" rows="3" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;" placeholder="e.g. Recommended and approved for Bank Education Loan Scheme. Official 3-letter university dossier sanctioned."></textarea>
+        </div>
+
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.8rem; color: #166534; line-height: 1.45;">
+          <strong>Official Result:</strong> Upon confirming, the system generates:
+          <br>&bull; <strong>Letter 1:</strong> Bonafide Student Certificate (For Bank Loan)
+          <br>&bull; <strong>Letter 2:</strong> Official Institutional Fee Structure &amp; Expenditure Estimate
+          <br>&bull; <strong>Letter 3:</strong> University NOC &amp; Bank Account Undertaking (with SBI A/C details)
+          <br>These letters are immediately available in the Student Portal with the Directorate seal and digital signature.
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.85rem 1.4rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="ui.closeModal('directorApproveModal')">Cancel</button>
+        <button class="btn btn-primary" id="btnConfirmApprove" onclick="directorLoans.confirmApprove()" style="background: #15803D; border-color: #15803D; font-weight: 700; padding: 0.55rem 1.5rem;">
+          ✓ Sanction &amp; Sign Letters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REJECTION MODAL -->
+  <div id="directorRejectLoanModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px; width: 92%;">
+      <div class="modal-header" style="background: #DC2626; color: #fff; padding: 1.1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
+        <div class="modal-title" style="color: #fff; font-weight: 800; font-size: 1.05rem;">Decline Loan Clearance</div>
+        <button class="bec-modal-close-icon" onclick="ui.closeModal('directorRejectLoanModal')" style="color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <div style="font-size: 0.88rem; color: #334155; margin-bottom: 0.75rem;">
+          Please state the official reason for not sanctioning this loan request:
+        </div>
+        <textarea id="directorRejectLoanReason" rows="3" style="width: 100%; padding: 0.6rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;" placeholder="e.g. Student fee arrears or incomplete documentation. Contact Directorate."></textarea>
+      </div>
+      <div class="modal-footer" style="padding: 0.75rem 1.25rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="ui.closeModal('directorRejectLoanModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="directorLoans.confirmReject()" style="background: #DC2626; border-color: #DC2626; font-weight: 700;">Confirm Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIRECTOR VIEW / PRINT 3 LETTERS MODAL -->
+  <div id="directorLettersModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 900px; width: 96%; max-height: 95vh; display: flex; flex-direction: column;">
+      <div class="modal-header bec-gateway-header no-print">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div>
+            <div class="modal-title" style="color: white; font-weight: 800; font-size: 1.05rem;" id="dirModalTitle">Director Official Sanction &bull; 3 Letters Dossier</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 500;">Gen-Z University Executive Academic Seal</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <button class="bec-modal-close-icon" onclick="ui.closeModal('directorLettersModal')" title="Close">&times;</button>
+        </div>
+      </div>
+
+      <!-- Letter Switcher Toolbar (no-print) -->
+      <div class="no-print" style="background: #F1F5F9; border-bottom: 1px solid #E2E8F0; padding: 0.65rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <button type="button" class="loan-tab-btn active" id="dirTabBtnAll" onclick="directorLoans.switchLetterPreview('ALL')" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 700; border: 1px solid #0B63C5; background: #0B63C5; color: #fff; cursor: pointer;">
+            📋 All 3 Letters
+          </button>
+          <button type="button" class="loan-tab-btn" id="dirTabBtn1" onclick="directorLoans.switchLetterPreview(1)" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #CBD5E1; background: #fff; color: #334155; cursor: pointer;">
+            1. Bonafide
+          </button>
+          <button type="button" class="loan-tab-btn" id="dirTabBtn2" onclick="directorLoans.switchLetterPreview(2)" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #CBD5E1; background: #fff; color: #334155; cursor: pointer;">
+            2. Fee Estimate
+          </button>
+          <button type="button" class="loan-tab-btn" id="dirTabBtn3" onclick="directorLoans.switchLetterPreview(3)" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #CBD5E1; background: #fff; color: #334155; cursor: pointer;">
+            3. NOC &amp; Account Details
+          </button>
+        </div>
+        <div style="display: flex; gap: 0.4rem; align-items: center;">
+          <button type="button" onclick="directorLoans.downloadCurrentLetterPdf()" style="background: #006644; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; padding: 0.42rem 1.1rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,102,68,0.25);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download PDF
+          </button>
+          <button type="button" onclick="window.print()" style="background: #ffffff; color: #0F172A; border: 1.5px solid #CBD5E1; font-weight: 700; font-size: 0.82rem; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print
+          </button>
+        </div>
+      </div>
+
+      <!-- Letter Content Scroll View -->
+      <div class="modal-body" style="padding: 1.5rem 1rem; background: #525659; overflow-y: auto; flex: 1;">
+        <div id="printableDirectorLettersContainer"></div>
+      </div>
+
+      <div class="modal-footer no-print" style="background: #F8FAFC; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E2E8F0;">
+        <button class="btn btn-secondary" onclick="ui.closeModal('directorLettersModal')">Close</button>
+        <button class="btn btn-primary" onclick="directorLoans.downloadLoanLetterPdf('ALL')" style="background: linear-gradient(135deg, #006644, #00875A); border: none; font-weight: 700; padding: 0.55rem 1.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(0,102,68,0.3); cursor: pointer;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Complete 3-Letter Dossier (PDF)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/js/api.js?v=20261009_3"></script>
+  <script src="/js/auth.js?v=20261009_3"></script>
+  <script src="/js/ui.js?v=20261009_3"></script>
+  <script src="/js/navigation.js?v=20261009_3"></script>
+  <script src="/js/directorLoans.js?v=20261009_3"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      navigation.init('director-loans');
+      await directorLoans.init();
+    });
+  </script>
+</body>
+</html>

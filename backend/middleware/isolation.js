@@ -1,6 +1,6 @@
 /**
  * Student Data Isolation Middleware
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { error } = require('../utils/response');

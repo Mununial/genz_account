@@ -1,6 +1,6 @@
 /**
  * System Settings, Academic Sessions, and Branches Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');

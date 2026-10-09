@@ -1,6 +1,6 @@
 /**
  * Invoice Management Controller (Staff & Admin Operations)
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query, withTransaction } = require('../config/db');

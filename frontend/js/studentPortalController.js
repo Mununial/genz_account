@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC) - STUDENT ERP PORTAL CONTROLLER
+ * GEN-Z UNIVERSITY (GZU) - STUDENT ERP PORTAL CONTROLLER
  * Dedicated Student-Exclusive Experience matching http://31.97.63.174:3006
  * ==============================================================================
  */
@@ -219,6 +219,8 @@ const studentPortal = {
       this.renderBacklogRegistrationTab();
     } else if (tabName === 'health') {
       this.renderHealthTab();
+    } else if (tabName === 'loan') {
+      this.renderLoanTab();
     }
 
     // Close mobile drawer if open
@@ -341,6 +343,835 @@ const studentPortal = {
         btn.innerHTML = 'Save Health Record &#10003;';
       }
     }
+  },
+
+  /* =========================================================================
+   * EDUCATION LOAN ASSISTANCE & 3-LETTER DOSSIER
+   * ========================================================================= */
+  loanRequestsList: [],
+  activeLoanLettersData: null,
+  currentLetterPreviewMode: 'ALL',
+
+  async renderLoanTab() {
+    const s = this.currentStudent || {};
+    const coName = document.getElementById('loanCoAppName');
+    if (coName && !coName.value) coName.value = s.parent_name || s.father_name || '';
+
+    const coPhone = document.getElementById('loanCoAppPhone');
+    if (coPhone && !coPhone.value) coPhone.value = s.parent_phone || s.phone || '';
+
+    try {
+      const res = await api.get('/student/loan-requests');
+      this.loanRequestsList = (res && res.data) ? res.data : [];
+    } catch (err) {
+      console.warn('Could not fetch loan requests:', err.message);
+      this.loanRequestsList = [];
+    }
+
+    this.renderLoanStatusAndLetters();
+  },
+
+  onBankSelectChange() {
+    const sel = document.getElementById('loanBankSelect');
+    const wrap = document.getElementById('loanCustomBankWrap');
+    const inp = document.getElementById('loanCustomBankInput');
+    if (!sel || !wrap) return;
+    if (sel.value === 'OTHER') {
+      wrap.style.display = 'block';
+      if (inp) inp.required = true;
+    } else {
+      wrap.style.display = 'none';
+      if (inp) inp.required = false;
+    }
+  },
+
+  setLoanAmountChip(val) {
+    const inp = document.getElementById('loanAmountInput');
+    if (inp) inp.value = val;
+  },
+
+  async submitLoanRequest(e) {
+    if (e) e.preventDefault();
+    const btn = document.getElementById('btnSubmitLoanRequest');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Submitting to Directorate...';
+    }
+
+    const sel = document.getElementById('loanBankSelect');
+    let bankName = sel ? sel.value : '';
+    if (bankName === 'OTHER') {
+      const customInp = document.getElementById('loanCustomBankInput');
+      bankName = customInp ? customInp.value.trim() : 'Custom Bank';
+    }
+
+    const payload = {
+      bank_name: bankName,
+      bank_branch: (document.getElementById('loanBranchInput')?.value || '').trim(),
+      bank_ifsc: (document.getElementById('loanIfscInput')?.value || '').trim().toUpperCase(),
+      loan_amount: parseFloat(document.getElementById('loanAmountInput')?.value || 0),
+      loan_purpose: document.getElementById('loanPurposeSelect')?.value || 'Tuition & Academic Fees',
+      co_applicant_name: (document.getElementById('loanCoAppName')?.value || '').trim(),
+      co_applicant_relation: document.getElementById('loanCoAppRelation')?.value || 'Father',
+      co_applicant_phone: (document.getElementById('loanCoAppPhone')?.value || '').trim(),
+      co_applicant_income: parseFloat(document.getElementById('loanCoAppIncome')?.value || 0),
+      student_remarks: (document.getElementById('loanStudentRemarks')?.value || '').trim()
+    };
+
+    if (!payload.bank_name || payload.loan_amount <= 0) {
+      ui.showToast('Please select bank and specify valid loan amount.', 'error');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Submit Request to Director &rarr;';
+      }
+      return;
+    }
+
+    try {
+      const res = await api.post('/student/loan-request', payload);
+      if (res && res.success) {
+        ui.showToast('🎉 Education Loan Request successfully forwarded to College Directorate!', 'success');
+        await this.renderLoanTab();
+      } else {
+        ui.showToast((res && res.message) || 'Request submitted successfully.', 'success');
+      }
+    } catch (err) {
+      console.error('submitLoanRequest error:', err);
+      ui.showToast('Failed to submit loan request: ' + (err.message || 'Server error'), 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Submit Request to Director &rarr;';
+      }
+    }
+  },
+
+  renderLoanStatusAndLetters() {
+    const statusCard = document.getElementById('loanActiveStatusCard');
+    const approvedLettersCard = document.getElementById('loanApprovedLettersCard');
+    const headerBadge = document.getElementById('loanStatusHeaderBadge');
+    const formCard = document.getElementById('loanApplicationFormCard');
+
+    if (!statusCard || !approvedLettersCard) return;
+
+    if (!this.loanRequestsList || this.loanRequestsList.length === 0) {
+      statusCard.style.display = 'none';
+      approvedLettersCard.style.display = 'none';
+      if (formCard) formCard.style.display = 'block';
+      if (headerBadge) {
+        headerBadge.textContent = 'Direct-to-Bank Verification Desk';
+        headerBadge.style.background = '#EFF6FF';
+        headerBadge.style.color = '#0B63C5';
+      }
+      return;
+    }
+
+    const latest = this.loanRequestsList[0];
+    statusCard.style.display = 'block';
+
+    if (latest.status === 'PENDING') {
+      if (headerBadge) {
+        headerBadge.textContent = 'Director Review in Progress';
+        headerBadge.style.background = '#FEF3C7';
+        headerBadge.style.color = '#B45309';
+      }
+      statusCard.innerHTML = `
+        <div style="background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:0 2px 8px rgba(245,158,11,0.08);">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <div style="background:#FEF3C7;color:#B45309;padding:6px;border-radius:8px;display:flex;align-items:center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#92400E;">Request Forwarded to Directorate &bull; Pending Clearance</h4>
+                <div style="font-size:0.8rem;color:#B45309;">Ref: <strong>${latest.reference_no || 'GZU/DIR/LOAN/2026/PENDING'}</strong> &bull; Submitted: ${new Date(latest.created_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</div>
+              </div>
+            </div>
+            <span style="background:#FDE68A;color:#92400E;font-size:0.78rem;font-weight:800;padding:4px 12px;border-radius:20px;border:1px solid #F59E0B;">
+              DIRECTOR REVIEW
+            </span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;background:#ffffff;border:1px solid #FDE68A;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <div>
+              <span style="font-size:0.75rem;color:#78350F;text-transform:uppercase;font-weight:700;">Target Bank</span>
+              <div style="font-weight:800;color:#0F172A;font-size:0.95rem;">${latest.bank_name}</div>
+              <div style="font-size:0.78rem;color:#64748B;">Branch: ${latest.bank_branch || 'Main'}</div>
+            </div>
+            <div>
+              <span style="font-size:0.75rem;color:#78350F;text-transform:uppercase;font-weight:700;">Requested Amount</span>
+              <div style="font-weight:800;color:#0B63C5;font-size:1.15rem;">₹${parseFloat(latest.loan_amount).toLocaleString('en-IN')}</div>
+              <div style="font-size:0.78rem;color:#64748B;">${latest.loan_purpose}</div>
+            </div>
+            <div>
+              <span style="font-size:0.75rem;color:#78350F;text-transform:uppercase;font-weight:700;">Co-Applicant</span>
+              <div style="font-weight:700;color:#0F172A;font-size:0.95rem;">${latest.co_applicant_name || 'Parent'}</div>
+              <div style="font-size:0.78rem;color:#64748B;">${latest.co_applicant_relation || 'Father'} &bull; ${latest.co_applicant_phone || ''}</div>
+            </div>
+          </div>
+
+          <div style="font-size:0.82rem;color:#92400E;line-height:1.45;">
+            ℹ️ Your application has been sent to the <strong>College Director</strong>. Once the Director approves and applies the institutional seal, all <strong>3 Official Bank Loan Letters</strong> will appear here for instant printing.
+          </div>
+        </div>
+      `;
+      approvedLettersCard.style.display = 'none';
+      if (formCard) formCard.style.display = 'none';
+
+    } else if (latest.status === 'APPROVED') {
+      if (headerBadge) {
+        headerBadge.textContent = '3 Bank Letters Generated & Ready';
+        headerBadge.style.background = '#DCFCE7';
+        headerBadge.style.color = '#15803D';
+      }
+      statusCard.innerHTML = `
+        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:0 2px 10px rgba(22,101,52,0.08);">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <div style="background:#DCFCE7;color:#15803D;padding:6px;border-radius:8px;display:flex;align-items:center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div>
+                <h4 style="margin:0;font-size:1.15rem;font-weight:800;color:#14532D;">Education Loan Approved by Directorate &bull; Official Letters Sanctioned</h4>
+                <div style="font-size:0.82rem;color:#166534;">Official Sanction Ref: <strong>${latest.reference_no}</strong> &bull; Approved on: ${latest.approved_at ? new Date(latest.approved_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : 'Today'}</div>
+              </div>
+            </div>
+            <span style="background:#BBF7D0;color:#14532D;font-size:0.8rem;font-weight:800;padding:5px 14px;border-radius:20px;border:1px solid #4ADE80;">
+              SANCTIONED &bull; LETTERS READY
+            </span>
+          </div>
+
+          <div style="background:#ffffff;border:1px solid #BBF7D0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;">
+            <div>
+              <span style="font-size:0.75rem;color:#166534;text-transform:uppercase;font-weight:700;">Target Bank &amp; Branch</span>
+              <div style="font-weight:800;color:#0F172A;font-size:0.95rem;">${latest.bank_name}</div>
+              <div style="font-size:0.78rem;color:#64748B;">Branch: ${latest.bank_branch || 'Main'}</div>
+            </div>
+            <div>
+              <span style="font-size:0.75rem;color:#166534;text-transform:uppercase;font-weight:700;">Approved Sanction Amount</span>
+              <div style="font-weight:800;color:#0B63C5;font-size:1.15rem;">₹${parseFloat(latest.loan_amount).toLocaleString('en-IN')}</div>
+              <div style="font-size:0.78rem;color:#64748B;">${latest.loan_purpose}</div>
+            </div>
+            <div>
+              <span style="font-size:0.75rem;color:#166534;text-transform:uppercase;font-weight:700;">Director Remarks</span>
+              <div style="font-weight:700;color:#0F172A;font-size:0.88rem;">${latest.director_remarks || 'Recommended & Cleared for Bank Education Loan.'}</div>
+              <div style="font-size:0.75rem;color:#166534;">Signed by College Director</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      approvedLettersCard.style.display = 'block';
+      approvedLettersCard.innerHTML = `
+        <div style="background:#ffffff;border:1.5px solid #0B63C5;border-radius:12px;padding:1.5rem;box-shadow:0 4px 14px rgba(11,99,197,0.08);">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;padding-bottom:0.85rem;border-bottom:1px solid #E2E8F0;">
+            <div>
+              <h3 style="margin:0;font-size:1.2rem;font-weight:800;color:#0F172A;">📜 3 Official Bank Loan Letters (Approved Dossier)</h3>
+              <p style="margin:4px 0 0 0;font-size:0.85rem;color:#64748B;">Take these 3 signed letters to <strong>${latest.bank_name}</strong> to finalize and disburse your education loan.</p>
+            </div>
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+              <button type="button" onclick="studentPortal.downloadLoanLetterPdf('ALL', ${latest.id})" style="background:linear-gradient(135deg,#006644,#00875A);color:#fff;border:none;padding:0.65rem 1.3rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;box-shadow:0 4px 12px rgba(0,102,68,0.25);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                📥 Download Full Dossier (PDF)
+              </button>
+              <button type="button" onclick="studentPortal.openLoanLettersModal(${latest.id}, 'ALL')" style="background:#ffffff;color:#0F172A;border:1.5px solid #CBD5E1;padding:0.65rem 1.1rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                🖨️ View &amp; Print
+              </button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.25rem;margin-bottom:1rem;">
+            <!-- Letter 1 -->
+            <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-radius:10px;padding:1.25rem;display:flex;flex-direction:column;justify-content:space-between;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                  <span style="background:#EFF6FF;color:#1D4ED8;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:4px;">LETTER 1</span>
+                  <span style="font-size:0.75rem;color:#166534;font-weight:700;">✓ Official Seal</span>
+                </div>
+                <h4 style="margin:0 0 0.5rem 0;font-size:1rem;font-weight:800;color:#0F172A;">Bonafide Student Certificate</h4>
+                <p style="margin:0 0 1rem 0;font-size:0.82rem;color:#64748B;line-height:1.4;">Official proof of student enrollment, branch, semester standing, and academic conduct certified by the Directorate for bank loan sanction.</p>
+              </div>
+              <div style="display:flex;gap:0.4rem;flex-direction:column;">
+                <button type="button" onclick="studentPortal.downloadLoanLetterPdf(1, ${latest.id})" style="width:100%;background:#006644;border:none;color:#ffffff;font-weight:700;padding:0.5rem;border-radius:6px;font-size:0.83rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;box-shadow:0 2px 4px rgba(0,102,68,0.2);">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  📥 Download Letter 1 PDF
+                </button>
+                <button type="button" onclick="studentPortal.openLoanLettersModal(${latest.id}, 1)" style="width:100%;background:#ffffff;border:1.2px solid #CBD5E1;color:#334155;font-weight:600;padding:0.45rem;border-radius:6px;font-size:0.82rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;">
+                  👁️ View / Print &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- Letter 2 -->
+            <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-radius:10px;padding:1.25rem;display:flex;flex-direction:column;justify-content:space-between;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                  <span style="background:#EFF6FF;color:#1D4ED8;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:4px;">LETTER 2</span>
+                  <span style="font-size:0.75rem;color:#166534;font-weight:700;">✓ Accounts Certified</span>
+                </div>
+                <h4 style="margin:0 0 0.5rem 0;font-size:1rem;font-weight:800;color:#0F172A;">Fee Estimate &amp; Expenditure Schedule</h4>
+                <p style="margin:0 0 1rem 0;font-size:0.82rem;color:#64748B;line-height:1.4;">Year-wise institutional breakdown of Tuition, Exam, Lab, and Hostel fees certified for bank disbursement schedule.</p>
+              </div>
+              <div style="display:flex;gap:0.4rem;flex-direction:column;">
+                <button type="button" onclick="studentPortal.downloadLoanLetterPdf(2, ${latest.id})" style="width:100%;background:#006644;border:none;color:#ffffff;font-weight:700;padding:0.5rem;border-radius:6px;font-size:0.83rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;box-shadow:0 2px 4px rgba(0,102,68,0.2);">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  📥 Download Letter 2 PDF
+                </button>
+                <button type="button" onclick="studentPortal.openLoanLettersModal(${latest.id}, 2)" style="width:100%;background:#ffffff;border:1.2px solid #CBD5E1;color:#334155;font-weight:600;padding:0.45rem;border-radius:6px;font-size:0.82rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;">
+                  👁️ View / Print &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- Letter 3 -->
+            <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-radius:10px;padding:1.25rem;display:flex;flex-direction:column;justify-content:space-between;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                  <span style="background:#EFF6FF;color:#1D4ED8;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:4px;">LETTER 3</span>
+                  <span style="font-size:0.75rem;color:#166534;font-weight:700;">✓ Bank A/C NOC</span>
+                </div>
+                <h4 style="margin:0 0 0.5rem 0;font-size:1rem;font-weight:800;color:#0F172A;">University NOC &amp; Bank Account Details</h4>
+                <p style="margin:0 0 1rem 0;font-size:0.82rem;color:#64748B;line-height:1.4;">Institutional NOC with Official Gen-Z University Bank Account (SBI) details and director undertaking for direct loan fund transfer.</p>
+              </div>
+              <div style="display:flex;gap:0.4rem;flex-direction:column;">
+                <button type="button" onclick="studentPortal.downloadLoanLetterPdf(3, ${latest.id})" style="width:100%;background:#006644;border:none;color:#ffffff;font-weight:700;padding:0.5rem;border-radius:6px;font-size:0.83rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;box-shadow:0 2px 4px rgba(0,102,68,0.2);">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  📥 Download Letter 3 PDF
+                </button>
+                <button type="button" onclick="studentPortal.openLoanLettersModal(${latest.id}, 3)" style="width:100%;background:#ffffff;border:1.2px solid #CBD5E1;color:#334155;font-weight:600;padding:0.45rem;border-radius:6px;font-size:0.82rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;">
+                  👁️ View / Print &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align:center;padding-top:0.5rem;">
+            <button type="button" onclick="studentPortal.toggleNewLoanForm()" style="background:transparent;border:none;color:#64748B;font-size:0.82rem;text-decoration:underline;cursor:pointer;">
+              Submit another loan application for different bank
+            </button>
+          </div>
+        </div>
+      `;
+      if (formCard) formCard.style.display = 'none';
+
+    } else if (latest.status === 'REJECTED') {
+      if (headerBadge) {
+        headerBadge.textContent = 'Application Not Sanctioned';
+        headerBadge.style.background = '#FEE2E2';
+        headerBadge.style.color = '#B91C1C';
+      }
+      statusCard.innerHTML = `
+        <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1.25rem 1.5rem;">
+          <h4 style="margin:0 0 0.4rem 0;font-size:1.05rem;font-weight:800;color:#991B1B;">Loan Application Not Sanctioned</h4>
+          <p style="margin:0 0 0.75rem 0;font-size:0.85rem;color:#7F1D1D;">Director Remarks: <em>${latest.director_remarks || 'Please contact the Directorate office for details.'}</em></p>
+          <button type="button" onclick="studentPortal.toggleNewLoanForm(true)" style="background:#DC2626;color:#fff;border:none;padding:0.45rem 1rem;border-radius:6px;font-weight:700;font-size:0.82rem;cursor:pointer;">
+            Re-apply for Loan Assistance &rarr;
+          </button>
+        </div>
+      `;
+      approvedLettersCard.style.display = 'none';
+      if (formCard) formCard.style.display = 'none';
+    }
+  },
+
+  toggleNewLoanForm(forceOpen = false) {
+    const formCard = document.getElementById('loanApplicationFormCard');
+    if (!formCard) return;
+    if (forceOpen || formCard.style.display === 'none') {
+      formCard.style.display = 'block';
+      formCard.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      formCard.style.display = 'none';
+    }
+  },
+
+  async openLoanLettersModal(requestId, letterNum = 'ALL') {
+    if (typeof ui !== 'undefined' && ui.showLoading) ui.showLoading('Preparing Letters...');
+    try {
+      const res = await api.get(`/student/loan-letters/${requestId}`);
+      if (typeof ui !== 'undefined' && ui.hideLoading) ui.hideLoading();
+      if (!res || !res.data) {
+        ui.showToast('Could not load loan letters data.', 'error');
+        return;
+      }
+      this.activeLoanLettersData = res.data;
+      this.currentLetterPreviewMode = letterNum;
+
+      this.updateLetterTabButtons(letterNum);
+
+      const container = document.getElementById('printableLoanLettersContainer');
+      if (container) {
+        container.innerHTML = this.renderLoanLettersHtml(this.activeLoanLettersData, letterNum);
+      }
+
+      ui.openModal('loanLettersModal');
+    } catch (err) {
+      if (typeof ui !== 'undefined' && ui.hideLoading) ui.hideLoading();
+      console.error('openLoanLettersModal error:', err);
+      ui.showToast('Failed to load official letters: ' + err.message, 'error');
+    }
+  },
+
+  closeLoanLettersModal() {
+    ui.closeModal('loanLettersModal');
+  },
+
+  switchLetterPreview(mode) {
+    this.currentLetterPreviewMode = mode;
+    this.updateLetterTabButtons(mode);
+    const container = document.getElementById('printableLoanLettersContainer');
+    if (container && this.activeLoanLettersData) {
+      container.innerHTML = this.renderLoanLettersHtml(this.activeLoanLettersData, mode);
+    }
+  },
+
+  updateLetterTabButtons(mode) {
+    const btnAll = document.getElementById('tabBtnAllLetters');
+    const btn1 = document.getElementById('tabBtnLetter1');
+    const btn2 = document.getElementById('tabBtnLetter2');
+    const btn3 = document.getElementById('tabBtnLetter3');
+
+    const reset = (btn) => {
+      if (!btn) return;
+      btn.style.background = '#fff';
+      btn.style.color = '#334155';
+      btn.style.border = '1px solid #CBD5E1';
+    };
+    const setActive = (btn) => {
+      if (!btn) return;
+      btn.style.background = '#0B63C5';
+      btn.style.color = '#fff';
+      btn.style.border = '1px solid #0B63C5';
+    };
+
+    reset(btnAll);
+    reset(btn1);
+    reset(btn2);
+    reset(btn3);
+
+    if (mode === 'ALL') setActive(btnAll);
+    else if (mode === 1) setActive(btn1);
+    else if (mode === 2) setActive(btn2);
+    else if (mode === 3) setActive(btn3);
+  },
+
+  downloadCurrentLetterPdf() {
+    this.downloadLoanLetterPdf(this.currentLetterPreviewMode || 'ALL');
+  },
+
+  async downloadLoanLetterPdf(mode = 'ALL', requestId = null) {
+    if (typeof ui !== 'undefined' && typeof ui.showLoading === 'function') {
+      ui.showLoading('Generating Official PDF...');
+    }
+
+    try {
+      if (!this.activeLoanLettersData && requestId) {
+        const res = await api.get(`/student/loan-letters/${requestId}`);
+        if (res && res.data) {
+          this.activeLoanLettersData = res.data;
+        }
+      }
+
+      if (!this.activeLoanLettersData && this.loanRequestsList && this.loanRequestsList.length > 0) {
+        const reqId = requestId || this.loanRequestsList[0].id;
+        const res = await api.get(`/student/loan-letters/${reqId}`);
+        if (res && res.data) {
+          this.activeLoanLettersData = res.data;
+        }
+      }
+
+      if (!this.activeLoanLettersData) {
+        throw new Error('Loan letter details not found');
+      }
+
+      const data = this.activeLoanLettersData;
+      const regNo = (data.student && data.student.reg_no) ? data.student.reg_no.replace(/[^a-zA-Z0-9_-]/g, '_') : 'Student';
+
+      // Prepare hidden rendering container
+      const sandbox = document.createElement('div');
+      sandbox.style.position = 'fixed';
+      sandbox.style.left = '-9999px';
+      sandbox.style.top = '0';
+      sandbox.style.width = '794px';
+      sandbox.style.background = '#FFFFFF';
+      sandbox.style.zIndex = '-9999';
+      sandbox.innerHTML = this.renderLoanLettersHtml(data, mode);
+      document.body.appendChild(sandbox);
+
+      await new Promise(r => setTimeout(r, 200));
+
+      const cards = sandbox.querySelectorAll('.printable-letter-card');
+      if (!cards || cards.length === 0) {
+        throw new Error('No letter cards found to render');
+      }
+
+      const hasHtml2Canvas = typeof html2canvas !== 'undefined';
+      const jsPdfClass = (typeof window.jspdf !== 'undefined' && window.jspdf.jsPDF) || (typeof window.jsPDF !== 'undefined' && window.jsPDF);
+
+      if (!hasHtml2Canvas || !jsPdfClass) {
+        if (document.body.contains(sandbox)) document.body.removeChild(sandbox);
+        if (typeof ui !== 'undefined' && typeof ui.hideLoading === 'function') ui.hideLoading();
+        if (typeof ui !== 'undefined' && typeof ui.showToast === 'function') {
+          ui.showToast('Opening print dialog. Choose "Save as PDF" to download.', 'info');
+        }
+        this.switchLetterPreview(mode);
+        ui.openModal('loanLettersModal');
+        window.print();
+        return;
+      }
+
+      const pdf = new jsPdfClass({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        card.style.margin = '0';
+        card.style.boxShadow = 'none';
+        card.style.borderRadius = '0';
+
+        const canvas = await html2canvas(card, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#FFFFFF',
+          width: 794,
+          windowWidth: 794
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+        if (i > 0) {
+          pdf.addPage();
+        }
+
+        const marginX = 8;
+        const targetWidth = pageWidth - (marginX * 2);
+        let targetHeight = (canvas.height * targetWidth) / canvas.width;
+        let marginY = 8;
+
+        const maxAvailableHeight = pageHeight - 16;
+        if (targetHeight > maxAvailableHeight) {
+          const scaleFactor = maxAvailableHeight / targetHeight;
+          targetHeight = maxAvailableHeight;
+          const adjustedWidth = targetWidth * scaleFactor;
+          const adjustedMarginX = (pageWidth - adjustedWidth) / 2;
+          pdf.addImage(imgData, 'JPEG', adjustedMarginX, marginY, adjustedWidth, targetHeight, undefined, 'FAST');
+        } else {
+          pdf.addImage(imgData, 'JPEG', marginX, marginY, targetWidth, targetHeight, undefined, 'FAST');
+        }
+      }
+
+      if (document.body.contains(sandbox)) {
+        document.body.removeChild(sandbox);
+      }
+
+      let fileName = `GENZ_3_Letter_Loan_Dossier_${regNo}.pdf`;
+      if (mode === 1) fileName = `GENZ_Bonafide_Certificate_${regNo}.pdf`;
+      else if (mode === 2) fileName = `GENZ_Fee_Estimate_${regNo}.pdf`;
+      else if (mode === 3) fileName = `GENZ_University_NOC_${regNo}.pdf`;
+
+      pdf.save(fileName);
+
+      if (typeof ui !== 'undefined' && typeof ui.hideLoading === 'function') ui.hideLoading();
+      if (typeof ui !== 'undefined' && typeof ui.showToast === 'function') {
+        ui.showToast(`✅ Downloaded: ${fileName}`, 'success');
+      }
+    } catch (err) {
+      if (typeof ui !== 'undefined' && typeof ui.hideLoading === 'function') ui.hideLoading();
+      console.error('downloadLoanLetterPdf error:', err);
+      if (typeof ui !== 'undefined' && typeof ui.showToast === 'function') {
+        ui.showToast('PDF download failed: ' + err.message, 'error');
+      }
+    }
+  },
+
+  printCurrentLetterView() {
+    window.print();
+  },
+
+  printAllLoanLetters() {
+    this.switchLetterPreview('ALL');
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  },
+
+  renderLoanLettersHtml(data, mode = 'ALL') {
+    if (!data) return '<div style="color:#fff;text-align:center;">No letter data available.</div>';
+
+    const u = data.university || {};
+    const s = data.student || {};
+    const l = data.loan || {};
+    const f = data.fee_structure || {};
+    const refNo = data.reference_no || 'GZU/DIR/LOAN/2026/0001';
+    const approvedDate = data.approved_at 
+      ? new Date(data.approved_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+      : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    const renderLetterhead = (docType) => `
+      <div style="border-bottom:2.5px solid #0B63C5;padding-bottom:12px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+        <img src="/assets/genz-logo.jpg" alt="University Crest" style="width:78px;height:78px;object-fit:contain;border-radius:8px;">
+        <div style="flex:1;text-align:center;">
+          <div style="font-family:'Times New Roman',Georgia,serif;font-size:22px;font-weight:900;color:#0F172A;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:2px;">
+            ${u.name || 'GEN-Z UNIVERSITY'}
+          </div>
+          <div style="font-size:10.5px;color:#475569;font-weight:600;margin-bottom:3px;">
+            ${u.sub_title || 'Approved by UGC & AICTE, New Delhi &bull; Autonomous Higher Education Institution'}
+          </div>
+          <div style="font-size:10px;color:#64748B;line-height:1.3;">
+            ${u.campus || 'Gen-Z Knowledge City, InfoValley-II, Bhubaneswar, Odisha - 752054'}<br>
+            Tel: ${u.phone || '+91-674-2970000'} &bull; Web: ${u.website || 'https://genz.edu.in'} &bull; Email: ${u.email || 'director@genz.edu.in'}
+          </div>
+          <div style="display:inline-block;margin-top:4px;background:#0F172A;color:#fff;font-size:9px;font-weight:800;padding:2px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:0.06em;">
+            OFFICE OF THE DIRECTORATE
+          </div>
+        </div>
+        <div style="width:78px;text-align:right;">
+          <div style="border:1.5px solid #CBD5E1;border-radius:4px;padding:4px;font-size:8px;color:#475569;text-align:center;line-height:1.2;">
+            <div style="font-weight:800;color:#0B63C5;">OFFICIAL</div>
+            <div>VERIFIED</div>
+            <div style="font-size:7px;color:#94A3B8;">A4 DOSSIER</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#334155;margin-bottom:18px;border-bottom:1px dashed #CBD5E1;padding-bottom:6px;">
+        <div>Ref. No.: <span style="color:#0B63C5;font-family:monospace;font-size:11.5px;">${refNo}</span></div>
+        <div>Date of Issue: <span>${approvedDate}</span></div>
+      </div>
+    `;
+
+    const renderSignatures = () => `
+      <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;padding-top:15px;border-top:1px solid #E2E8F0;">
+        <div style="text-align:center;">
+          <div style="width:100px;height:100px;border:2.5px solid #1D4ED8;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1D4ED8;font-size:8px;font-weight:900;text-transform:uppercase;line-height:1.2;margin:0 auto;box-shadow:inset 0 0 0 2px #DBEAFE;">
+            <div style="font-size:7.5px;">* DIRECTORATE *</div>
+            <div style="font-weight:900;font-size:8.5px;color:#0F172A;margin:2px 0;">GEN-Z</div>
+            <div style="font-size:7.5px;">UNIVERSITY</div>
+            <div style="font-size:6.5px;color:#1E40AF;">BHUBANESWAR</div>
+          </div>
+          <div style="font-size:9px;font-weight:700;color:#64748B;margin-top:4px;">Official Institutional Seal</div>
+        </div>
+
+        <div style="text-align:right;">
+          <div style="font-family:'Brush Script MT',cursive,'Caveat',cursive;font-size:24px;font-weight:700;color:#0B63C5;margin-bottom:2px;">
+            Dr. S. K. Mahapatra
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#0F172A;">Prof. (Dr.) S. K. Mahapatra, Ph.D. (IIT)</div>
+          <div style="font-size:10.5px;font-weight:700;color:#1D4ED8;">Director</div>
+          <div style="font-size:10px;color:#475569;">Gen-Z University, Bhubaneswar</div>
+        </div>
+      </div>
+    `;
+
+    const letter1Html = `
+      <div class="printable-letter-card print-page-break" style="background:#ffffff;color:#000000;font-family:'Times New Roman',Georgia,serif;padding:36px 42px;margin:0 auto 28px;max-width:780px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.18);box-sizing:border-box;">
+        ${renderLetterhead('BONAFIDE')}
+
+        <div style="text-align:center;margin:15px 0 22px;">
+          <div style="display:inline-block;font-size:15px;font-weight:900;text-transform:uppercase;color:#0F172A;border-bottom:2px solid #000;padding-bottom:3px;letter-spacing:0.04em;">
+            BONAFIDE STUDENT CERTIFICATE FOR EDUCATION LOAN
+          </div>
+          <div style="font-size:11px;font-style:italic;color:#475569;margin-top:3px;">
+            (Issued to facilitate processing of Bank Education Loan Scheme)
+          </div>
+        </div>
+
+        <div style="font-size:12.5px;line-height:1.75;text-align:justify;color:#0F172A;">
+          <p style="margin-bottom:14px;text-indent:2em;">
+            This is to certify that <strong>Mr. / Ms. ${s.name || 'STUDENT'}</strong>, Son/Daughter of <strong>Mr. ${s.father_name || 'Father'}</strong>, residing at ${s.address || 'Odisha, India'}, is a bonafide student of <strong>GEN-Z UNIVERSITY</strong>.
+          </p>
+
+          <p style="margin-bottom:14px;text-indent:2em;">
+            He/She is officially admitted and currently enrolled in the regular, full-time <strong>${s.course || 'Bachelor of Technology (B.Tech)'}</strong> degree programme in the branch of <strong>${s.branch || 'Computer Science & Engineering'}</strong> under University Registration Number <strong>${s.reg_no || '2026GENZ...'}</strong> (Roll No: <strong>${s.roll_no || s.reg_no}</strong>) for the Academic Session <strong>${s.session || '2026-27'}</strong>.
+          </p>
+
+          <p style="margin-bottom:14px;text-indent:2em;">
+            He/She is currently pursuing studies in <strong>${s.current_semester || '1st Semester'}</strong> of the total prescribed course duration of <strong>${s.duration_years || 4} Years</strong>. The student has maintained satisfactory academic records and excellent moral character throughout his/her tenure at this University.
+          </p>
+
+          <p style="margin-bottom:14px;text-indent:2em;">
+            This institutional certificate is being issued upon the specific requisition of the student and parent to enable them to avail an <strong>Education Loan</strong> from <strong>${l.bank_name || 'The Bank'}</strong>, ${l.bank_branch || ''} for academic purposes.
+          </p>
+
+          <p style="margin-bottom:14px;text-indent:2em;">
+            The Directorate of Gen-Z University has <strong>NO OBJECTION</strong> whatsoever to the student availing education loan assistance from the bank.
+          </p>
+        </div>
+
+        ${renderSignatures()}
+      </div>
+    `;
+
+    const breakdownRows = (f.yearlyBreakdown || []).map(row => `
+      <tr style="text-align:center;font-size:11px;">
+        <td style="border:1px solid #334155;padding:6px;font-weight:700;text-align:left;">${row.year_label}</td>
+        <td style="border:1px solid #334155;padding:6px;">₹${row.tuition.toLocaleString('en-IN')}</td>
+        <td style="border:1px solid #334155;padding:6px;">₹${row.development_lab.toLocaleString('en-IN')}</td>
+        <td style="border:1px solid #334155;padding:6px;">₹${row.exam_reg.toLocaleString('en-IN')}</td>
+        <td style="border:1px solid #334155;padding:6px;">₹${row.hostel_mess.toLocaleString('en-IN')}</td>
+        <td style="border:1px solid #334155;padding:6px;font-weight:800;background:#F8FAFC;">₹${row.total.toLocaleString('en-IN')}</td>
+      </tr>
+    `).join('');
+
+    const letter2Html = `
+      <div class="printable-letter-card print-page-break" style="background:#ffffff;color:#000000;font-family:'Times New Roman',Georgia,serif;padding:36px 42px;margin:0 auto 28px;max-width:780px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.18);box-sizing:border-box;">
+        ${renderLetterhead('FEE_STRUCTURE')}
+
+        <div style="text-align:center;margin:15px 0 20px;">
+          <div style="display:inline-block;font-size:15px;font-weight:900;text-transform:uppercase;color:#0F172A;border-bottom:2px solid #000;padding-bottom:3px;letter-spacing:0.04em;">
+            INSTITUTIONAL FEE STRUCTURE &amp; EXPENDITURE ESTIMATE
+          </div>
+          <div style="font-size:11px;font-style:italic;color:#475569;margin-top:3px;">
+            (Official Academic Cost Estimate for Education Loan Sanction by ${l.bank_name || 'Bank'})
+          </div>
+        </div>
+
+        <div style="font-size:12px;line-height:1.65;margin-bottom:14px;">
+          Certified that <strong>Mr. / Ms. ${s.name || 'STUDENT'}</strong> (Reg. No: <strong>${s.reg_no}</strong>), admitted to <strong>${s.course} - ${s.branch}</strong>, is required to pay the following standard institutional academic fees during the entire duration of the course (${s.duration_years} Years) as per the approved fee schedule of Gen-Z University:
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;border:1.5px solid #000;margin-bottom:16px;">
+          <thead>
+            <tr style="background:#F1F5F9;font-size:10.5px;font-weight:800;text-transform:uppercase;">
+              <th style="border:1px solid #334155;padding:7px;text-align:left;">Academic Term</th>
+              <th style="border:1px solid #334155;padding:7px;">Tuition Fee</th>
+              <th style="border:1px solid #334155;padding:7px;">Dev &amp; Lab</th>
+              <th style="border:1px solid #334155;padding:7px;">Exam &amp; Reg</th>
+              <th style="border:1px solid #334155;padding:7px;">Hostel/Mess</th>
+              <th style="border:1px solid #334155;padding:7px;background:#E2E8F0;">Annual Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${breakdownRows}
+            <tr style="font-size:11.5px;font-weight:900;background:#E2E8F0;border-top:2px solid #000;">
+              <td colspan="5" style="border:1px solid #000;padding:8px 10px;text-align:right;">TOTAL INSTITUTIONAL EXPENDITURE ESTIMATE:</td>
+              <td style="border:1px solid #000;padding:8px;text-align:center;color:#0B63C5;font-size:12px;">₹${(f.grandTotal || 0).toLocaleString('en-IN')}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-radius:6px;padding:10px 14px;font-size:11.5px;margin-bottom:14px;line-height:1.6;">
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding-bottom:3px;margin-bottom:3px;">
+            <span>1. Total Estimated Academic Expenditure (Full Course):</span>
+            <strong>₹${(f.grandTotal || 0).toLocaleString('en-IN')}</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding-bottom:3px;margin-bottom:3px;">
+            <span>2. Fee Already Deposited by Student:</span>
+            <strong>₹${(f.totalPaid || 0).toLocaleString('en-IN')}</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;color:#0B63C5;font-weight:800;font-size:12px;">
+            <span>3. Net Balance Required to be Financed via Education Loan:</span>
+            <span>₹${(f.requestedLoanAmount || (f.grandTotal - f.totalPaid) || 0).toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+
+        <div style="font-size:10.5px;color:#475569;font-style:italic;line-height:1.4;">
+          Note: The fee structure is statutory and fixed as per University Academic Council guidelines. Fee receipts will be issued by the University Accounts Section upon each bank disbursement installment.
+        </div>
+
+        ${renderSignatures()}
+      </div>
+    `;
+
+    const b = u.bank_details || {};
+    const letter3Html = `
+      <div class="printable-letter-card" style="background:#ffffff;color:#000000;font-family:'Times New Roman',Georgia,serif;padding:36px 42px;margin:0 auto;max-width:780px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.18);box-sizing:border-box;">
+        ${renderLetterhead('NOC_UNDERTAKING')}
+
+        <div style="text-align:center;margin:15px 0 20px;">
+          <div style="display:inline-block;font-size:14.5px;font-weight:900;text-transform:uppercase;color:#0F172A;border-bottom:2px solid #000;padding-bottom:3px;letter-spacing:0.04em;">
+            NO OBJECTION CERTIFICATE &amp; DIRECT DISBURSEMENT UNDERTAKING
+          </div>
+        </div>
+
+        <div style="font-size:12px;line-height:1.5;margin-bottom:14px;color:#0F172A;">
+          To,<br>
+          <strong>The Branch Manager</strong>,<br>
+          ${l.bank_name || 'Bank'},<br>
+          ${l.bank_branch || 'Branch'}.
+        </div>
+
+        <div style="font-size:12px;font-weight:800;margin-bottom:14px;background:#F1F5F9;padding:6px 10px;border-left:3px solid #0B63C5;">
+          Sub: University Undertaking &amp; Bank Account Particulars for Education Loan in respect of ${s.name} (Reg. No: ${s.reg_no})
+        </div>
+
+        <div style="font-size:12px;line-height:1.7;text-align:justify;color:#0F172A;">
+          <p style="margin-bottom:10px;">Dear Sir / Madam,</p>
+          <p style="margin-bottom:10px;text-indent:1.5em;">
+            With reference to the Education Loan application submitted by our student <strong>Mr. / Ms. ${s.name}</strong> along with co-applicant <strong>${l.co_applicant_name || s.father_name} (${l.co_applicant_relation || 'Parent'})</strong>, the University hereby submits the following formal confirmations and undertaking:
+          </p>
+
+          <ol style="margin-left:18px;margin-bottom:14px;padding-left:6px;">
+            <li style="margin-bottom:6px;"><strong>Institutional Recognition:</strong> Gen-Z University is an established university recognized under statutory authority and approved by UGC / AICTE, New Delhi.</li>
+            <li style="margin-bottom:6px;"><strong>No Objection:</strong> The University Directorate has <strong>NO OBJECTION</strong> to your bank sanctioning an Education Loan facility of <strong>₹${(l.loan_amount || 0).toLocaleString('en-IN')}</strong> to the aforementioned student.</li>
+            <li style="margin-bottom:6px;"><strong>Direct Fund Credit:</strong> You are requested to release and disburse the sanctioned education loan installments directly in favor of the University official institutional bank account as specified below:</li>
+          </ol>
+        </div>
+
+        <div style="background:#F0FDF4;border:1.5px solid #16A34A;border-radius:6px;padding:12px 18px;margin:14px 0;font-size:12px;line-height:1.65;">
+          <div style="font-weight:900;color:#166534;margin-bottom:6px;text-transform:uppercase;font-size:11.5px;letter-spacing:0.04em;">
+            Official University Bank Account Particulars for Electronic Transfer:
+          </div>
+          <table style="width:100%;font-size:11.5px;color:#0F172A;">
+            <tr>
+              <td style="width:190px;font-weight:700;">Beneficiary Name:</td>
+              <td style="font-weight:800;color:#0B63C5;">${b.beneficiary_name || 'GEN-Z UNIVERSITY ACCOUNTS'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Bank Name:</td>
+              <td><strong>${b.bank_name || 'State Bank of India (SBI)'}</strong></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Branch Name:</td>
+              <td>${b.branch || 'Capital Commercial Branch, Bhubaneswar'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Account Number:</td>
+              <td style="font-family:monospace;font-size:13px;font-weight:900;color:#000;">${b.account_number || '398200140029'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Account Type:</td>
+              <td>${b.account_type || 'Current Account'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">IFSC Code:</td>
+              <td style="font-family:monospace;font-size:12.5px;font-weight:800;color:#166534;">${b.ifsc_code || 'SBIN0001234'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">MICR Code:</td>
+              <td>${b.micr_code || '751002018'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="font-size:11.5px;line-height:1.6;text-align:justify;color:#0F172A;margin-top:10px;">
+          <p style="margin-bottom:8px;">
+            <strong>Refund Undertaking:</strong> In case the student discontinues his/her studies prior to course completion, any refundable fee balance as per UGC/institutional regulations will be remitted directly to <strong>${l.bank_name}</strong> to be credited against the student's loan account.
+          </p>
+        </div>
+
+        ${renderSignatures()}
+      </div>
+    `;
+
+    if (mode === 1) return letter1Html;
+    if (mode === 2) return letter2Html;
+    if (mode === 3) return letter3Html;
+
+    return `
+      ${letter1Html}
+      ${letter2Html}
+      ${letter3Html}
+    `;
   },
 
   /* =========================================================================
@@ -529,7 +1360,7 @@ const studentPortal = {
       const feeElements = [
         { name: 'Tuition Fee (Annual Academic Instruction)', amount: 85000, key: 'Tuition Fee' },
         { name: 'Institutional Development Fee', amount: 15000, key: 'Development Fee' },
-        { name: 'BPUT University Examination Fee', amount: 5000, key: 'Exam Fee' },
+        { name: 'Gen-Z University Examination Fee', amount: 5000, key: 'Exam Fee' },
         { name: 'Advanced Engineering Computing &amp; Laboratory Fee', amount: 5000, key: 'Lab Fee' },
         { name: 'Registration &amp; Student Amenities Fee', amount: 5000, key: 'Registration Fee' }
       ].map(item => {
@@ -891,7 +1722,7 @@ const studentPortal = {
       modalBody.innerHTML = `
         <div class="bec-gateway-processing">
           <div class="bec-gateway-spinner"></div>
-          <div class="bec-gateway-step">Authorizing Payment with BEC Secure Gateway...</div>
+          <div class="bec-gateway-step">Authorizing Payment with GENZ Secure Gateway...</div>
           <div class="bec-gateway-substep" id="becProcessingSubstep">Connecting to banking node &amp; verifying digital tokens...</div>
           <div style="margin-top: 1.5rem; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #475569; display: inline-block;">
             Payment Amount: <strong style="color: #0B63C5;">${ui.formatCurrency(payAmount)}</strong>
@@ -1040,7 +1871,7 @@ const studentPortal = {
         <div class="bec-gateway-bar">
           <div>
             <span style="font-weight: 600; color: #64748B;">Order Ref:</span>
-            <strong style="color: #1E293B; margin-left: 0.25rem;">BEC-PG-${Date.now().toString().slice(-6)}</strong>
+            <strong style="color: #1E293B; margin-left: 0.25rem;">GENZ-PG-${Date.now().toString().slice(-6)}</strong>
           </div>
           <div>
             <span style="color: #64748B;">Session Time:</span>
@@ -1255,13 +2086,13 @@ const studentPortal = {
           key: ord.key,
           amount: Math.round(amount * 100),
           currency: ord.currency || 'INR',
-          name: 'Bhubaneswar Engineering College',
+          name: 'Gen-Z University',
           description: `${desc || 'College Fee Payment'} (${ord.invoiceNo || 'Fee'})`,
           image: '/assets/logo.svg',
           order_id: ord.orderId,
           prefill: {
             name: s.full_name || '',
-            email: s.email || 'accounts@bec.ac.in',
+            email: s.email || 'accounts@genz.edu.in',
             contact: s.contact_number || s.phone || '9876543210'
           },
           notes: {
@@ -1389,7 +2220,7 @@ const studentPortal = {
         amount: amount,
         discount_amount: 0,
         payment_method: paymentMethodLabel,
-        remarks: 'Digital BEC Gateway Settlement'
+        remarks: 'Digital GENZ Gateway Settlement'
       };
 
       this.receiptsList.unshift(newReceipt);
@@ -1528,7 +2359,7 @@ const studentPortal = {
       <div class="bec-official-receipt-frame" id="becPrintableReceipt">
         <div class="receipt-inner-border">
           <!-- College Heading -->
-          <div class="receipt-college-title">BHUBANESWAR ENGINEERING COLLEGE</div>
+          <div class="receipt-college-title">GEN-Z UNIVERSITY</div>
 
           <!-- Title Badge & Metadata Row -->
           <div class="receipt-title-row">
@@ -1887,7 +2718,7 @@ const studentPortal = {
       <html>
       <head>
         <meta charset="utf-8">
-        <title>BEC Fee Receipt #${receiptNo}</title>
+        <title>GENZ Fee Receipt #${receiptNo}</title>
         <link rel="stylesheet" href="/css/print.css">
         <style>
           body { margin: 0; padding: 20px; background: #fff; }
@@ -1979,7 +2810,7 @@ const studentPortal = {
       { name: '10th Marksheet & Certificate', url: s.marksheet_10th_url, authority: 'BSE Odisha / CBSE' },
       { name: '12th / Diploma Certificate', url: s.certificate_12th_url, authority: 'CHSE Odisha / SCTE&VT' },
       { name: 'JEE Main / OJEE Allotment Rank Card', url: s.rank_card_url, authority: 'Central Counselling Board' },
-      { name: 'College Admission Allotment Letter', url: s.allotment_letter_url, authority: 'Bhubaneswar Engineering College' },
+      { name: 'College Admission Allotment Letter', url: s.allotment_letter_url, authority: 'Gen-Z University' },
       { name: 'Aadhaar Card Document Copy', url: s.aadhaar_doc_url, authority: `UIDAI: ${s.aadhaar_no || 'Verified'}` },
       { name: 'College Leaving Certificate (CLC) / TC', url: s.tc_clc_url, authority: 'Original Institutional Transfer' },
       { name: 'Conduct Certificate', url: s.conduct_url, authority: 'Issued by School / College' },
@@ -2129,10 +2960,10 @@ const studentPortal = {
   },
 
   /* =========================================================================
-   * SUBJECT REGISTRATION MODULE (BPUT Workflow: Student -> HOD -> Director -> Accounts)
+   * SUBJECT REGISTRATION MODULE (Gen-Z Workflow: Student -> HOD -> Director -> Accounts)
    * ========================================================================= */
   /* =========================================================================
-   * SUBJECT REGISTRATION MODULE (BPUT Workflow: Student -> HOD -> Director -> Accounts)
+   * SUBJECT REGISTRATION MODULE (Gen-Z Workflow: Student -> HOD -> Director -> Accounts)
    * Continuous Multi-Semester Lifecycle with Visual Approval Roadmap Tracker
    * ========================================================================= */
   srSubjectsData: null,
@@ -2252,7 +3083,7 @@ const studentPortal = {
                 <div style="background:#16A34A;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;">✓</div>
                 <div>
                   <div style="font-weight:700;color:#166534;font-size:1.05rem;">1st Semester Registration Completed at Admission</div>
-                  <div style="color:#15803D;font-size:0.85rem;">Official BPUT enrollment, subject assignment, and university admission onboarding were automatically completed during admission counseling.</div>
+                  <div style="color:#15803D;font-size:0.85rem;">Official Gen-Z enrollment, subject assignment, and university admission onboarding were automatically completed during admission counseling.</div>
                 </div>
               </div>
               <button onclick="studentPortal.switchSrSemester(2)" style="background:#0B63C5;color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:6px;font-weight:700;font-size:0.85rem;cursor:pointer;">
@@ -2327,7 +3158,7 @@ const studentPortal = {
         `;
       }
 
-      // 6. Existing Registration & BPUT Approval Roadmap Tracker
+      // 6. Existing Registration & Gen-Z Approval Roadmap Tracker
       if (existingRegistration) {
         existingCard.style.display = 'block';
         const st = existingRegistration.status;
@@ -2350,7 +3181,7 @@ const studentPortal = {
         if (st === 'SUBMITTED') {
           stage2Class = 'active';
           stage2Badge = '<span class="sr-step-badge" style="background:#FEF3C7;color:#D97706;">Awaiting HOD Review</span>';
-          stage2Note = 'Verification of enrolled subjects & BPUT credit threshold in progress.';
+          stage2Note = 'Verification of enrolled subjects & Gen-Z credit threshold in progress.';
         } else if (['HOD_FORWARDED', 'DIRECTOR_APPROVED', 'CONFIRMED'].includes(st)) {
           stage2Class = 'completed';
           stage2Icon = '✓';
@@ -2395,10 +3226,10 @@ const studentPortal = {
           stage4Class = 'active';
           stage4Badge = '<span class="sr-step-badge" style="background:#FEF3C7;color:#D97706;">Action: Pay ₹1,550</span>';
           stage4Note = `
-            Academic sanction cleared. Pay BPUT exam fee to submit to Exam Section.<br>
+            Academic sanction cleared. Pay Gen-Z exam fee to submit to Exam Section.<br>
             <button type="button" onclick="studentPortal.payExamFee(${existingRegistration.id}, 1550)" style="margin-top:0.45rem;background:#0B63C5;color:#fff;border:none;padding:0.4rem 0.85rem;border-radius:6px;font-weight:700;font-size:0.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.35rem;box-shadow:0 2px 6px rgba(11,99,197,0.25);">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              Pay BPUT Exam Fee (₹1,550) Online →
+              Pay Gen-Z Exam Fee (₹1,550) Online →
             </button>
           `;
         } else if (['EXAM_FEE_PAID', 'CONFIRMED'].includes(st)) {
@@ -2417,7 +3248,7 @@ const studentPortal = {
         if (st === 'EXAM_FEE_PAID') {
           stage5Class = 'active';
           stage5Badge = '<span class="sr-step-badge" style="background:#DBEAFE;color:#1D4ED8;">In Verification</span>';
-          stage5Note = 'College Examination Section verifying fee & BPUT university registration.';
+          stage5Note = 'College Examination Section verifying fee & Gen-Z university registration.';
         } else if (st === 'CONFIRMED') {
           stage5Class = 'completed';
           stage5Icon = '✓';
@@ -2447,7 +3278,7 @@ const studentPortal = {
                 ${st === 'CONFIRMED' ? `
                   <button onclick="studentPortal.printRegistrationSlip(${existingRegistration.id})" style="background:#006644;color:#fff;border:none;padding:0.4rem 0.85rem;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;box-shadow:0 2px 6px rgba(0,102,68,0.25);">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                    Print BPUT Slip
+                    Print Gen-Z Slip
                   </button>
                 ` : ''}
               </div>
@@ -2499,7 +3330,7 @@ const studentPortal = {
                 <div class="sr-step-header">
                   <div class="sr-step-icon ${stage4Class}">${stage4Icon}</div>
                   <div>
-                    <div class="sr-step-title">4. BPUT Exam Fee</div>
+                    <div class="sr-step-title">4. Gen-Z Exam Fee</div>
                     ${stage4Badge}
                   </div>
                 </div>
@@ -2530,7 +3361,7 @@ const studentPortal = {
               <div style="margin-top:1.25rem;padding:1rem;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
                 <div>
                   <div style="font-weight:700;color:#166534;font-size:0.92rem;">🎉 Semester ${existingRegistration.semester} Registration Completed &amp; Locked!</div>
-                  <div style="font-size:0.8rem;color:#15803D;">All BPUT academic approvals, ₹1,550 fee clearance, and Exam Section verification confirmed. Ready for next semester cycle.</div>
+                  <div style="font-size:0.8rem;color:#15803D;">All Gen-Z academic approvals, ₹1,550 fee clearance, and Exam Section verification confirmed. Ready for next semester cycle.</div>
                 </div>
                 <button type="button" onclick="studentPortal.switchSrSemester(${existingRegistration.semester + 1})" style="background:#0B63C5;color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:6px;font-weight:700;font-size:0.85rem;cursor:pointer;box-shadow:0 2px 6px rgba(11,99,197,0.25);">
                   Register for Next Semester (Sem ${existingRegistration.semester + 1}) →
@@ -2907,10 +3738,10 @@ const studentPortal = {
           <!-- Top Header -->
           <div style="text-align:center;border-bottom:2px solid #0B63C5;padding-bottom:1rem;margin-bottom:1.25rem;">
             <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:0.35rem;">
-              <img src="/assets/logo.svg" alt="BEC Crest" style="height:38px;">
-              <h2 style="margin:0;color:#0B63C5;font-size:1.45rem;font-weight:800;letter-spacing:0.5px;">BHUBANESWAR ENGINEERING COLLEGE</h2>
+              <img src="/assets/logo.svg" alt="Gen-Z University Crest" style="height:38px;">
+              <h2 style="margin:0;color:#0B63C5;font-size:1.45rem;font-weight:800;letter-spacing:0.5px;">GEN-Z UNIVERSITY</h2>
             </div>
-            <div style="font-size:0.85rem;color:#475569;">Affiliated to Biju Patnaik University of Technology (BPUT), Odisha</div>
+            <div style="font-size:0.85rem;color:#475569;">Affiliated to Gen-Z University (Autonomous), Odisha</div>
             <div style="display:inline-block;background:#0B63C5;color:#fff;font-weight:700;font-size:0.88rem;padding:0.35rem 1.4rem;border-radius:20px;margin-top:0.75rem;letter-spacing:0.5px;">
               OFFICIAL SUBJECT REGISTRATION CARD (${reg.academic_year})
             </div>
@@ -2930,7 +3761,7 @@ const studentPortal = {
             <div><strong>Department:</strong> ${escapeHtml(reg.department_name || s.branch_name || 'Computer Science & Engineering')}</div>
             <div><strong>Semester:</strong> Semester ${reg.semester}</div>
             <div><strong>Registration Type:</strong> ${escapeHtml(reg.registration_type)}</div>
-            <div><strong>Total Registered Credits:</strong> <span style="color:#0B63C5;font-weight:800;">${reg.total_credits} Credits</span> (BPUT Standard: 20-28)</div>
+            <div><strong>Total Registered Credits:</strong> <span style="color:#0B63C5;font-weight:800;">${reg.total_credits} Credits</span> (Gen-Z Standard: 20-28)</div>
             <div><strong>Fee Clearance:</strong> <span style="color:#16A34A;font-weight:700;">✓ 100% Institution Verified</span></div>
           </div>
 
@@ -2975,12 +3806,12 @@ const studentPortal = {
               <div style="font-weight:800;color:#16A34A;letter-spacing:0.5px;">✓ RECEIVED &amp; CONFIRMED</div>
               <div style="font-weight:700;margin-top:0.25rem;color:#0F172A;">Exam Section Clearance</div>
               <div style="color:#64748B;font-size:0.75rem;">${reg.exam_section_name || reg.accounts_name || 'Dr. Ramesh Chandra Sahoo'}</div>
-              <div style="color:#15803D;font-weight:600;font-size:0.7rem;margin-top:2px;">BPUT Exam Fee: ₹${(reg.exam_fee_amount || 1550).toLocaleString('en-IN')} (PAID)</div>
+              <div style="color:#15803D;font-weight:600;font-size:0.7rem;margin-top:2px;">Gen-Z Exam Fee: ₹${(reg.exam_fee_amount || 1550).toLocaleString('en-IN')} (PAID)</div>
             </div>
           </div>
 
           <div style="margin-top:1.5rem;text-align:center;font-size:0.72rem;color:#64748B;border-top:1px solid #E2E8F0;padding-top:0.75rem;">
-            This is a computer-generated authentic registration document issued under BPUT regulations. Certified by BEC Examination Cell.
+            This is a computer-generated authentic registration document issued under Gen-Z regulations. Certified by GENZ Examination Cell.
           </div>
         </div>
       `;
@@ -3046,8 +3877,8 @@ const studentPortal = {
           <!-- Header -->
           <div style="border-bottom:2px solid #0B63C5;padding-bottom:0.85rem;margin-bottom:1.15rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
             <div>
-              <h2 style="margin:0;color:#0B63C5;font-size:1.25rem;font-weight:800;">BHUBANESWAR ENGINEERING COLLEGE</h2>
-              <div style="font-size:0.78rem;color:#475569;">Affiliated to Biju Patnaik University of Technology (BPUT), Odisha</div>
+              <h2 style="margin:0;color:#0B63C5;font-size:1.25rem;font-weight:800;">GEN-Z UNIVERSITY</h2>
+              <div style="font-size:0.78rem;color:#475569;">Affiliated to Gen-Z University (Autonomous), Odisha</div>
               <div style="font-size:0.85rem;font-weight:700;color:#16A34A;margin-top:2px;">SEMESTER REGISTRATION DOSSIER &amp; CLEARANCE STATUS</div>
             </div>
             <div style="text-align:right;">
@@ -3107,7 +3938,7 @@ const studentPortal = {
                 <tr style="background:#F8FAFC;font-weight:800;border-top:2px solid #0B63C5;color:#0F172A;">
                   <td colspan="4" style="padding:7px 12px;text-align:right;">TOTAL REGISTERED CREDITS:</td>
                   <td style="padding:7px 10px;text-align:center;color:#0B63C5;font-size:0.95rem;">${reg.total_credits}</td>
-                  <td style="padding:7px 10px;text-align:center;font-size:0.75rem;color:#64748B;">BPUT Certified</td>
+                  <td style="padding:7px 10px;text-align:center;font-size:0.75rem;color:#64748B;">Gen-Z Certified</td>
                 </tr>
               </tfoot>
             </table>
@@ -3146,7 +3977,7 @@ const studentPortal = {
 
               <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:8px;padding:0.95rem;border-left:4px solid #16A34A;">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <div style="font-size:0.72rem;text-transform:uppercase;color:#64748B;font-weight:700;">BPUT Exam Fee</div>
+                  <div style="font-size:0.72rem;text-transform:uppercase;color:#64748B;font-weight:700;">Gen-Z Exam Fee</div>
                   ${isExamPaid 
                     ? '<span style="background:#DCFCE7;color:#15803D;font-weight:800;font-size:0.72rem;padding:2px 6px;border-radius:4px;border:1px solid #86EFAC;">✓ PAID</span>' 
                     : '<span style="background:#FEF2F2;color:#DC2626;font-weight:800;font-size:0.72rem;padding:2px 6px;border-radius:4px;border:1px solid #FECACA;">PENDING</span>'
@@ -3179,7 +4010,7 @@ const studentPortal = {
                   <div style="font-size:0.75rem;color:#166534;font-weight:600;margin-top:2px;">College Fees + University Exam Fees</div>
                 </div>
                 <div style="margin-top:0.75rem;border-top:1px dashed #86EFAC;padding-top:0.4rem;font-size:0.78rem;text-align:center;color:#15803D;font-weight:700;">
-                  ✓ Verified by BEC Accounts &amp; Cashier
+                  ✓ Verified by Gen-Z University Accounts &amp; Cashier
                 </div>
               </div>
             </div>
@@ -3212,7 +4043,7 @@ const studentPortal = {
               <!-- 3. Director -->
               <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:6px;padding:0.75rem;border-top:3px solid ${trail.director && trail.director.status === 'APPROVED' ? '#16A34A' : '#F59E0B'};">
                 <div style="font-size:0.7rem;font-weight:800;color:${trail.director && trail.director.status === 'APPROVED' ? '#16A34A' : '#D97706'};text-transform:uppercase;">3. Directorate</div>
-                <div style="font-weight:700;color:#0F172A;font-size:0.8rem;margin-top:2px;">${escapeHtml((trail.director && trail.director.officer) || reg.director_name || 'Director BEC')}</div>
+                <div style="font-weight:700;color:#0F172A;font-size:0.8rem;margin-top:2px;">${escapeHtml((trail.director && trail.director.officer) || reg.director_name || 'Director GENZ')}</div>
                 <div style="font-size:0.72rem;color:#64748B;margin-top:3px;">${trail.director && trail.director.date ? new Date(trail.director.date).toLocaleDateString('en-IN') : 'Cleared'}</div>
                 <div style="font-size:0.7rem;color:${trail.director && trail.director.status === 'APPROVED' ? '#16A34A' : '#D97706'};font-weight:600;margin-top:4px;">
                   ${trail.director && trail.director.status === 'APPROVED' ? '✓ Director Approved' : 'Pending Approval'}
@@ -3229,11 +4060,11 @@ const studentPortal = {
 
               <!-- 5. Exam Cell -->
               <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:6px;padding:0.75rem;border-top:3px solid ${reg.status === 'CONFIRMED' ? '#16A34A' : '#3B82F6'};">
-                <div style="font-size:0.7rem;font-weight:800;color:${reg.status === 'CONFIRMED' ? '#16A34A' : '#2563EB'};text-transform:uppercase;">5. BPUT Exam Cell</div>
+                <div style="font-size:0.7rem;font-weight:800;color:${reg.status === 'CONFIRMED' ? '#16A34A' : '#2563EB'};text-transform:uppercase;">5. Gen-Z Exam Cell</div>
                 <div style="font-weight:700;color:#0F172A;font-size:0.8rem;margin-top:2px;">Controller of Exams</div>
                 <div style="font-size:0.72rem;color:#64748B;margin-top:3px;">${reg.status === 'CONFIRMED' ? 'Confirmed &amp; Dispatched' : 'Desk Processing'}</div>
                 <div style="font-size:0.7rem;color:${reg.status === 'CONFIRMED' ? '#16A34A' : '#2563EB'}; font-weight:600; margin-top:4px;">
-                  ${reg.status === 'CONFIRMED' ? '✓ BPUT Confirmed' : 'Ready to Confirm'}
+                  ${reg.status === 'CONFIRMED' ? '✓ Gen-Z Confirmed' : 'Ready to Confirm'}
                 </div>
               </div>
             </div>
@@ -3247,7 +4078,7 @@ const studentPortal = {
             </button>
             ${!isExamPaid && ['DIRECTOR_APPROVED', 'HOD_FORWARDED'].includes(reg.status) ? `
               <button class="btn" onclick="ui.closeModal('receiptModal'); studentPortal.openExamFeeGateway(${reg.id}, ${examFeeAmount})" style="background:#16A34A;color:#fff;font-weight:700;">
-                💳 Pay BPUT Exam Fee (₹${examFeeAmount})
+                💳 Pay Gen-Z Exam Fee (₹${examFeeAmount})
               </button>
             ` : ''}
           </div>
@@ -3261,7 +4092,7 @@ const studentPortal = {
     }
   },
 
-  /* ── Interactive Online Payment Gateway (Razorpay/BEC Gateway) ── */
+  /* ── Interactive Online Payment Gateway (Razorpay/GENZ Gateway) ── */
   activeGatewayMethod: 'UPI',
   activeGatewayRegId: null,
   activeGatewayAmount: 1550,
@@ -3282,7 +4113,7 @@ const studentPortal = {
     if (!modal || !modalBody) return;
 
     if (modalTitle) {
-      modalTitle.textContent = 'BEC Secure Payment Gateway (256-Bit SSL)';
+      modalTitle.textContent = 'GENZ Secure Payment Gateway (256-Bit SSL)';
     }
 
     modalBody.innerHTML = `
@@ -3297,7 +4128,7 @@ const studentPortal = {
         
         <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed #CBD5E1; display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="font-size:0.85rem; font-weight:700; color:#0F172A;">BPUT Semester Registration &amp; Exam Fee</div>
+            <div style="font-size:0.85rem; font-weight:700; color:#0F172A;">Gen-Z Semester Registration &amp; Exam Fee</div>
             <div style="font-size:0.75rem; color:#64748B;">Application: ${escapeHtml(reg.reference_number || 'REG-' + regId)}</div>
           </div>
           <div style="text-align:right;">
@@ -3502,17 +4333,17 @@ const studentPortal = {
             key: ord.key,
             amount: ord.amountPaise || (amount * 100),
             currency: ord.currency || 'INR',
-            name: 'Bhubaneswar Engineering College',
-            description: `BPUT Semester Exam Fee (${ord.studentRegNo || 'Exam Registration'})`,
+            name: 'Gen-Z University',
+            description: `Gen-Z Semester Exam Fee (${ord.studentRegNo || 'Exam Registration'})`,
             order_id: ord.orderId,
             prefill: {
               name: ord.studentName || this.currentStudent?.full_name || '',
-              email: ord.studentEmail || 'student@bec.ac.in',
+              email: ord.studentEmail || 'student@genz.edu.in',
               contact: '9876543210'
             },
             notes: {
               registrationId: String(regId),
-              college: 'BEC Bhubaneswar'
+              college: 'GENZ Bhubaneswar'
             },
             method: {
               upi: true,
@@ -3618,7 +4449,7 @@ const studentPortal = {
           ✓
         </div>
         <div style="font-size:1.35rem; font-weight:800; color:#15803D; margin-bottom:0.25rem;">Payment Successful!</div>
-        <div style="font-size:0.88rem; color:#475569; margin-bottom:1.5rem;">₹${amount.toLocaleString('en-IN')} paid successfully for BPUT Semester Registration</div>
+        <div style="font-size:0.88rem; color:#475569; margin-bottom:1.5rem;">₹${amount.toLocaleString('en-IN')} paid successfully for Gen-Z Semester Registration</div>
 
         <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:1rem; text-align:left; font-size:0.85rem; margin-bottom:1.5rem;">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">

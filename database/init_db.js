@@ -1,6 +1,6 @@
 /**
  * Database Initialization and Seed Automation Runner
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * GEN-Z UNIVERSITY (GZU) Accounts System
  */
 
 const fs = require('fs');
@@ -11,14 +11,14 @@ const { parseReportingExcel } = require('./import_students');
 
 async function initializeDatabase() {
   console.log('================================================================');
-  console.log('BHUBANESWAR ENGINEERING COLLEGE - DATABASE PROVISIONER & SEEDER');
+  console.log('Gen-Z University - DATABASE PROVISIONER & SEEDER');
   console.log('================================================================\n');
 
   const host = process.env.DB_HOST || '127.0.0.1';
   const port = parseInt(process.env.DB_PORT, 10) || 3306;
   const user = process.env.DB_USER || 'root';
   const password = process.env.DB_PASSWORD || '';
-  const database = process.env.DB_NAME || 'bec_accounts_db';
+  const database = process.env.DB_NAME || 'genz_accounts_db';
 
   console.log(`[1/5] Connecting to MySQL server at ${host}:${port}...`);
   let rootConnection;

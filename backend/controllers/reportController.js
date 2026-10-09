@@ -1,6 +1,6 @@
 /**
  * Financial Reports & Analytics Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');
@@ -132,7 +132,7 @@ async function exportCsv(req, res) {
 
   try {
     let csvData = '';
-    let filename = `bec_report_${type}_${Date.now()}.csv`;
+    let filename = `genz_report_${type}_${Date.now()}.csv`;
 
     if (type === 'collections') {
       const [rows] = await query(`

@@ -1,5 +1,5 @@
 /**
- * Bhubaneswar Engineering College (BEC) - Student Data Importer
+ * GEN-Z UNIVERSITY (GZU) - Student Data Importer
  * Imports full real-world student report from 'BEC_Complete_Student_Report_2026-09-24.xlsx'
  * Single Source of Truth for Student Admissions, Credentials, Financials & Documents.
  */
@@ -211,7 +211,7 @@ async function parseReportingExcel(filePath) {
 
       const rollNo = (rawRoll && rawRoll !== 'PENDING' && rawRoll !== 'N/A')
         ? rawRoll
-        : `BEC-26-${String(serialNo).padStart(3, '0')}`;
+        : `GENZ-26-${String(serialNo).padStart(3, '0')}`;
 
       // Section A, B, C based on branch
       const section = branchInfo.branchId <= 2 ? 'A' : (branchInfo.branchId <= 6 ? 'B' : 'C');
@@ -357,7 +357,7 @@ async function parseReportingExcel(filePath) {
         residenceCertUrl: row['Residence Certificate URL'] && row['Residence Certificate URL'] !== 'N/A' ? row['Residence Certificate URL'] : '',
         feeReceiptUrl: row['Fee Receipt URL'] && row['Fee Receipt URL'] !== 'N/A' ? row['Fee Receipt URL'] : '',
         parentSignatureUrl: row['Parent Signature URL'] && row['Parent Signature URL'] !== 'N/A' ? row['Parent Signature URL'] : '',
-        mentor: mentors[branchInfo.branchId] || 'Prof. B. K. Mohapatra (BEC Faculty)',
+        mentor: mentors[branchInfo.branchId] || 'Prof. B. K. Mohapatra (GENZ Faculty)',
         batch: `${branchInfo.courseName} ${branchInfo.courseId === 2 ? '2026 - 2029' : (branchInfo.courseId === 3 ? '2026 - 2028' : '2026 - 2030')}`,
         religion: 'Hindu',
         lunch: 'College Canteen (Opted)',

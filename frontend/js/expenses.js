@@ -1,5 +1,5 @@
 /**
- * Bhubaneswar Engineering College (BEC) - Expenses & Accounts Master Controller
+ * Gen-Z University - Expenses & Accounts Master Controller
  * Handles Search Expenses, New Expense, Party Master, Categories, Day Book, and Profit & Loss
  */
 

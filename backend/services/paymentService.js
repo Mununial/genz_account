@@ -1,14 +1,14 @@
 /**
  * Pluggable Payment Gateway Abstraction Service
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const crypto = require('crypto');
 const { generatePaymentNo } = require('../utils/helpers');
 
 const GATEWAY_PROVIDER = process.env.PAYMENT_GATEWAY_PROVIDER || 'MOCK';
-const GATEWAY_KEY = process.env.PAYMENT_GATEWAY_KEY || 'bec_pay_key';
-const GATEWAY_SECRET = process.env.PAYMENT_GATEWAY_SECRET || 'bec_pay_secret';
+const GATEWAY_KEY = process.env.PAYMENT_GATEWAY_KEY || 'genz_pay_key';
+const GATEWAY_SECRET = process.env.PAYMENT_GATEWAY_SECRET || 'genz_pay_secret';
 
 /**
  * Interface / Base Implementation for Payment Gateway

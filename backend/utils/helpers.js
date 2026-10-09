@@ -1,6 +1,6 @@
 /**
  * System Identifiers & Formatting Helpers
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const crypto = require('crypto');
@@ -17,7 +17,7 @@ function generatePaymentNo(year = new Date().getFullYear()) {
 
 function generateReceiptNo(year = new Date().getFullYear()) {
   const rand = crypto.randomInt(10000, 99999);
-  return `BEC-REC-${year}-${rand}`;
+  return `GZU-REC-${year}-${rand}`;
 }
 
 function generateRefundNo(year = new Date().getFullYear()) {

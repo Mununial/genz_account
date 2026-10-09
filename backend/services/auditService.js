@@ -1,6 +1,6 @@
 /**
  * Immutable Audit Logging Service
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');

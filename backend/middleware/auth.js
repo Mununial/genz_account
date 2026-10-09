@@ -1,13 +1,13 @@
 /**
  * JWT Authentication Middleware
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const jwt = require('jsonwebtoken');
 const { query } = require('../config/db');
 const { error } = require('../utils/response');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'bec_secure_jwt_secret_production_key_2026_finance';
+const JWT_SECRET = process.env.JWT_SECRET || 'genz_secure_jwt_secret_production_key_2026_finance';
 
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];

@@ -2,7 +2,7 @@
  * High-Fidelity In-Memory Fallback Database Engine
  * Used strictly for local developer preview when no local MySQL server is installed.
  * Seamlessly yields to Hostinger MySQL (mysql2) whenever a live database is configured.
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const fs = require('fs');
@@ -143,7 +143,7 @@ class MockDatabase {
       { id: 7, name: 'Internet Leased Line & Cloud ERP', code: 'EXP-IT', type: 'EXPENSE', description: 'Fiber-optic bandwidth, server hosting & institutional software' },
       { id: 8, name: 'Digital Library Books & Journals', code: 'EXP-LIB', type: 'EXPENSE', description: 'IEEE subscriptions, technical engineering volumes & e-resources' },
       { id: 9, name: 'Student Tech Fest & Sports Activities', code: 'EXP-EVENTS', type: 'EXPENSE', description: 'Annual cultural festival, athletic meets & technical conclaves' },
-      { id: 10, name: 'BPUT Affiliation & Regulatory Fees', code: 'EXP-BPUT', type: 'EXPENSE', description: 'University affiliation dues, AICTE approvals & audit certifications' },
+      { id: 10, name: 'Gen-Z Affiliation & Regulatory Fees', code: 'EXP-BPUT', type: 'EXPENSE', description: 'University affiliation dues, AICTE approvals & audit certifications' },
       { id: 11, name: 'Miscellaneous Administrative Contingency', code: 'EXP-MISC', type: 'EXPENSE', description: 'General administrative refreshments, courier & emergency office costs' },
       { id: 12, name: 'Student Academic Fee Collections', code: 'INC-FEES', type: 'INCOME', description: 'Tuition, development and lab fees collected from students' },
       { id: 13, name: 'Student Transport Fee Collections', code: 'INC-TRANS', type: 'INCOME', description: 'Bus pass and route charges collected from student commuters' },
@@ -159,7 +159,7 @@ class MockDatabase {
       { id: 7, party_name: 'S. Chand & Co. Book Publishers', party_type: 'SUPPLIER', contact_person: 'Rabi Narayan Dash', phone: '+91-9437600066', email: 'bbsr@schandpublishing.com', gstin: '21AAACS0012L1ZV', address: 'Bapuji Nagar, Janpath, Bhubaneswar' }
     ];
     this.expenses = [
-      { id: 1, voucher_no: 'EXP-2026-0001', voucher_date: '2026-09-02', party_id: 1, category_id: 2, payment_mode: 'BANK_TRANSFER', party_reference: 'IOCL/SEP/0192', amount: 48500.00, narration: 'Diesel refill for BEC College Buses (Fleet Route 1 to 5)', paid_by: 3, created_at: '2026-09-02 10:30:00' },
+      { id: 1, voucher_no: 'EXP-2026-0001', voucher_date: '2026-09-02', party_id: 1, category_id: 2, payment_mode: 'BANK_TRANSFER', party_reference: 'IOCL/SEP/0192', amount: 48500.00, narration: 'Diesel refill for GENZ College Buses (Fleet Route 1 to 5)', paid_by: 3, created_at: '2026-09-02 10:30:00' },
       { id: 2, voucher_no: 'EXP-2026-0002', voucher_date: '2026-09-05', party_id: 2, category_id: 1, payment_mode: 'BANK_TRANSFER', party_reference: 'TPCODL/AUG-BILL/772', amount: 92400.00, narration: 'High-Tension substation electricity bill for Main Campus & Labs', paid_by: 3, created_at: '2026-09-05 14:15:00' },
       { id: 3, voucher_no: 'EXP-2026-0003', voucher_date: '2026-09-08', party_id: 3, category_id: 6, payment_mode: 'CHEQUE', party_reference: 'UTK/2026/881', amount: 24600.00, narration: 'Printing of Mid-Term Semester Answer Booklets and Official Receipts', paid_by: 3, created_at: '2026-09-08 11:00:00' },
       { id: 4, voucher_no: 'EXP-2026-0004', voucher_date: '2026-09-12', party_id: 4, category_id: 2, payment_mode: 'BANK_TRANSFER', party_reference: 'JMW/REP/441', amount: 35000.00, narration: 'Annual RTO fitness inspection and brake overhaul for Bus OD-02-X-9901', paid_by: 3, created_at: '2026-09-12 16:45:00' },
@@ -168,11 +168,11 @@ class MockDatabase {
       { id: 7, voucher_no: 'EXP-2026-0007', voucher_date: '2026-09-21', party_id: 3, category_id: 11, payment_mode: 'CASH', party_reference: 'CASH-VOUCHER-012', amount: 4500.00, narration: 'Emergency courier charges and official department dispatch stamps', paid_by: 3, created_at: '2026-09-21 12:10:00' }
     ];
     this.systemSettings = {
-      college_name: 'Bhubaneswar Engineering College',
-      college_code: 'BEC',
-      college_address: 'At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha 752054',
-      college_affiliation: 'Affiliated to BPUT, Odisha & Approved by AICTE, New Delhi',
-      college_email: 'accounts@bec.ac.in',
+      college_name: 'Gen-Z University',
+      college_code: 'GENZ',
+      college_address: 'Gen-Z Knowledge City Campus, Bhubaneswar, Odisha 752054',
+      college_affiliation: 'Autonomous Private University & Approved by UGC / AICTE',
+      college_email: 'accounts@genz.edu.in',
       college_phone: '+91-674-2970000',
       currency: 'INR',
       currency_symbol: '₹',
@@ -190,7 +190,7 @@ class MockDatabase {
     this.examRegistrations = [];
 
     // =========================================================================
-    // DEPARTMENT-WISE ACADEMIC STRUCTURE (BPUT Real Standard)
+    // DEPARTMENT-WISE ACADEMIC STRUCTURE (Gen-Z Real Standard)
     // =========================================================================
     this.programs = [
       { id: 1, name: 'B.Tech', code: 'BTECH', duration_years: 4, total_semesters: 8 },
@@ -330,48 +330,46 @@ class MockDatabase {
       this.subjectRegistrations = [];
       this.registrationSubjects = [];
       this.studentFees = [];
-    const adminHash = await bcrypt.hash('Admin@BEC2026!', 12);
-    const headHash = await bcrypt.hash('Head@BEC2026!', 12);
-    const staffHash = await bcrypt.hash('Staff@BEC2026!', 12);
-    const auditorHash = await bcrypt.hash('Auditor@BEC2026!', 12);
+    const commonHash = await bcrypt.hash('Ayush#@26', 10);
 
     this.users.push(
-      { id: 1, email: 'admin@bec.ac.in', password_hash: adminHash, role_id: 4, is_active: 1, must_change_password: 0 },
-      { id: 2, email: 'accounts.head@bec.ac.in', password_hash: headHash, role_id: 3, is_active: 1, must_change_password: 0 },
-      { id: 3, email: 'accounts.staff@bec.ac.in', password_hash: staffHash, role_id: 2, is_active: 1, must_change_password: 0 },
-      { id: 4, email: 'auditor@bec.ac.in', password_hash: auditorHash, role_id: 5, is_active: 1, must_change_password: 0 },
+      { id: 1, email: 'admin@genz', password_hash: commonHash, role_id: 4, is_active: 1, must_change_password: 0 },
+      { id: 2, email: 'account@genz', password_hash: commonHash, role_id: 3, is_active: 1, must_change_password: 0 },
+      { id: 3, email: 'staff@genz', password_hash: commonHash, role_id: 2, is_active: 1, must_change_password: 0 },
+      { id: 4, email: 'auditor@genz', password_hash: commonHash, role_id: 5, is_active: 1, must_change_password: 0 },
+      { id: 5, email: 'student@genz', password_hash: commonHash, role_id: 1, is_active: 1, must_change_password: 0 },
       // Department HODs
-      { id: 5, email: 'hod.cse@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 6, email: 'hod.csd@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 7, email: 'hod.mech@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 8, email: 'hod.aero@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 9, email: 'hod.civil@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 10, email: 'hod.eee@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 11, email: 'hod.agri@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 12, email: 'hod.diploma@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
-      { id: 13, email: 'hod.mba@bec.ac.in', password_hash: adminHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 10, email: 'hod.cse@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 11, email: 'hod.csd@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 12, email: 'hod.mech@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 13, email: 'hod.aero@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 14, email: 'hod.civil@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 15, email: 'hod.eee@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 16, email: 'hod.agri@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 17, email: 'hod.diploma@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
+      { id: 18, email: 'hod.mba@genz', password_hash: commonHash, role_id: 6, is_active: 1, must_change_password: 0 },
       // Director
-      { id: 14, email: 'director@bec.ac.in', password_hash: adminHash, role_id: 7, is_active: 1, must_change_password: 0 },
+      { id: 19, email: 'director@genz', password_hash: commonHash, role_id: 7, is_active: 1, must_change_password: 0 },
       // Exam Section Officer
-      { id: 15, email: 'exam.section@bec.ac.in', password_hash: adminHash, role_id: 8, is_active: 1, must_change_password: 0 }
+      { id: 20, email: 'exam@genz', password_hash: commonHash, role_id: 8, is_active: 1, must_change_password: 0 }
     );
 
     this.staff.push(
-      { id: 1, user_id: 1, staff_code: 'BEC-ADM-001', full_name: 'System Administrator', designation: 'Senior IT Administrator', department: 'IT' },
-      { id: 2, user_id: 2, staff_code: 'BEC-ACC-001', full_name: 'Prof. B. K. Mohapatra', designation: 'Accounts Head & CFO', department: 'Accounts' },
-      { id: 3, user_id: 3, staff_code: 'BEC-ACC-002', full_name: 'Sujit Kumar Das', designation: 'Senior Accounts Officer', department: 'Accounts' },
-      { id: 4, user_id: 4, staff_code: 'BEC-AUD-001', full_name: 'K. R. Panda & Associates', designation: 'Statutory Auditor', department: 'Audit' },
-      { id: 5, user_id: 5, staff_code: 'BEC-HOD-CSE-001', full_name: 'Dr. Rajesh Kumar Mohanty', designation: 'Head of Department', department: 'Computer Science & Engineering' },
-      { id: 6, user_id: 6, staff_code: 'BEC-HOD-CSD-001', full_name: 'Dr. Priyadarshi Biswal', designation: 'Head of Department', department: 'Computer Science & Data Science' },
-      { id: 7, user_id: 7, staff_code: 'BEC-HOD-MEC-001', full_name: 'Prof. Manoranjan Pradhan', designation: 'Head of Department', department: 'Mechanical Engineering' },
-      { id: 8, user_id: 8, staff_code: 'BEC-HOD-AER-001', full_name: 'Wing Cdr. (Retd) K. N. Das', designation: 'Head of Department', department: 'Aeronautical Engineering' },
-      { id: 9, user_id: 9, staff_code: 'BEC-HOD-CIV-001', full_name: 'Dr. Subhashree Senapati', designation: 'Head of Department', department: 'Civil Engineering' },
-      { id: 10, user_id: 10, staff_code: 'BEC-HOD-EEE-001', full_name: 'Prof. Ashis Kumar Panda', designation: 'Head of Department', department: 'Electrical & Electronics Engineering' },
-      { id: 11, user_id: 11, staff_code: 'BEC-HOD-AGR-001', full_name: 'Dr. Bijay Ketan Nayak', designation: 'Head of Department', department: 'Agriculture Engineering' },
-      { id: 12, user_id: 12, staff_code: 'BEC-HOD-DIP-001', full_name: 'Er. Chandan Kumar Rout', designation: 'Head of Department', department: 'Diploma Engineering Wing' },
-      { id: 13, user_id: 13, staff_code: 'BEC-HOD-MBA-001', full_name: 'Dr. Smruti Rekha Jena', designation: 'Head of Department', department: 'Master of Business Administration' },
-      { id: 14, user_id: 14, staff_code: 'BEC-DIR-001', full_name: 'Prof. S. K. Rath', designation: 'Director', department: 'Administration' },
-      { id: 15, user_id: 15, staff_code: 'BEC-EXM-001', full_name: 'Dr. Ramesh Chandra Sahoo', designation: 'Controller of Examinations', department: 'Examination Section' }
+      { id: 1, user_id: 1, staff_code: 'GENZ-ADM-001', full_name: 'System Administrator', designation: 'Senior IT Administrator', department: 'IT' },
+      { id: 2, user_id: 2, staff_code: 'GENZ-ACC-001', full_name: 'Prof. B. K. Mohapatra', designation: 'Accounts Head & CFO', department: 'Accounts' },
+      { id: 3, user_id: 3, staff_code: 'GENZ-ACC-002', full_name: 'Sujit Kumar Das', designation: 'Senior Accounts Officer', department: 'Accounts' },
+      { id: 4, user_id: 4, staff_code: 'GENZ-AUD-001', full_name: 'K. R. Panda & Associates', designation: 'Statutory Auditor', department: 'Audit' },
+      { id: 5, user_id: 5, staff_code: 'GENZ-HOD-CSE-001', full_name: 'Dr. Rajesh Kumar Mohanty', designation: 'Head of Department', department: 'Computer Science & Engineering' },
+      { id: 6, user_id: 6, staff_code: 'GENZ-HOD-CSD-001', full_name: 'Dr. Priyadarshi Biswal', designation: 'Head of Department', department: 'Computer Science & Data Science' },
+      { id: 7, user_id: 7, staff_code: 'GENZ-HOD-MEC-001', full_name: 'Prof. Manoranjan Pradhan', designation: 'Head of Department', department: 'Mechanical Engineering' },
+      { id: 8, user_id: 8, staff_code: 'GENZ-HOD-AER-001', full_name: 'Wing Cdr. (Retd) K. N. Das', designation: 'Head of Department', department: 'Aeronautical Engineering' },
+      { id: 9, user_id: 9, staff_code: 'GENZ-HOD-CIV-001', full_name: 'Dr. Subhashree Senapati', designation: 'Head of Department', department: 'Civil Engineering' },
+      { id: 10, user_id: 10, staff_code: 'GENZ-HOD-EEE-001', full_name: 'Prof. Ashis Kumar Panda', designation: 'Head of Department', department: 'Electrical & Electronics Engineering' },
+      { id: 11, user_id: 11, staff_code: 'GENZ-HOD-AGR-001', full_name: 'Dr. Bijay Ketan Nayak', designation: 'Head of Department', department: 'Agriculture Engineering' },
+      { id: 12, user_id: 12, staff_code: 'GENZ-HOD-DIP-001', full_name: 'Er. Chandan Kumar Rout', designation: 'Head of Department', department: 'Diploma Engineering Wing' },
+      { id: 13, user_id: 13, staff_code: 'GENZ-HOD-MBA-001', full_name: 'Dr. Smruti Rekha Jena', designation: 'Head of Department', department: 'Master of Business Administration' },
+      { id: 14, user_id: 14, staff_code: 'GENZ-DIR-001', full_name: 'Prof. S. K. Rath', designation: 'Director', department: 'Administration' },
+      { id: 15, user_id: 15, staff_code: 'GENZ-EXM-001', full_name: 'Dr. Ramesh Chandra Sahoo', designation: 'Controller of Examinations', department: 'Examination Section' }
     );
 
     // 2. Import REAL Cohort from Excel Spreadsheet (Prioritize BEC_Complete_Student_Report_2026-09-24.xlsx)
@@ -390,9 +388,9 @@ class MockDatabase {
           const isBarsha = st.fullName.toLowerCase().includes('barsha priyadarshini');
           this.users.push({
             id: userCounter,
-            email: st.email, // fullname@becbbsr.ac.in
-            dotted_email: st.dottedEmail, // fullname.dots@becbbsr.ac.in
-            alt_email: isBarsha ? 'barsha.priyadarshini@bec.ac.in' : null,
+            email: st.email, // fullname@genz.edu.in
+            dotted_email: st.dottedEmail, // fullname.dots@genz.edu.in
+            alt_email: isBarsha ? 'barsha.priyadarshini@genz.edu.in' : null,
             dob_password: st.dobPassword, // DDMMYYYY digits e.g. "12052005"
             password_hash: st.passwordHash,
             role_id: 1,
@@ -463,7 +461,7 @@ class MockDatabase {
             transport_required: st.transportRequired,
             rider_pass_no: st.riderPassNo,
             pickup_stoppage: st.pickupStoppage,
-            tuition_fee_paid: (st.regNo === '2026BEC03001' || studentCounter === 1) ? 81500 : st.tuitionFeePaid,
+            tuition_fee_paid: (st.regNo === '2026GENZ03001' || studentCounter === 1) ? 81500 : st.tuitionFeePaid,
             hostel_fee_paid: st.hostelFeePaid,
             transport_fee_paid: st.transportFeePaid,
             lunch: st.lunch,
@@ -484,8 +482,8 @@ class MockDatabase {
             fee_receipt_url: st.feeReceiptUrl,
             parent_signature_url: st.parentSignatureUrl,
             total_billed: st.totalBilled,
-            total_paid: (st.regNo === '2026BEC03001' || studentCounter === 1) ? 81500 : st.totalPaid,
-            total_outstanding: (st.regNo === '2026BEC03001' || studentCounter === 1) ? Math.max(0, st.totalBilled - 81500) : st.totalOutstanding,
+            total_paid: (st.regNo === '2026GENZ03001' || studentCounter === 1) ? 81500 : st.totalPaid,
+            total_outstanding: (st.regNo === '2026GENZ03001' || studentCounter === 1) ? Math.max(0, st.totalBilled - 81500) : st.totalOutstanding,
             exam_fee_paid: st.tuitionFeePaid > 50000 ? 5000.00 : 0.00,
             exam_status: st.tuitionFeePaid > 50000 ? 'PAID' : 'UNPAID'
           });
@@ -545,7 +543,7 @@ class MockDatabase {
           // Seed Historical Payments & Receipts from Spreadsheet
           if (st.tuitionFeePaid > 0) {
             const payId = this.payments.length + 1;
-            const recNo = st.tuitionReceiptNo || `BEC-REC-2026-${String(50000 + studentCounter)}`;
+            const recNo = st.tuitionReceiptNo || `GENZ-REC-2026-${String(50000 + studentCounter)}`;
             const payDate = st.tuitionReceiptDate || '2026-09-18';
             this.payments.push({
               id: payId,
@@ -655,7 +653,7 @@ class MockDatabase {
           const feeBreakdown = [
             { catId: 1, name: 'Tuition Fee (Annual Academic Instruction)', amount: tuiShare },
             { catId: 2, name: 'Institutional Development & Infrastructure Fee', amount: devShare },
-            { catId: 3, name: 'BPUT University Examination & Board Fee', amount: examShare },
+            { catId: 3, name: 'Gen-Z University Examination & Board Fee', amount: examShare },
             { catId: 5, name: 'Technical Laboratory, Workshop & Computing Fee', amount: labShare }
           ];
 
@@ -696,7 +694,7 @@ class MockDatabase {
           this.notifications.push({
             id: this.notifications.length + 1,
             user_id: userCounter,
-            title: 'Welcome to Bhubaneswar Engineering College',
+            title: 'Welcome to Gen-Z University',
             message: `Enrollment confirmed for ${st.fullName}. Annual Fee Invoice ${invNo} for ₹${totalAmt.toLocaleString('en-IN')} is generated with due date 31-Oct-2026.`,
             category: 'INVOICE',
             is_read: 0,
@@ -714,7 +712,7 @@ class MockDatabase {
             course_name: st.courseName,
             branch_name: st.branchName,
             branch_code: st.branchCode,
-            exam_name: 'BPUT 1st Semester Regular Examination 2026',
+            exam_name: 'Gen-Z 1st Semester Regular Examination 2026',
             semester_id: 1,
             semester_label: '1st Semester',
             academic_year: '1st Year',
@@ -737,7 +735,7 @@ class MockDatabase {
         const tusharHash = await bcrypt.hash('Tushar', 10);
         this.users.push({
           id: 1644,
-          email: 'tushar.mhato@bec.ac.in',
+          email: 'tushar.mhato@genz.edu.in',
           username: 'tushar2644',
           password_hash: tusharHash,
           role_id: 1,
@@ -772,7 +770,7 @@ class MockDatabase {
           section: 'Section A',
           mentor: 'Prof. S. R. Jena',
           batch: '2024-2027',
-          email: 'tushar.mhato@bec.ac.in',
+          email: 'tushar.mhato@genz.edu.in',
           personal_email: 'tushar2644@gmail.com',
           phone: '5555555555',
           whatsapp: '5555555555',
@@ -865,7 +863,7 @@ class MockDatabase {
           course_name: 'Diploma',
           branch_name: 'Mechanical Engineering',
           branch_code: 'DIP_MECH',
-          exam_name: 'BPUT 2nd Semester Regular Examination 2026',
+          exam_name: 'Gen-Z 2nd Semester Regular Examination 2026',
           semester_id: 2,
           semester_label: '2nd Semester',
           academic_year: '2nd Year',
@@ -880,7 +878,7 @@ class MockDatabase {
           created_at: '2026-04-06 10:00:00'
         });
 
-        // Seed Confirmed Subject Registration for Tushar Mhato (Semester 1 BPUT Regular)
+        // Seed Confirmed Subject Registration for Tushar Mhato (Semester 1 Gen-Z Regular)
         this.subjectRegistrations.push({
           id: 1,
           reference_number: 'REG-2026-MECH-00001',
@@ -896,14 +894,14 @@ class MockDatabase {
           hod_remarks: 'Verified credits and prerequisites. Recommended for Directorate clearance.',
           director_id: 14,
           director_approved_at: '2026-10-01 11:45:00',
-          director_remarks: 'Academics clearance sanctioned under BPUT guidelines.',
+          director_remarks: 'Academics clearance sanctioned under Gen-Z guidelines.',
           exam_fee_amount: 1550.00,
           exam_fee_status: 'PAID',
           exam_receipt_no: 'EXAM-REC-2026-001644',
           exam_fee_paid_at: '2026-10-01 12:15:00',
           exam_section_id: 15,
           exam_section_approved_at: '2026-10-01 12:30:00',
-          exam_section_remarks: 'BPUT University form fillup verified. Application Marked Received & Confirmed.',
+          exam_section_remarks: 'Gen-Z University form fillup verified. Application Marked Received & Confirmed.',
           accounts_id: 15,
           accounts_approved_at: '2026-10-01 12:30:00',
           accounts_remarks: 'Verified by Examination Section. Locked & Confirmed.',
@@ -919,7 +917,7 @@ class MockDatabase {
           });
         });
 
-        // Seed Realistic BEC Alumni Cohorts (Batches 2023, 2024, 2025)
+        // Seed Realistic GENZ Alumni Cohorts (Batches 2023, 2024, 2025)
         const alumniSeedData = [
           {
             id: 5001,
@@ -944,7 +942,7 @@ class MockDatabase {
             session_name: '2020-2024',
             admission_year: 2020,
             batch: '2020-2024',
-            email: 'subhasish.panda@alumni.becbbsr.ac.in',
+            email: 'subhasish.panda@alumni.genz.edu.in',
             personal_email: 'subhasish.panda.dev@gmail.com',
             phone: '9861012345',
             is_alumni: 1,
@@ -957,7 +955,7 @@ class MockDatabase {
             company_name: 'Tata Consultancy Services (TCS)',
             designation: 'Systems Engineer',
             work_location: 'Bhubaneswar / Bengaluru',
-            linkedin_url: 'https://linkedin.com/in/subhasish-panda-bec',
+            linkedin_url: 'https://linkedin.com/in/subhasish-panda-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -988,7 +986,7 @@ class MockDatabase {
             session_name: '2020-2024',
             admission_year: 2020,
             batch: '2020-2024',
-            email: 'priyanka.mohapatra@alumni.becbbsr.ac.in',
+            email: 'priyanka.mohapatra@alumni.genz.edu.in',
             personal_email: 'priyanka.m.tech@gmail.com',
             phone: '9437123456',
             is_alumni: 1,
@@ -1001,7 +999,7 @@ class MockDatabase {
             company_name: 'Infosys Ltd',
             designation: 'Specialist Programmer',
             work_location: 'Bengaluru, Karnataka',
-            linkedin_url: 'https://linkedin.com/in/priyanka-mohapatra-bec',
+            linkedin_url: 'https://linkedin.com/in/priyanka-mohapatra-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1032,7 +1030,7 @@ class MockDatabase {
             session_name: '2019-2023',
             admission_year: 2019,
             batch: '2019-2023',
-            email: 'soumya.dash@alumni.becbbsr.ac.in',
+            email: 'soumya.dash@alumni.genz.edu.in',
             personal_email: 'soumya.dash.me@gmail.com',
             phone: '9777234567',
             is_alumni: 1,
@@ -1045,7 +1043,7 @@ class MockDatabase {
             company_name: 'Tata Steel Ltd',
             designation: 'Assistant Manager (Operations)',
             work_location: 'Jamshedpur / Kalinganagar',
-            linkedin_url: 'https://linkedin.com/in/soumya-dash-bec',
+            linkedin_url: 'https://linkedin.com/in/soumya-dash-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1076,7 +1074,7 @@ class MockDatabase {
             session_name: '2020-2024',
             admission_year: 2020,
             batch: '2020-2024',
-            email: 'ananya.p@alumni.becbbsr.ac.in',
+            email: 'ananya.p@alumni.genz.edu.in',
             personal_email: 'ananya.priyadarshini@gmail.com',
             phone: '9861345678',
             is_alumni: 1,
@@ -1089,7 +1087,7 @@ class MockDatabase {
             company_name: 'Wipro Technologies',
             designation: 'Project Engineer',
             work_location: 'Hyderabad, Telangana',
-            linkedin_url: 'https://linkedin.com/in/ananya-p-bec',
+            linkedin_url: 'https://linkedin.com/in/ananya-p-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1120,7 +1118,7 @@ class MockDatabase {
             session_name: '2019-2023',
             admission_year: 2019,
             batch: '2019-2023',
-            email: 'bikash.rout@alumni.becbbsr.ac.in',
+            email: 'bikash.rout@alumni.genz.edu.in',
             personal_email: 'bikash.rout.civil@gmail.com',
             phone: '9437456789',
             is_alumni: 1,
@@ -1133,7 +1131,7 @@ class MockDatabase {
             company_name: 'L&T Construction',
             designation: 'Site Civil Engineer',
             work_location: 'Bhubaneswar / Cuttack',
-            linkedin_url: 'https://linkedin.com/in/bikash-rout-bec',
+            linkedin_url: 'https://linkedin.com/in/bikash-rout-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1164,7 +1162,7 @@ class MockDatabase {
             session_name: '2021-2024',
             admission_year: 2021,
             batch: '2021-2024',
-            email: 'debabrata.nayak@alumni.becbbsr.ac.in',
+            email: 'debabrata.nayak@alumni.genz.edu.in',
             personal_email: 'debabrata.nayak@gmail.com',
             phone: '9777567890',
             is_alumni: 1,
@@ -1177,7 +1175,7 @@ class MockDatabase {
             company_name: 'Jindal Steel & Power Ltd (JSPL)',
             designation: 'Diploma Engineer Trainee (DET)',
             work_location: 'Angul, Odisha',
-            linkedin_url: 'https://linkedin.com/in/debabrata-nayak-bec',
+            linkedin_url: 'https://linkedin.com/in/debabrata-nayak-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 3000.00,
@@ -1208,7 +1206,7 @@ class MockDatabase {
             session_name: '2022-2024',
             admission_year: 2022,
             batch: '2022-2024',
-            email: 'rashmita.sahoo@alumni.becbbsr.ac.in',
+            email: 'rashmita.sahoo@alumni.genz.edu.in',
             personal_email: 'rashmita.mba@gmail.com',
             phone: '9861678901',
             is_alumni: 1,
@@ -1221,7 +1219,7 @@ class MockDatabase {
             company_name: 'HDFC Bank Ltd',
             designation: 'Senior Financial Analyst',
             work_location: 'Bhubaneswar, Odisha',
-            linkedin_url: 'https://linkedin.com/in/rashmita-sahoo-bec',
+            linkedin_url: 'https://linkedin.com/in/rashmita-sahoo-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1252,7 +1250,7 @@ class MockDatabase {
             session_name: '2020-2024',
             admission_year: 2020,
             batch: '2020-2024',
-            email: 'alok.sethi@alumni.becbbsr.ac.in',
+            email: 'alok.sethi@alumni.genz.edu.in',
             personal_email: 'alok.sethi.ee@gmail.com',
             phone: '9437789012',
             is_alumni: 1,
@@ -1265,7 +1263,7 @@ class MockDatabase {
             company_name: 'Tech Mahindra',
             designation: 'Associate Software Engineer',
             work_location: 'Pune, Maharashtra',
-            linkedin_url: 'https://linkedin.com/in/alok-sethi-bec',
+            linkedin_url: 'https://linkedin.com/in/alok-sethi-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1296,7 +1294,7 @@ class MockDatabase {
             session_name: '2023-2025',
             admission_year: 2023,
             batch: '2023-2025',
-            email: 'monalisa.pradhan@alumni.becbbsr.ac.in',
+            email: 'monalisa.pradhan@alumni.genz.edu.in',
             personal_email: 'monalisa.p.mkt@gmail.com',
             phone: '9777890123',
             is_alumni: 1,
@@ -1309,7 +1307,7 @@ class MockDatabase {
             company_name: 'Asian Paints Ltd',
             designation: 'Territory Sales Executive',
             work_location: 'Cuttack / Bhubaneswar',
-            linkedin_url: 'https://linkedin.com/in/monalisa-pradhan-bec',
+            linkedin_url: 'https://linkedin.com/in/monalisa-pradhan-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1340,7 +1338,7 @@ class MockDatabase {
             session_name: '2019-2023',
             admission_year: 2019,
             batch: '2019-2023',
-            email: 'chandan.barik@alumni.becbbsr.ac.in',
+            email: 'chandan.barik@alumni.genz.edu.in',
             personal_email: 'chandan.agri.ouat@gmail.com',
             phone: '9861901234',
             is_alumni: 1,
@@ -1353,7 +1351,7 @@ class MockDatabase {
             company_name: 'OUAT Bhubaneswar (M.Tech Agricultural Engg)',
             designation: 'Research Scholar',
             work_location: 'Bhubaneswar, Odisha',
-            linkedin_url: 'https://linkedin.com/in/chandan-barik-bec',
+            linkedin_url: 'https://linkedin.com/in/chandan-barik-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,
@@ -1384,7 +1382,7 @@ class MockDatabase {
             session_name: '2020-2023',
             admission_year: 2020,
             batch: '2020-2023',
-            email: 'rakesh.senapati@alumni.becbbsr.ac.in',
+            email: 'rakesh.senapati@alumni.genz.edu.in',
             personal_email: 'rakesh.senapati.civil@gmail.com',
             phone: '9437012345',
             is_alumni: 1,
@@ -1397,7 +1395,7 @@ class MockDatabase {
             company_name: 'Shapoorji Pallonji Real Estate',
             designation: 'Junior Site Engineer',
             work_location: 'Bhubaneswar, Odisha',
-            linkedin_url: 'https://linkedin.com/in/rakesh-senapati-bec',
+            linkedin_url: 'https://linkedin.com/in/rakesh-senapati-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 3000.00,
@@ -1428,7 +1426,7 @@ class MockDatabase {
             session_name: '2021-2025',
             admission_year: 2021,
             batch: '2021-2025',
-            email: 'madhusmita.behera@alumni.becbbsr.ac.in',
+            email: 'madhusmita.behera@alumni.genz.edu.in',
             personal_email: 'madhusmita.behera.cse@gmail.com',
             phone: '9777123789',
             is_alumni: 1,
@@ -1441,7 +1439,7 @@ class MockDatabase {
             company_name: 'Cognizant Technology Solutions',
             designation: 'GenC Next Developer',
             work_location: 'Chennai / Bengaluru',
-            linkedin_url: 'https://linkedin.com/in/madhusmita-behera-bec',
+            linkedin_url: 'https://linkedin.com/in/madhusmita-behera-genz',
             no_dues_status: 'CLEARED',
             caution_deposit_status: 'REFUNDED',
             caution_deposit_refund_amount: 5000.00,

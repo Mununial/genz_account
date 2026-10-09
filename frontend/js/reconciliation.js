@@ -1,6 +1,6 @@
 /**
  * Payment Reconciliation Controller (Gateway vs Ledger)
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const reconciliationModule = {

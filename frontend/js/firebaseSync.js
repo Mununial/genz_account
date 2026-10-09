@@ -1,10 +1,10 @@
 /**
- * Bhubaneswar Engineering College (BEC) Accounts & Finance System
+ * Gen-Z University Accounts & Finance System
  * Firebase Real-time Synchronization Module
  * Connects frontend to Firebase Cloud Firestore for live payment broadcasts and cross-device counter sync.
  */
 
-const becFirebase = {
+const genzFirebase = {
   app: null,
   db: null,
   isInitialized: false,
@@ -12,12 +12,12 @@ const becFirebase = {
   initialLoadTimestamp: Date.now() - 5000,
 
   config: {
-    apiKey: "AIzaSyCduVYcPTGfeCdu0a5J2VMwYnVx-YI3OL8",
-    authDomain: "becaccount.firebaseapp.com",
-    projectId: "becaccount",
-    storageBucket: "becaccount.firebasestorage.app",
-    messagingSenderId: "344226455152",
-    appId: "1:344226455152:web:936d5348782772df5fdeb5"
+    apiKey: "AIzaSyBpLQvYjddu0LaEUhPmva08u89eOXKbImg",
+    authDomain: "genzuniversity.firebaseapp.com",
+    projectId: "genzuniversity",
+    storageBucket: "genzuniversity.firebasestorage.app",
+    messagingSenderId: "423748552299",
+    appId: "1:423748552299:web:8981f1300ad217afd7132e"
   },
 
   async init() {
@@ -37,7 +37,7 @@ const becFirebase = {
 
       this.db = firebase.firestore();
       this.isInitialized = true;
-      console.log('[Firebase] Connected to Firebase Cloud Firestore (Project: becaccount).');
+      console.log('[Firebase] Connected to Firebase Cloud Firestore.');
 
       // Update UI Status Badge
       this.renderStatusBadge(true);
@@ -181,8 +181,9 @@ const becFirebase = {
   }
 };
 
-window.becFirebase = becFirebase;
+window.genzFirebase = genzFirebase;
+window.becFirebase = genzFirebase;
 
 document.addEventListener('DOMContentLoaded', () => {
-  becFirebase.init();
+  genzFirebase.init();
 });

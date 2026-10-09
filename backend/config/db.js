@@ -1,6 +1,6 @@
 /**
  * Database Connection Manager & Query Executor
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  * 
  * Supports:
  * 1. Live Hostinger-hosted MySQL via mysql2 connection pool (Production Standard)
@@ -17,7 +17,7 @@ const dbConfig = {
   port: parseInt(process.env.DB_PORT, 10) || 3306,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'bec_accounts_db',
+  database: process.env.DB_NAME || 'genz_accounts_db',
   waitForConnections: process.env.DB_WAIT_FOR_CONNECTIONS === 'true',
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT, 10) || 20,
   queueLimit: parseInt(process.env.DB_QUEUE_LIMIT, 10) || 0,
@@ -158,7 +158,7 @@ async function testConnection() {
       connected: true,
       mode: 'SIMULATION_FALLBACK',
       message: 'Operating in in-memory preview mode (MySQL server not detected on localhost). Set DB_HOST in .env for production Hostinger MySQL.',
-      database: 'bec_accounts_memory',
+      database: 'genz_accounts_memory',
       host: 'localhost (in-memory)'
     };
   }
@@ -850,7 +850,7 @@ function executeMockQuery(sql, params) {
       course_name: 'Bachelor of Technology',
       branch_name: 'Computer Science & Engineering',
       semester_label: '1st Semester',
-      created_by_email: 'accounts.head@bec.ac.in'
+      created_by_email: 'accounts.head@genz.edu.in'
     }));
     return [list];
   }
@@ -1886,7 +1886,7 @@ function executeMockQuery(sql, params) {
       payment_mode: payment_mode || 'ONLINE',
       payment_method: payment_mode || 'Online Gateway',
       semester: semester || 'Semester 2',
-      remarks: remarks || 'BPUT Semester Examination & Board Fee',
+      remarks: remarks || 'Gen-Z Semester Examination & Board Fee',
       created_by: created_by || 1,
       created_at: new Date().toISOString()
     };

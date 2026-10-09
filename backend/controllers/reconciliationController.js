@@ -1,6 +1,6 @@
 /**
  * Bank & Payment Gateway Reconciliation Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');

@@ -1,6 +1,6 @@
 /**
  * Department-Wise Subject Registration Routes
- * BEC — Workflow: Student → HOD (Department) → Director (All) → Accounts (Finalize) → CONFIRMED
+ * GENZ — Workflow: Student → HOD (Department) → Director (All) → Accounts (Finalize) → CONFIRMED
  */
 
 const express = require('express');

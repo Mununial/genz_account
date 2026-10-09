@@ -1,6 +1,6 @@
 /**
  * Refund Management Controller (Accounts Head & Admin)
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query, withTransaction } = require('../config/db');

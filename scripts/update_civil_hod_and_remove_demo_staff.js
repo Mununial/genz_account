@@ -35,15 +35,15 @@ async function run() {
   // 4. Update Staff record for User 14
   await db.query(`
     INSERT INTO staff (user_id, staff_code, full_name, designation, department, phone, created_at, updated_at)
-    VALUES (14, 'BEC-HOD-CIV-001', 'Saswat Mohanty', 'Head of Department (Civil & Environmental Engineering)', 'Civil & Environmental Engineering', '9437000014', NOW(), NOW())
+    VALUES (14, 'GENZ-HOD-CIV-001', 'Saswat Mohanty', 'Head of Department (Civil & Environmental Engineering)', 'Civil & Environmental Engineering', '9437000014', NOW(), NOW())
     ON DUPLICATE KEY UPDATE
       full_name = 'Saswat Mohanty',
       designation = 'Head of Department (Civil & Environmental Engineering)',
       department = 'Civil & Environmental Engineering',
-      staff_code = 'BEC-HOD-CIV-001',
+      staff_code = 'GENZ-HOD-CIV-001',
       updated_at = NOW()
   `);
-  console.log('✓ Updated Staff record for Saswat Mohanty [Code: BEC-HOD-CIV-001]');
+  console.log('✓ Updated Staff record for Saswat Mohanty [Code: GENZ-HOD-CIV-001]');
 
   // 5. Remove demo staff records (user_id 11: Prof. B.K. Mohapatra, user_id 17: Er. Chandan Kumar Rout)
   await db.query(`DELETE FROM staff WHERE user_id IN (11, 17)`);

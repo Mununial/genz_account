@@ -1,6 +1,6 @@
 /**
- * Admin BPUT Subject Catalog Controller
- * Bhubaneswar Engineering College (BEC) — Curricula & Syllabus Management
+ * Admin Gen-Z Subject Catalog Controller
+ * Gen-Z University — Curricula & Syllabus Management
  */
 
 const adminSubjects = {
@@ -161,7 +161,7 @@ const adminSubjects = {
 
   openAddModal() {
     document.getElementById('modalSubjectId').value = '';
-    document.getElementById('modalSubTitle').textContent = 'Add BPUT Subject';
+    document.getElementById('modalSubTitle').textContent = 'Add Gen-Z Subject';
     document.getElementById('subCode').value = '';
     document.getElementById('subName').value = '';
     document.getElementById('subSemester').value = '1';

@@ -1,6 +1,6 @@
 /**
  * Authentication & Session Management
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const auth = {
@@ -46,7 +46,7 @@ const auth = {
         return { mustChangePassword: true };
       }
 
-      ui.showToast('Login successful! Welcome to BEC Finance Portal.', 'success');
+      ui.showToast('Login successful! Welcome to GENZ Finance Portal.', 'success');
       window.location.href = '/index.html';
       return { success: true };
     } catch (err) {
@@ -99,7 +99,7 @@ const auth = {
         .slice(0, 2)
         .join('')
         .toUpperCase();
-      avatarEl.textContent = initials || 'BEC';
+      avatarEl.textContent = initials || 'GENZ';
     }
   }
 };

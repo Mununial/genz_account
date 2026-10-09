@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC)
+ * GEN-Z UNIVERSITY (GZU)
  * ACCOUNTS & FINANCE MANAGEMENT SYSTEM - MAIN EXPRESS BACKEND SERVER
  * ==============================================================================
  */
@@ -76,7 +76,7 @@ app.get('/api/health', async (req, res) => {
   const dbHealth = await testConnection();
   res.status(dbHealth.connected ? 200 : 503).json({
     status: dbHealth.connected ? 'HEALTHY' : 'DATABASE_DISCONNECTED',
-    college: 'Bhubaneswar Engineering College (BEC)',
+    college: 'Gen-Z University',
     timestamp: new Date().toISOString(),
     database: dbHealth
   });
@@ -170,7 +170,7 @@ app.use(errorHandler);
 if (require.main === module) {
   const server = app.listen(PORT, async () => {
     console.log('================================================================');
-    console.log(`BHUBANESWAR ENGINEERING COLLEGE - ACCOUNTS & FINANCE SYSTEM`);
+    console.log(`GEN-Z UNIVERSITY - ACCOUNTS & FINANCE SYSTEM`);
     console.log(`Server listening on port ${PORT} in [${process.env.NODE_ENV || 'development'}] mode`);
     console.log(`Application URL: http://localhost:${PORT}`);
     console.log('================================================================');

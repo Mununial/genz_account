@@ -1,6 +1,6 @@
 /**
  * Standardized API Response Utilities
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 function success(res, data = null, message = 'Success', statusCode = 200) {

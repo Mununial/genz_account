@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student ERP Portal - Bhubaneswar Engineering College</title>
-  <meta name="description" content="Student self-service ERP portal with institutional fee payment gateway, academic ledger, and receipts for Bhubaneswar Engineering College.">
+  <title>Student ERP Portal - Gen-Z University</title>
+  <meta name="description" content="Student self-service ERP portal with institutional fee payment gateway, academic ledger, and receipts for Gen-Z University.">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/becReal.css">
+  <link rel="stylesheet" href="/css/genzReal.css">
   <link rel="stylesheet" href="/css/print.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -487,7 +487,7 @@
     }
 
     /* ========================================================================= */
-    /* 8. BEC SECURE ONLINE PAYMENT GATEWAY & MODAL STYLES                       */
+    /* 8. GENZ SECURE ONLINE PAYMENT GATEWAY & MODAL STYLES                       */
     /* ========================================================================= */
     .bec-pay-dialog {
       max-width: 580px !important;
@@ -1070,7 +1070,7 @@
     }
 
     /* ========================================================================= */
-    /* 9. OFFICIAL BEC FEE RECEIPT (AUTHENTIC DOCUMENT STYLING)                  */
+    /* 9. OFFICIAL GENZ FEE RECEIPT (AUTHENTIC DOCUMENT STYLING)                  */
     /* ========================================================================= */
     .bec-official-receipt-frame {
       background: #FFFFFF;
@@ -1493,9 +1493,9 @@
       </button>
       <div class="topbar-college-brand">
         <div style="background: #ffffff; border-radius: 8px; padding: 2px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-          <img src="/assets/bec-logo.jpg" alt="Bhubaneswar Engineering College Logo" style="height: 36px; width: 36px; object-fit: contain; border-radius: 6px; display: block;">
+          <img src="/assets/genz-logo.jpg" alt="Gen-Z University Logo" style="height: 36px; width: 36px; object-fit: contain; border-radius: 6px; display: block;">
         </div>
-        <span>BHUBANESWAR ENGINEERING COLLEGE - STUDENT ERP</span>
+        <span>GEN-Z UNIVERSITY - STUDENT ERP</span>
       </div>
     </div>
 
@@ -1515,7 +1515,7 @@
         <div class="student-meta-details">
           <div class="drawer-student-name" id="drawerStudentName">Loading Student...</div>
           <div class="drawer-student-roll" id="drawerStudentRoll">Reg No: ...</div>
-          <div class="drawer-student-branch" id="drawerStudentBranch">BEC Student</div>
+          <div class="drawer-student-branch" id="drawerStudentBranch">GENZ Student</div>
         </div>
       </div>
 
@@ -1557,6 +1557,10 @@
         <a class="nav-link-item" data-tab="health">
           <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
           Health &amp; Medical
+        </a>
+        <a class="nav-link-item" data-tab="loan">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
+          Education Loan Assistance
         </a>
       </nav>
     </aside>
@@ -1724,7 +1728,7 @@
               </div>
               <div>
                 <h2 style="margin:0;font-size:1.3rem;font-weight:700;color:#0F172A;">Subject Registration</h2>
-                <p style="margin:0;font-size:0.85rem;color:#64748B;">Academic Year 2026-27 | BPUT Affiliation</p>
+                <p style="margin:0;font-size:0.85rem;color:#64748B;">Academic Year 2026-27 | Gen-Z Affiliation</p>
               </div>
             </div>
             <!-- Semester Progression Selector -->
@@ -1871,7 +1875,7 @@
               </div>
               <div>
                 <h2 style="margin:0;font-size:1.3rem;font-weight:800;color:#0F172A;">Student Health &amp; Medical Wellness</h2>
-                <p style="margin:2px 0 0 0;font-size:0.85rem;color:#64748B;">Official Institutional Medical Record &bull; BPUT Campus Wellness Registry</p>
+                <p style="margin:2px 0 0 0;font-size:0.85rem;color:#64748B;">Official Institutional Medical Record &bull; Gen-Z Campus Wellness Registry</p>
               </div>
             </div>
             <div>
@@ -1891,7 +1895,7 @@
             <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:1.1rem;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
               <div style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Vaccination Status</div>
               <div id="dispVaccine" style="font-size:1.15rem;font-weight:800;color:#15803D;margin-top:0.5rem;">Fully Vaccinated</div>
-              <div style="font-size:0.75rem;color:#94A3B8;">BPUT Health Protocol</div>
+              <div style="font-size:0.75rem;color:#94A3B8;">Gen-Z Health Protocol</div>
             </div>
             <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:10px;padding:1.1rem;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
               <div style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Campus Health Center</div>
@@ -1982,6 +1986,169 @@
         </div>
       </section>
 
+      <!-- ============================================================= -->
+      <!-- TAB: EDUCATION LOAN ASSISTANCE & 3-LETTER DOSSIER             -->
+      <!-- ============================================================= -->
+      <section id="tabPane-loan" class="student-tab-pane" style="display: none;">
+        <div style="max-width: 960px; margin: 0 auto;">
+          <!-- Top Header Card -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="background:linear-gradient(135deg,#0B63C5,#1E40AF);width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(11,99,197,0.25);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
+              </div>
+              <div>
+                <h2 style="margin:0;font-size:1.3rem;font-weight:800;color:#0F172A;">Education Loan Assistance &amp; Bank Desk</h2>
+                <p style="margin:2px 0 0 0;font-size:0.85rem;color:#64748B;">College Directorate Approval Workflow &bull; 3 Official Bank Letters &bull; Gen-Z University</p>
+              </div>
+            </div>
+            <div>
+              <span id="loanStatusHeaderBadge" style="background:#EFF6FF;color:#0B63C5;font-weight:700;font-size:0.82rem;padding:0.4rem 1rem;border-radius:20px;border:1px solid #BFDBFE;">
+                Direct-to-Bank Verification Desk
+              </span>
+            </div>
+          </div>
+
+          <!-- Active Application & Approval Status Container -->
+          <div id="loanActiveStatusCard" style="display:none;margin-bottom:1.5rem;"></div>
+
+          <!-- 3 Generated Letters Showcase (shown when APPROVED) -->
+          <div id="loanApprovedLettersCard" style="display:none;margin-bottom:1.5rem;"></div>
+
+          <!-- Application Form Card -->
+          <div id="loanApplicationFormCard" style="background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid #F1F5F9;">
+              <div>
+                <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:#0F172A;">Apply for Institutional Education Loan Clearance</h3>
+                <p style="margin:3px 0 0 0;font-size:0.82rem;color:#64748B;">Upon submission, your application will be routed to the <strong>College Director</strong> for executive sanction and generation of the 3 required bank letters.</p>
+              </div>
+              <span style="background:#F0FDF4;color:#166534;font-size:0.75rem;font-weight:700;padding:4px 8px;border-radius:4px;border:1px solid #BBF7D0;">A4 Official Format</span>
+            </div>
+
+            <form id="loanRequestForm" onsubmit="studentPortal.submitLoanRequest(event)">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-bottom:1.25rem;">
+                
+                <!-- Target Bank Selection -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Select Required Bank *</label>
+                  <select id="loanBankSelect" required onchange="studentPortal.onBankSelectChange()" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;background:#fff;outline:none;">
+                    <option value="">-- Choose Your Loan Bank --</option>
+                    <option value="State Bank of India (SBI)">State Bank of India (SBI)</option>
+                    <option value="Punjab National Bank (PNB)">Punjab National Bank (PNB)</option>
+                    <option value="Canara Bank">Canara Bank</option>
+                    <option value="Union Bank of India">Union Bank of India</option>
+                    <option value="Bank of Baroda">Bank of Baroda</option>
+                    <option value="HDFC Bank">HDFC Bank</option>
+                    <option value="ICICI Bank">ICICI Bank</option>
+                    <option value="Axis Bank">Axis Bank</option>
+                    <option value="Bank of India">Bank of India</option>
+                    <option value="Central Bank of India">Central Bank of India</option>
+                    <option value="Indian Bank">Indian Bank</option>
+                    <option value="UCO Bank">UCO Bank</option>
+                    <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                    <option value="IDBI Bank">IDBI Bank</option>
+                    <option value="OTHER">Other Bank (Type Below)</option>
+                  </select>
+                </div>
+
+                <!-- Custom Bank Name (hidden by default) -->
+                <div id="loanCustomBankWrap" style="display:none;">
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Specify Bank Name *</label>
+                  <input type="text" id="loanCustomBankInput" placeholder="Enter Full Bank Name" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;outline:none;">
+                </div>
+
+                <!-- Bank Branch & City -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Target Bank Branch / City *</label>
+                  <input type="text" id="loanBranchInput" required placeholder="e.g. Bhubaneswar Main / Saheed Nagar Branch" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;outline:none;">
+                </div>
+
+                <!-- Bank IFSC (optional) -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Bank IFSC Code (Optional)</label>
+                  <input type="text" id="loanIfscInput" placeholder="e.g. SBIN0001234" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;text-transform:uppercase;outline:none;">
+                </div>
+
+                <!-- Requested Loan Amount -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Requested Loan Amount (₹) *</label>
+                  <input type="number" id="loanAmountInput" required min="10000" step="5000" placeholder="e.g. 350000" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.95rem;font-weight:700;color:#0B63C5;outline:none;">
+                  <div style="display:flex;gap:0.4rem;margin-top:0.35rem;flex-wrap:wrap;">
+                    <button type="button" onclick="studentPortal.setLoanAmountChip(150000)" style="background:#F1F5F9;border:1px solid #CBD5E1;border-radius:4px;font-size:0.75rem;padding:2px 6px;cursor:pointer;">₹1.5 Lakh</button>
+                    <button type="button" onclick="studentPortal.setLoanAmountChip(250000)" style="background:#F1F5F9;border:1px solid #CBD5E1;border-radius:4px;font-size:0.75rem;padding:2px 6px;cursor:pointer;">₹2.5 Lakh</button>
+                    <button type="button" onclick="studentPortal.setLoanAmountChip(350000)" style="background:#F1F5F9;border:1px solid #CBD5E1;border-radius:4px;font-size:0.75rem;padding:2px 6px;cursor:pointer;">₹3.5 Lakh</button>
+                    <button type="button" onclick="studentPortal.setLoanAmountChip(450000)" style="background:#F1F5F9;border:1px solid #CBD5E1;border-radius:4px;font-size:0.75rem;padding:2px 6px;cursor:pointer;">₹4.5 Lakh</button>
+                  </div>
+                </div>
+
+                <!-- Loan Purpose -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Purpose of Loan *</label>
+                  <select id="loanPurposeSelect" required style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;background:#fff;outline:none;">
+                    <option value="Tuition & Academic Fees">Tuition &amp; Academic Fees</option>
+                    <option value="Full Course Fee Package (Tuition + Exam + Dev)">Full Course Fee Package (Tuition + Exam + Dev)</option>
+                    <option value="Tuition + Hostel & Mess Accommodation">Tuition + Hostel &amp; Mess Accommodation</option>
+                    <option value="Complete 4-Year B.Tech Educational Expenses">Complete 4-Year B.Tech Educational Expenses</option>
+                    <option value="Academic Project & Special Courseware">Academic Project &amp; Special Courseware</option>
+                  </select>
+                </div>
+
+                <!-- Co-Applicant Name -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Co-Applicant / Parent Name *</label>
+                  <input type="text" id="loanCoAppName" required placeholder="e.g. Dilip Bag" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;outline:none;">
+                </div>
+
+                <!-- Co-Applicant Relation -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Relation to Student *</label>
+                  <select id="loanCoAppRelation" required style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;background:#fff;outline:none;">
+                    <option value="Father">Father</option>
+                    <option value="Mother">Mother</option>
+                    <option value="Guardian">Legal Guardian</option>
+                    <option value="Sibling">Elder Brother / Sister</option>
+                  </select>
+                </div>
+
+                <!-- Co-Applicant Phone -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Co-Applicant Mobile Number *</label>
+                  <input type="tel" id="loanCoAppPhone" required placeholder="+91 9876543210" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;outline:none;">
+                </div>
+
+                <!-- Co-Applicant Annual Income -->
+                <div>
+                  <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Co-Applicant Annual Income (₹)</label>
+                  <input type="number" id="loanCoAppIncome" placeholder="e.g. 450000" style="width:100%;height:38px;padding:0.4rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;outline:none;">
+                </div>
+
+              </div>
+
+              <!-- Student Remarks / Additional Notes -->
+              <div style="margin-bottom:1.5rem;">
+                <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:0.4rem;">Student Notes / Special Request to Directorate</label>
+                <textarea id="loanStudentRemarks" rows="2" placeholder="Mention any specific letter requirements requested by your bank manager..." style="width:100%;padding:0.5rem 0.75rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.88rem;outline:none;resize:vertical;"></textarea>
+              </div>
+
+              <!-- Directorate Workflow Advisory -->
+              <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:0.75rem;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <div style="font-size:0.82rem;color:#1E3A8A;line-height:1.45;">
+                  <strong>Important Bank Loan Note:</strong> After submitting, your application is reviewed and signed digitally by the <strong>Director of Gen-Z University</strong>. Once approved, the system generates the <strong>3 Official Bank Loan Letters</strong> (Bonafide Certificate, Institutional Expenditure Schedule, and University NOC &amp; Bank Account Undertaking) with the university seal, ready to present at the bank.
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div style="display:flex;justify-content:flex-end;">
+                <button type="submit" id="btnSubmitLoanRequest" style="background:linear-gradient(135deg,#0B63C5,#1E40AF);color:#fff;border:none;padding:0.75rem 2rem;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 14px rgba(11,99,197,0.3);display:inline-flex;align-items:center;gap:0.5rem;transition:all 0.2s;">
+                  Submit Request to Director &rarr;
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
     </main>
 
   </div>
@@ -1992,7 +2159,7 @@
       <div class="modal-header bec-gateway-header">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <div class="modal-title" style="color: white; font-weight: 700; font-size: 1.05rem;" id="checkoutModalTitle">BEC Secure Payment Gateway</div>
+          <div class="modal-title" style="color: white; font-weight: 700; font-size: 1.05rem;" id="checkoutModalTitle">GENZ Secure Payment Gateway</div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.65rem;">
           <span class="bec-pay-badge-secure">256-Bit SSL</span>
@@ -2009,7 +2176,7 @@
       <div class="modal-header bec-gateway-header no-print">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <div class="modal-title" style="color: white; font-weight: 700; font-size: 1.05rem;">Bhubaneswar Engineering College - Official Fee Receipt</div>
+          <div class="modal-title" style="color: white; font-weight: 700; font-size: 1.05rem;">Gen-Z University - Official Fee Receipt</div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.65rem;">
           <span class="bec-pay-badge-secure">Official Copy</span>
@@ -2030,6 +2197,71 @@
           </button>
         </div>
       </div>
+  <!-- 3 OFFICIAL BANK LOAN LETTERS MODAL & PRINT DOSSIER -->
+  <div id="loanLettersModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 900px; width: 96%; max-height: 95vh; display: flex; flex-direction: column;">
+      <div class="modal-header bec-gateway-header no-print">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div>
+            <div class="modal-title" style="color: white; font-weight: 800; font-size: 1.05rem;" id="loanModalTitle">Official Bank Loan Letters &bull; Directorate Sanction</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 500;" id="loanModalSubtitle">Gen-Z University Directorate Official Clearance</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <span class="bec-pay-badge-secure" style="background: rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.6);">Director Approved</span>
+          <button class="bec-modal-close-icon" onclick="studentPortal.closeLoanLettersModal()" title="Close">&times;</button>
+        </div>
+      </div>
+
+      <!-- Letter Switcher Toolbar (no-print) -->
+      <div class="no-print" style="background: #F1F5F9; border-bottom: 1px solid #E2E8F0; padding: 0.65rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <button type="button" class="loan-tab-btn active" id="tabBtnAllLetters" onclick="studentPortal.switchLetterPreview('ALL')" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 700; border: 1px solid #0B63C5; background: #0B63C5; color: #fff; cursor: pointer;">
+            📋 Complete 3-Letter Dossier
+          </button>
+          <button type="button" class="loan-tab-btn" id="tabBtnLetter1" onclick="studentPortal.switchLetterPreview(1)" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #CBD5E1; background: #fff; color: #334155; cursor: pointer;">
+            1. Bonafide Certificate
+          </button>
+          <button type="button" class="loan-tab-btn" id="tabBtnLetter2" onclick="studentPortal.switchLetterPreview(2)" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #CBD5E1; background: #fff; color: #334155; cursor: pointer;">
+            2. Fee Estimate
+          </button>
+          <button type="button" class="loan-tab-btn" id="tabBtnLetter3" onclick="studentPortal.switchLetterPreview(3)" style="padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #CBD5E1; background: #fff; color: #334155; cursor: pointer;">
+            3. Bank NOC &amp; A/C Details
+          </button>
+        </div>
+        <div style="display: flex; gap: 0.4rem; align-items: center;">
+          <button type="button" onclick="studentPortal.downloadCurrentLetterPdf()" style="background: #006644; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; padding: 0.42rem 1.1rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,102,68,0.25);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Visible (PDF)
+          </button>
+          <button type="button" onclick="studentPortal.printCurrentLetterView()" style="background: #ffffff; color: #0F172A; border: 1.5px solid #CBD5E1; font-weight: 700; font-size: 0.82rem; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print
+          </button>
+        </div>
+      </div>
+
+      <!-- Letter Content Scroll View -->
+      <div class="modal-body" id="loanLettersModalBody" style="padding: 1.5rem 1rem; background: #525659; overflow-y: auto; flex: 1;">
+        <!-- Rendered dynamically into #printableLoanLettersContainer -->
+        <div id="printableLoanLettersContainer"></div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="modal-footer no-print" style="background: #F8FAFC; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid #E2E8F0;">
+        <button class="btn btn-secondary" onclick="studentPortal.closeLoanLettersModal()" style="font-weight: 600; padding: 0.5rem 1.2rem; border-radius: 6px;">Close Preview</button>
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="studentPortal.downloadLoanLetterPdf('ALL')" style="background: linear-gradient(135deg, #006644, #00875A); border: none; font-weight: 700; padding: 0.55rem 1.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(0,102,68,0.3); cursor: pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download All 3 Letters (PDF Dossier)
+          </button>
+          <button class="btn" onclick="studentPortal.printAllLoanLetters()" style="background: #ffffff; color: #0F172A; border: 1.5px solid #CBD5E1; font-weight: 700; padding: 0.55rem 1.1rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print All
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2037,10 +2269,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/ui.js"></script>
-  <script src="/js/studentPortalController.js"></script>
+  <script src="/js/api.js?v=20261009_2"></script>
+  <script src="/js/auth.js?v=20261009_2"></script>
+  <script src="/js/ui.js?v=20261009_2"></script>
+  <script src="/js/studentPortalController.js?v=20261009_2"></script>
   <!-- Firebase Cloud Realtime Sync -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>

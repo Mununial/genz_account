@@ -1,6 +1,6 @@
 /**
  * Digital Receipt Generation and Verification Service
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query } = require('../config/db');
@@ -52,9 +52,9 @@ async function generateDigitalReceipt(connection, {
   const receiptNo = generateReceiptNo();
 
   const receiptMetadata = {
-    institution: 'Bhubaneswar Engineering College',
-    affiliation: 'Affiliated to BPUT, Odisha & Approved by AICTE',
-    address: 'At-Paniora, NK Nagar, Pittapally, Bhubaneswar, Odisha 752054',
+    institution: 'Gen-Z University',
+    affiliation: 'Autonomous Private University & Approved by UGC / AICTE',
+    address: 'Gen-Z Knowledge City Campus, Bhubaneswar, Odisha 752054',
     receiptNo,
     issuedAt: new Date().toISOString(),
     student: {

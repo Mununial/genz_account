@@ -1,6 +1,6 @@
 /**
  * Online & Offline Payment Processing Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const { query, withTransaction } = require('../config/db');
@@ -71,7 +71,7 @@ async function createPaymentOrder(req, res) {
         student_id: studentId,
         outstanding_amount: reqAmt,
         status: 'ISSUED',
-        email: sInfo[0]?.email || 'student@bec.ac.in'
+        email: sInfo[0]?.email || 'student@genz.edu.in'
       };
     }
 
@@ -495,7 +495,7 @@ async function recordCounterPayment(req, res) {
           createdBy: req.user ? req.user.id : 2
         });
       } catch (e) {
-        const receiptNo = `BEC-REC-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+        const receiptNo = `GENZ-REC-2026-${Math.floor(10000 + Math.random() * 90000)}`;
         receipt = { id: Date.now(), receiptNo };
       }
 

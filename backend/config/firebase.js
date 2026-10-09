@@ -1,5 +1,5 @@
 /**
- * Bhubaneswar Engineering College (BEC) Accounts & Finance System
+ * Gen-Z University Accounts & Finance System
  * Firebase Cloud Firestore Integration
  * Project: becaccount
  */
@@ -7,12 +7,12 @@
 const https = require('https');
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyCduVYcPTGfeCdu0a5J2VMwYnVx-YI3OL8",
-  authDomain: "becaccount.firebaseapp.com",
-  projectId: process.env.FIREBASE_PROJECT_ID || "becaccount",
-  storageBucket: "becaccount.firebasestorage.app",
-  messagingSenderId: "344226455152",
-  appId: "1:344226455152:web:936d5348782772df5fdeb5"
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyBpLQvYjddu0LaEUhPmva08u89eOXKbImg",
+  authDomain: "genzuniversity.firebaseapp.com",
+  projectId: process.env.FIREBASE_PROJECT_ID || "genzuniversity",
+  storageBucket: "genzuniversity.firebasestorage.app",
+  messagingSenderId: "423748552299",
+  appId: "1:423748552299:web:8981f1300ad217afd7132e"
 };
 
 /**

@@ -19,7 +19,7 @@ async function generateHostingerDump() {
   }
 
   write(`-- ==============================================================================`);
-  write(`-- BHUBANESWAR ENGINEERING COLLEGE (BEC) & BPUT REGISTRATION`);
+  write(`-- GEN-Z UNIVERSITY (GENZ) & BPUT REGISTRATION`);
   write(`-- Target Database: u847513759_acccount`);
   write(`-- Target User:     u847513759_erp_account`);
   write(`-- Generated:       ${new Date().toISOString()}`);

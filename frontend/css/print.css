@@ -1,6 +1,6 @@
 /**
  * Official Digital Receipt & Invoice High-Resolution Print Stylesheet
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 /* Hidden on screen by default */
@@ -9,7 +9,7 @@
 }
 
 /* ========================================================================= */
-/* ON-SCREEN OFFICIAL BEC FEE RECEIPT PREVIEW (AUTHENTIC PAPER PREVIEW)     */
+/* ON-SCREEN OFFICIAL GENZ FEE RECEIPT PREVIEW (AUTHENTIC PAPER PREVIEW)     */
 /* ========================================================================= */
 .bec-official-receipt-frame {
   background: #FFFFFF;

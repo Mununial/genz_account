@@ -1,6 +1,6 @@
 /**
  * Financial Reports, Defaulters & University Registrations Module
- * Bhubaneswar Engineering College (BEC) Accounts & ERP System
+ * Gen-Z University Accounts & ERP System
  */
 
 const reportsModule = {
@@ -1009,7 +1009,7 @@ const reportsModule = {
 
     becExportUtils.exportToPDF({
       title: 'EXAMINATION & UNIVERSITY REGISTRATION FEE REGISTER',
-      subtitle: 'BPUT 1st Semester Regular Examination & Enrollment Compliance Register • Session 2026-27',
+      subtitle: 'Gen-Z 1st Semester Regular Examination & Enrollment Compliance Register • Session 2026-27',
       filterSummary: `Status: ${this.currentRegStatusFilter} | Total Students: ${list.length}`,
       stats: {
         'Total Cohort': list.length,

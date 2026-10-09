@@ -1,6 +1,6 @@
 /**
  * Accounts Executive & Administrative Operations Controller
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const accountsDashboard = {

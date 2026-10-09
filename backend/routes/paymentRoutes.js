@@ -1,6 +1,6 @@
 /**
  * Payment Routes
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const express = require('express');

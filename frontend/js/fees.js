@@ -1,6 +1,6 @@
 /**
  * Fee Structures & Fine Configuration Module
- * Bhubaneswar Engineering College (BEC) Accounts System
+ * Gen-Z University Accounts System
  */
 
 const feesModule = {

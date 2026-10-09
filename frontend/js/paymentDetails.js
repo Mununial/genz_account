@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * BHUBANESWAR ENGINEERING COLLEGE (BEC) - PAYMENT DETAILS CONTROLLER
+ * GEN-Z UNIVERSITY (GZU) - PAYMENT DETAILS CONTROLLER
  * Recreates the authentic college payment details and outstanding dues view.
  * Supports both Student Self-Service and Accounts Office / Administrator View.
  * ==============================================================================
@@ -224,7 +224,7 @@ const paymentDetails = {
                       </tr>
                       <tr>
                         <td>3</td>
-                        <td>BPUT University Examination Fee</td>
+                        <td>Gen-Z University Examination Fee</td>
                         <td style="text-align: right;">₹5,000.00</td>
                         <td style="text-align: right; color: #16A34A;">₹0.00</td>
                         <td style="text-align: right; font-weight: 700; color: #DC2626;">₹5,000.00</td>
@@ -470,12 +470,12 @@ const paymentDetails = {
           key: ord.key,
           amount: Math.round(amount * 100),
           currency: 'INR',
-          name: 'Bhubaneswar Engineering College',
+          name: 'Gen-Z University',
           description: `College Fee Payment - ${s.full_name || s.student_name || 'Student'}`,
           order_id: ord.orderId,
           prefill: {
             name: s.full_name || s.student_name || '',
-            email: s.email || 'accounts@bec.ac.in',
+            email: s.email || 'accounts@genz.edu.in',
             contact: '9876543210'
           },
           theme: {

@@ -1,6 +1,6 @@
 /**
  * HOD Subject Registration Approvals Controller
- * Bhubaneswar Engineering College (BEC) — Level 1 Academic Review
+ * Gen-Z University — Level 1 Academic Review
  */
 
 const hodRegistrations = {
@@ -116,7 +116,7 @@ const hodRegistrations = {
             </td>
             <td style="padding:12px;text-align:center;">
               <span style="font-weight:700;color:#0B63C5;">${r.total_credits}</span>
-              <span style="font-size:0.72rem;color:#64748B;display:block;">BPUT (20-28)</span>
+              <span style="font-size:0.72rem;color:#64748B;display:block;">Gen-Z (20-28)</span>
             </td>
             <td style="padding:12px;font-size:0.82rem;color:#64748B;">${new Date(r.submitted_at).toLocaleDateString('en-IN')}</td>
             <td style="padding:12px;text-align:center;">
@@ -268,7 +268,7 @@ const hodRegistrations = {
                 <tr style="background:#F8FAFC;font-weight:800;border-top:2px solid #0B63C5;color:#0F172A;">
                   <td colspan="4" style="padding:8px 12px;text-align:right;">TOTAL REGISTERED CREDITS:</td>
                   <td style="padding:8px 10px;text-align:center;color:#0B63C5;font-size:1rem;">${r.total_credits}</td>
-                  <td style="padding:8px 10px;text-align:center;font-size:0.75rem;color:#64748B;">BPUT Syllabus</td>
+                  <td style="padding:8px 10px;text-align:center;font-size:0.75rem;color:#64748B;">Gen-Z Syllabus</td>
                 </tr>
               </tfoot>
             </table>
@@ -285,10 +285,10 @@ const hodRegistrations = {
           </div>
 
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:0.85rem;">
-            <!-- Card 1: BPUT Exam Fee -->
+            <!-- Card 1: Gen-Z Exam Fee -->
             <div style="background:#ffffff;border:1px solid #CBD5E1;border-radius:8px;padding:1rem;border-left:4px solid ${isExamPaid ? '#16A34A' : '#D97706'};">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
-                <span style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">BPUT Exam &amp; Board Fee</span>
+                <span style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;">Gen-Z Exam &amp; Board Fee</span>
                 ${isExamPaid 
                   ? '<span style="background:#DCFCE7;color:#15803D;font-weight:800;font-size:0.72rem;padding:2px 7px;border-radius:4px;">✓ PAID</span>' 
                   : '<span style="background:#FEF3C7;color:#B45309;font-weight:800;font-size:0.72rem;padding:2px 7px;border-radius:4px;">⏳ PENDING</span>'
@@ -340,7 +340,7 @@ const hodRegistrations = {
                 ✓ Accounts Financial Audit Passed
               </div>
               <div style="font-size:0.75rem;color:#64748B;margin-top:2px;">
-                Verified under BPUT Minimum Fee Rule
+                Verified under Gen-Z Minimum Fee Rule
               </div>
             </div>
           </div>
@@ -403,7 +403,7 @@ const hodRegistrations = {
               </div>
               <div style="font-size:0.82rem;font-weight:700;color:#0F172A;">Fee Clearance Audit</div>
               <div style="font-size:0.75rem;color:#475569;margin-top:2px;">${clearancePercent}% Cleared (₹${totalCollegePaid.toLocaleString('en-IN')})</div>
-              <div style="font-size:0.72rem;color:#64748B;font-style:italic;margin-top:2px;">BPUT 50% minimum fee satisfied</div>
+              <div style="font-size:0.72rem;color:#64748B;font-style:italic;margin-top:2px;">Gen-Z 50% minimum fee satisfied</div>
             </div>
 
             <!-- Stage 5: Exam Cell -->
@@ -414,7 +414,7 @@ const hodRegistrations = {
                   ${trail.examSection?.ok ? '✓ CONFIRMED' : (isExamPaid ? 'RECEIPT ISSUED' : 'PENDING')}
                 </span>
               </div>
-              <div style="font-size:0.82rem;font-weight:700;color:#0F172A;">BPUT University Roll</div>
+              <div style="font-size:0.82rem;font-weight:700;color:#0F172A;">Gen-Z University Roll</div>
               <div style="font-size:0.75rem;color:#475569;margin-top:2px;">${escapeHtml(trail.examSection?.officer || 'Exam Controller')}</div>
               <div style="font-size:0.72rem;color:#64748B;font-style:italic;margin-top:2px;">${isExamPaid ? 'Exam form confirmed' : 'Awaiting confirmation'}</div>
             </div>
@@ -426,7 +426,7 @@ const hodRegistrations = {
           <label style="font-weight:700;font-size:0.85rem;color:#1E293B;display:block;margin-bottom:0.35rem;">
             HOD Endorsement Remarks <span style="font-size:0.75rem;color:#64748B;font-weight:400;">(Mandatory for reversion, optional for forwarding)</span>
           </label>
-          <textarea id="hodRemarksInput" rows="2" style="width:100%;padding:0.6rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;" placeholder="e.g., Academic eligibility verified. Credits verified as per BPUT syllabus."></textarea>
+          <textarea id="hodRemarksInput" rows="2" style="width:100%;padding:0.6rem;border:1px solid #CBD5E1;border-radius:6px;font-size:0.85rem;" placeholder="e.g., Academic eligibility verified. Credits verified as per Gen-Z syllabus."></textarea>
         </div>
 
         <!-- Action Buttons -->
