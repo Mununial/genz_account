@@ -369,7 +369,7 @@ class MockDatabase {
       { id: 12, user_id: 12, staff_code: 'GENZ-HOD-DIP-001', full_name: 'Er. Chandan Kumar Rout', designation: 'Head of Department', department: 'Diploma Engineering Wing' },
       { id: 13, user_id: 13, staff_code: 'GENZ-HOD-MBA-001', full_name: 'Dr. Smruti Rekha Jena', designation: 'Head of Department', department: 'Master of Business Administration' },
       { id: 14, user_id: 14, staff_code: 'GENZ-DIR-001', full_name: 'Prof. S. K. Rath', designation: 'Director', department: 'Administration' },
-      { id: 15, user_id: 15, staff_code: 'GENZ-EXM-001', full_name: 'Dr. Ramesh Chandra Sahoo', designation: 'Controller of Examinations', department: 'Examination Section' }
+      { id: 15, user_id: 20, staff_code: 'GENZ-EXM-001', full_name: 'Dr. Ramesh Chandra Sahoo', designation: 'Controller of Examinations', department: 'Examination Section' }
     );
 
     // 2. Import REAL Cohort from Excel Spreadsheet (Prioritize BEC_Complete_Student_Report_2026-09-24.xlsx)
