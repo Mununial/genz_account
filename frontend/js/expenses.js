@@ -439,7 +439,7 @@ const expensesApp = {
   },
 
   exportToExcel() {
-    window.location.href = '/api/expenses/export';
+    window.location.href = `${window.API_BASE || '/api'}/expenses/export`;
   },
 
   exportToPDF() {

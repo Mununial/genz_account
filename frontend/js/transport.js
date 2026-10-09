@@ -383,7 +383,7 @@ const transportApp = {
     if (pickupPoint) params.append('pickup_point', pickupPoint);
     if (showUnpaid) params.append('unpaid_only', 'true');
 
-    window.location.href = `/api/transport/export?${params.toString()}`;
+    window.location.href = `${window.API_BASE || '/api'}/transport/export?${params.toString()}`;
   }
 };
 
