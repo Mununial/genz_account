@@ -159,25 +159,29 @@ async function login(req, res) {
     );
 
     if (!isDobMatch && user.dob) {
-      let dobStr = '';
+      let dobStr = ''; // DDMMYYYY
+      let dobYmd = ''; // YYYYMMDD
       if (user.dob instanceof Date) {
         const y = user.dob.getFullYear();
         const m = String(user.dob.getMonth() + 1).padStart(2, '0');
         const d = String(user.dob.getDate()).padStart(2, '0');
         dobStr = `${d}${m}${y}`;
+        dobYmd = `${y}${m}${d}`;
       } else {
         const parts = String(user.dob).split(/[-/]/);
         if (parts.length === 3) {
           if (parts[0].length === 4) {
-            // YYYY-MM-DD -> DDMMYYYY
+            // YYYY-MM-DD
             dobStr = `${parts[2].padStart(2, '0')}${parts[1].padStart(2, '0')}${parts[0]}`;
+            dobYmd = `${parts[0]}${parts[1].padStart(2, '0')}${parts[2].padStart(2, '0')}`;
           } else {
             // DD-MM-YYYY
             dobStr = `${parts[0].padStart(2, '0')}${parts[1].padStart(2, '0')}${parts[2]}`;
+            dobYmd = `${parts[2]}${parts[1].padStart(2, '0')}${parts[0].padStart(2, '0')}`;
           }
         }
       }
-      if (dobStr && cleanInputPwd === dobStr) {
+      if ((dobStr && cleanInputPwd === dobStr) || (dobYmd && cleanInputPwd === dobYmd)) {
         isDobMatch = true;
       }
     }
