@@ -39,7 +39,7 @@ async function verifyConnection() {
 async function sendEmail({ to, subject, text, html, attachments }) {
   try {
     const mailOptions = {
-      from: `"Gen-Z University Support" <${gmailUser}>`,
+      from: `"GenZ University Digital Campus" <${gmailUser}>`,
       to,
       subject,
       text: text || '',
