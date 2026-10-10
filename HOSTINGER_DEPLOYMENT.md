@@ -1,7 +1,7 @@
-# Bhubaneswar Engineering College (BEC)
+# GEN-Z UNIVERSITY (GZU)
 ## Production Deployment Manual for Hostinger (Node.js & MySQL)
 
-This guide provides end-to-end instructions for deploying the **BEC Accounts & Finance Management System** on Hostinger Web Hosting or Cloud Hosting.
+This guide provides end-to-end instructions for deploying the **GENZ Accounts & Finance Management System** on Hostinger Web Hosting or Cloud Hosting.
 
 ---
 
@@ -109,8 +109,8 @@ PAYMENT_GATEWAY_SECRET=rzp_live_secret
 PAYMENT_WEBHOOK_SECRET=rzp_webhook_secret
 
 # Institutional Information
-COLLEGE_NAME=Bhubaneswar Engineering College
-COLLEGE_CODE=BEC
+COLLEGE_NAME=Gen-Z University
+COLLEGE_CODE=GENZ
 COLLEGE_AFFILIATION=Affiliated to BPUT, Odisha & Approved by AICTE
 COLLEGE_EMAIL=accounts@bec.ac.in
 COLLEGE_PHONE=+91-674-2970000

@@ -1,7 +1,7 @@
-# Bhubaneswar Engineering College (BEC)
+# GEN-Z UNIVERSITY (GZU)
 ## College Accounts & Finance Management System
 
-A production-grade, secure, and responsive **College Accounts & Finance Management System** engineered for **Bhubaneswar Engineering College (BEC)**. The platform provides full lifecycle financial operations across students, accounts staff, accounts head, college administration, and external auditors.
+A production-grade, secure, and responsive **College Accounts & Finance Management System** engineered for **GEN-Z UNIVERSITY (GZU)**. The platform provides full lifecycle financial operations across students, accounts staff, accounts head, college administration, and external auditors.
 
 Built strictly with **HTML5, CSS3, Vanilla JavaScript, Node.js, Express.js, and Hostinger MySQL (`mysql2`)** with zero frontend framework overhead and absolute single-source-of-truth database integrity.
 
@@ -14,8 +14,8 @@ Built strictly with **HTML5, CSS3, Vanilla JavaScript, Node.js, Express.js, and 
 - **ACID Financial Transactions:** Payments and ledger settlements execute inside MySQL `START TRANSACTION ... FOR UPDATE` blocks, eliminating double-credits, race conditions, and ledger drift.
 - **Replay & Tampering Prevention:** Server-side HMAC signature verification, order token hashing, and idempotency key checks.
 - **Comprehensive 5-Tier RBAC:** `STUDENT`, `ACCOUNTS_STAFF`, `ACCOUNTS_HEAD`, `ADMIN`, and `AUDITOR_READ_ONLY`.
-- **Authentic BEC Cohort Integration:** Pre-seeded from Bhubaneswar Engineering College 1st-year reporting records (`final 1st Year database from reporting.xlsx`) across all 7 engineering departments.
-- **Official Digital Receipts:** Verifiable digital receipts with unique numbers (`BEC-REC-YYYY-XXXXX`) and printable A4 layouts.
+- **Authentic GENZ Cohort Integration:** Pre-seeded from Gen-Z University 1st-year reporting records (`final 1st Year database from reporting.xlsx`) across all 7 engineering departments.
+- **Official Digital Receipts:** Verifiable digital receipts with unique numbers (`GZU-REC-YYYY-XXXXX`) and printable A4 layouts.
 - **Automated Financial Intelligence:** Deterministic SQL-driven analytics flagging students with dues expiring in 3 days, overdue aging, and settlement discrepancies.
 - **Hostinger Production Ready:** Native configuration for Hostinger Node.js application management and Hostinger MySQL database hosting.
 
@@ -67,7 +67,7 @@ Built strictly with **HTML5, CSS3, Vanilla JavaScript, Node.js, Express.js, and 
 7. **Online Fee Payments:** Safe payment order flow with server-side signature validation and atomic ledger posting.
 8. **Counter / Offline Collections:** Accounts staff cash, cheque, DD, and NEFT recording with instant receipt issuance.
 9. **Payment History:** Searchable payment records with verification timestamps.
-10. **Digital Receipts:** Unique receipt generator (`BEC-REC-YYYY-XXXXX`) with printable A4 templates.
+10. **Digital Receipts:** Unique receipt generator (`GZU-REC-YYYY-XXXXX`) with printable A4 templates.
 11. **Refund Management:** Multi-tier refund request, approval, and adjustment workflow.
 12. **Fee Adjustments:** Credit and debit adjustments with mandatory audit justification.
 13. **Scholarships & Discounts:** Merited fee deductions and criteria tracking.
@@ -181,7 +181,7 @@ Edit `backend/.env` with your database credentials.
 # If running local MySQL or remote Hostinger MySQL:
 node database/init_db.js
 ```
-*(Note: If MySQL is not running on localhost, the backend automatically operates in an In-Memory High-Fidelity Simulation Mode populated with the real BEC cohort for local preview).*
+*(Note: If MySQL is not running on localhost, the backend automatically operates in an In-Memory High-Fidelity Simulation Mode populated with the real GENZ cohort for local preview).*
 
 ### 4. Run Automated Test Suite
 ```bash
@@ -217,5 +217,5 @@ For complete, step-by-step instructions on setting up MySQL, Node.js application
 ---
 
 ## License & Attribution
-Proprietary software developed for **Bhubaneswar Engineering College (BEC)**.  
+Proprietary software developed for **GEN-Z UNIVERSITY (GZU)**.  
 Affiliated to BPUT, Odisha & Approved by AICTE, New Delhi.

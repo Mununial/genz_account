@@ -94,7 +94,7 @@ console.log('  Testing Scenario A: studentObj is null (exact scenario from recen
 try {
   modalOpened = false;
   modalHtml = '';
-  becRealFee.printReceiptPreview(1, 'BEC-REC-2026-18813', 'Barsha Priyadarshini Sahoo', 65000, 'CASH', 'COUNTER-CASH', null);
+  becRealFee.printReceiptPreview(1, 'GENZ-REC-2026-18813', 'Barsha Priyadarshini Sahoo', 65000, 'CASH', 'COUNTER-CASH', null);
   console.log(`    -> Modal opened: ${modalOpened ? 'YES (PASS)' : 'NO (FAIL)'}`);
   console.log(`    -> Modal body generated length: ${modalHtml.length} chars`);
   console.log(`    -> Contains Official Fee e-Receipt: ${modalHtml.includes('OFFICIAL FEE PAYMENT e-RECEIPT') ? 'YES' : 'NO'}`);
@@ -109,7 +109,7 @@ console.log('\n  Testing Scenario B: studentObj passed directly as object...');
 try {
   modalOpened = false;
   modalHtml = '';
-  becRealFee.printReceiptPreview(2, 'BEC-REC-2026-68315', 'Barsha Priyadarshini Sahoo', 65000, 'CASH', 'REPRINT', {
+  becRealFee.printReceiptPreview(2, 'GENZ-REC-2026-68315', 'Barsha Priyadarshini Sahoo', 65000, 'CASH', 'REPRINT', {
     id: 101,
     full_name: 'Barsha Priyadarshini Sahoo',
     roll_no: '26CE001'
@@ -125,7 +125,7 @@ console.log('\n  Testing Scenario C: studentObj is null and studentName not in c
 try {
   modalOpened = false;
   modalHtml = '';
-  becRealFee.printReceiptPreview(3, 'BEC-REC-2026-99999', 'Unknown Student', 5000, 'UPI', 'UPI-987654', null);
+  becRealFee.printReceiptPreview(3, 'GENZ-REC-2026-99999', 'Unknown Student', 5000, 'UPI', 'UPI-987654', null);
   console.log(`    -> Modal opened: ${modalOpened ? 'YES (PASS)' : 'NO (FAIL)'}`);
   console.log(`    -> Fallback roll_no and branch applied cleanly without throw: YES`);
   console.log('    [PASS] Scenario C executed flawlessly!');

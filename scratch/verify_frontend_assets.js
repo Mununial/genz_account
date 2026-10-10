@@ -85,7 +85,7 @@ async function checkAll() {
   console.log('\nbecExportUtils.js Size:', exportUtilsContent.length, 'bytes');
   console.log('becExportUtils exports to Excel:', exportUtilsContent.includes('exportToExcel'));
   console.log('becExportUtils exports to PDF:', exportUtilsContent.includes('exportToPDF'));
-  console.log('becExportUtils institutional header:', exportUtilsContent.includes('BHUBANESWAR ENGINEERING COLLEGE'));
+  console.log('becExportUtils institutional header:', exportUtilsContent.includes('GEN-Z UNIVERSITY'));
 
   console.log('\n>>> ALL 4 PAGE CHECKS & ASSETS FULLY VERIFIED SUCCESS! <<<');
 }
