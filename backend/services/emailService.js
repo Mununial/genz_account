@@ -5,6 +5,7 @@
 
 const nodemailer = require('nodemailer');
 const path = require('path');
+const pdfService = require('./pdfService');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const gmailUser = process.env.GMAIL_USER || 'genzsupportbbsr@gmail.com';
@@ -35,14 +36,15 @@ async function verifyConnection() {
 /**
  * Send General Email
  */
-async function sendEmail({ to, subject, text, html }) {
+async function sendEmail({ to, subject, text, html, attachments }) {
   try {
     const mailOptions = {
       from: `"Gen-Z University Support" <${gmailUser}>`,
       to,
       subject,
       text: text || '',
-      html: html || `<p>${text}</p>`
+      html: html || `<p>${text}</p>`,
+      attachments: attachments || []
     };
 
     const info = await transporter.sendMail(mailOptions);
@@ -110,7 +112,19 @@ async function sendPaymentReceiptEmail({ to, studentName, receiptNo, amount, pay
     </div>
   `;
 
-  return sendEmail({ to, subject, html });
+  let attachments = [];
+  try {
+    const pdf = await pdfService.generateReceiptPdf({ studentName, receiptNo, amount, paymentMethod, transactionId, date });
+    attachments.push({
+      filename: `Receipt_${(receiptNo || 'REC').replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`,
+      content: pdf,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('[EmailService] Receipt PDF generation error:', err.message);
+  }
+
+  return sendEmail({ to, subject, html, attachments });
 }
 
 /**
@@ -166,7 +180,19 @@ async function sendCertificateEmail({ to, studentName, rollNo, certificateType, 
       </div>
     </div>
   `;
-  return sendEmail({ to, subject, html });
+  let attachments = [];
+  try {
+    const pdf = await pdfService.generateCertificatePdf({ studentName, rollNo, certificateType, issueDate, certificateNo });
+    attachments.push({
+      filename: `Certificate_${(rollNo || 'GENZ').replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`,
+      content: pdf,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('[EmailService] Certificate PDF generation error:', err.message);
+  }
+
+  return sendEmail({ to, subject, html, attachments });
 }
 
 /**
@@ -226,7 +252,19 @@ async function sendGatePassEmail({ to, studentName, rollNo, passType, reason, va
       </div>
     </div>
   `;
-  return sendEmail({ to, subject, html });
+  let attachments = [];
+  try {
+    const pdf = await pdfService.generateGatePassPdf({ studentName, rollNo, passType, reason, validFrom, validTo, passId, wardenApproval });
+    attachments.push({
+      filename: `GatePass_${(passId || 'GP').replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`,
+      content: pdf,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('[EmailService] GatePass PDF generation error:', err.message);
+  }
+
+  return sendEmail({ to, subject, html, attachments });
 }
 
 /**
@@ -286,7 +324,19 @@ async function sendTechnicianTicketEmail({ to, technicianName, ticketId, roomOrL
       </div>
     </div>
   `;
-  return sendEmail({ to, subject, html });
+  let attachments = [];
+  try {
+    const pdf = await pdfService.generateTechnicianTicketPdf({ technicianName, ticketId, roomOrLab, issueDescription, priority, reportedBy });
+    attachments.push({
+      filename: `WorkOrder_${(ticketId || 'TKT').replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`,
+      content: pdf,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('[EmailService] Technician Ticket PDF generation error:', err.message);
+  }
+
+  return sendEmail({ to, subject, html, attachments });
 }
 
 /**
@@ -342,7 +392,20 @@ async function sendDirectorReportEmail({ to, directorName, date, totalCollection
       </div>
     </div>
   `;
-  return sendEmail({ to, subject, html });
+
+  let attachments = [];
+  try {
+    const pdf = await pdfService.generateDirectorReportPdf({ directorName, date, totalCollections, activeStudents, pendingApprovals, systemHealth });
+    attachments.push({
+      filename: `Director_Daily_Report_${new Date().toISOString().slice(0, 10)}.pdf`,
+      content: pdf,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('[EmailService] Director Report PDF generation error:', err.message);
+  }
+
+  return sendEmail({ to, subject, html, attachments });
 }
 
 module.exports = {
