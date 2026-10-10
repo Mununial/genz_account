@@ -95,19 +95,10 @@ This digital certificate is issued upon the scholar's official application for p
  * 2. Generate Campus Gate Pass PDF (with REAL SCANNABLE QR CODE)
  */
 async function generateGatePassPdf({ studentName, rollNo, passType, reason, validFrom, validTo, passId, wardenApproval }) {
-  // Generate REAL QR Code containing official pass JSON
-  const qrPayload = JSON.stringify({
-    passId: passId || 'GP-2026-8819',
-    student: studentName || 'Munu Nial',
-    roll: rollNo || 'GENZ-2026-CSE-042',
-    validFrom: validFrom || 'Today, 04:30 PM',
-    validTo: validTo || 'Today, 09:00 PM',
-    status: 'ACTIVE_APPROVED',
-    securityVerified: true,
-    university: 'Gen-Z University Campus Security'
-  });
+  // Encode pure Pass Number or Roll Number so scanner puts the exact identifier into the input field
+  const cleanCode = (passId || rollNo || 'GP-20261011-8819').trim();
 
-  const qrBuffer = await QRCode.toBuffer(qrPayload, {
+  const qrBuffer = await QRCode.toBuffer(cleanCode, {
     width: 250,
     margin: 1,
     color: { dark: '#064E3B', light: '#FFFFFF' }
