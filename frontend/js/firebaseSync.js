@@ -35,9 +35,12 @@ const genzFirebase = {
         this.app = firebase.apps[0];
       }
 
+      if (typeof firebase.firestore.setLogLevel === 'function') {
+        firebase.firestore.setLogLevel('silent');
+      }
       this.db = firebase.firestore();
       this.isInitialized = true;
-      console.log('[Firebase] Connected to Firebase Cloud Firestore.');
+      console.log('[Firebase] Cloud Firestore initialized.');
 
       // Update UI Status Badge
       this.renderStatusBadge(true);

@@ -5,49 +5,19 @@
 
 const REMOTE_BACKEND_URL = 'https://genz-account.onrender.com/api';
 
+// Direct, fast API base resolution - avoids 404 console probes
+const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+  ? 'http://localhost:5000/api'
+  : REMOTE_BACKEND_URL;
+
+window.API_BASE = API_BASE;
+
 // Proactively warm up backend on page load so login is instant with zero cold-start delay
 try {
-  fetch(`${REMOTE_BACKEND_URL}/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
+  if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+    fetch(`${REMOTE_BACKEND_URL}/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
+  }
 } catch (e) {}
-
-let cachedApiBase = null;
-
-async function resolveApiBase() {
-  if (cachedApiBase) return cachedApiBase;
-
-  if (typeof window === 'undefined') {
-    cachedApiBase = '/api';
-    return cachedApiBase;
-  }
-
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    cachedApiBase = 'http://localhost:5000/api';
-    return cachedApiBase;
-  }
-
-  // Check if Hostinger local /api has an active Node.js server responding with JSON
-  try {
-    const ctrl = new AbortController();
-    const tId = setTimeout(() => ctrl.abort(), 1000);
-    const probe = await fetch('/api/health', { signal: ctrl.signal });
-    clearTimeout(tId);
-    const cType = probe.headers.get('content-type') || '';
-    if (probe.ok && cType.includes('application/json')) {
-      cachedApiBase = '/api';
-      return cachedApiBase;
-    }
-  } catch (err) {
-    // Local /api not ready or timed out
-  }
-
-  // Default to live backend (connected directly to Hostinger MySQL)
-  cachedApiBase = REMOTE_BACKEND_URL;
-  return cachedApiBase;
-}
-
-// Start probing immediately in background
-const baseReadyPromise = resolveApiBase();
 
 const api = {
   getToken() {
@@ -76,8 +46,7 @@ const api = {
   },
 
   async request(endpoint, options = {}) {
-    const apiBase = await baseReadyPromise;
-    const url = `${apiBase}${endpoint}`;
+    const url = `${API_BASE}${endpoint}`;
     const token = this.getToken();
 
     const headers = {
@@ -87,7 +56,7 @@ const api = {
     };
 
     try {
-      let response = await fetch(url, {
+      const response = await fetch(url, {
         method: options.method || 'GET',
         headers,
         body: options.body ? JSON.stringify(options.body) : undefined
@@ -99,21 +68,6 @@ const api = {
         if (!window.location.pathname.includes('login')) {
           window.location.href = '/login.html';
         }
-      }
-
-      // Check if response is valid JSON
-      const cType = response.headers.get('content-type') || '';
-      const isJson = cType.includes('application/json');
-
-      if (!isJson && apiBase !== REMOTE_BACKEND_URL) {
-        // If local /api returned HTML, immediately switch and retry via remote backend
-        cachedApiBase = REMOTE_BACKEND_URL;
-        const retryUrl = `${REMOTE_BACKEND_URL}${endpoint}`;
-        response = await fetch(retryUrl, {
-          method: options.method || 'GET',
-          headers,
-          body: options.body ? JSON.stringify(options.body) : undefined
-        });
       }
 
       let data = null;
