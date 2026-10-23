@@ -1,0 +1,40 @@
+# ==============================================================================
+# Gen-Z University ERP - Production Apache / LiteSpeed Configuration
+# ==============================================================================
+
+# Disable directory listing to avoid 403 Forbidden or directory leaks
+Options -Indexes
+
+# Set directory index
+DirectoryIndex index.html frontend/index.html index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Protect sensitive files and directories
+  RewriteRule ^(\.git|\.env|node_modules|backend|database|tests|scratch) - [F,L]
+
+  # 2. Route root URL '/' directly to frontend/index.html
+  RewriteRule ^$ frontend/index.html [L]
+
+  # 3. Serve physical files/directories directly if they exist in current root
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # 4. Rewrite root requests for frontend assets to frontend/ folder
+  # (e.g. /css/style.css -> frontend/css/style.css, /js/api.js -> frontend/js/api.js)
+  RewriteCond %{DOCUMENT_ROOT}/frontend/$1 -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}/frontend/$1 -d
+  RewriteRule ^(.*)$ frontend/$1 [L]
+
+  # 5. Clean URLs without .html (e.g. /login -> frontend/login.html, /student-portal -> frontend/student-portal.html)
+  RewriteCond %{DOCUMENT_ROOT}/frontend/$1.html -f
+  RewriteRule ^([^/]+)/?$ frontend/$1.html [L]
+
+  # 6. Fallback for client SPA navigation
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^.*$ frontend/index.html [L]
+</IfModule>

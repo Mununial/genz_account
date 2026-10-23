@@ -156,6 +156,10 @@ app.get('/master-control', (req, res) => {
   res.sendFile(path.join(frontendPath, 'master-control.html'));
 });
 
+app.get('/virtual-tour', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'virtual-tour.html'));
+});
+
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ success: false, message: `API endpoint '${req.originalUrl}' not found.` });

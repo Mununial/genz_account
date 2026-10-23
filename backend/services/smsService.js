@@ -13,7 +13,7 @@ const https = require('https');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
-const FAST2SMS_API_KEY = process.env.FAST2SMS_API_KEY || process.env.SMS_API_KEY || '3lqdhCpj5nMYyeBZ9UJgrQ8oIN4Ls7Gf0i2PETHVxAK1O6XFbz9jWsIHG7LcPtdNZTEJrzawloFgkeKR';
+const FAST2SMS_API_KEY = process.env.FAST2SMS_API_KEY || process.env.SMS_API_KEY || 'r4vF6SUbuzA3DlTRCMJnHK7Vdo8agp5YmLxEO9chk2s1XGywNW5F43cyJItZn6ePVHaxvXfDYUblOE2g';
 
 /**
  * Low-level Fast2SMS Dispatcher
