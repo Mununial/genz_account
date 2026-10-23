@@ -20,7 +20,7 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background: #0B132B url('/assets/genz-campus.jpg?v=real_giet_campus_2026') no-repeat center center fixed;
+      background: #0B132B url('/assets/genz-campus.jpg?v=clean_hq_2026') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       flex-direction: column;
@@ -380,49 +380,6 @@
       border-color: #F59E0B;
     }
 
-    /* 360 Virtual Tour Entry Styles */
-    .virtual-tour-entry-pill {
-      margin-top: 1.15rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.8rem 1.1rem;
-      background: linear-gradient(135deg, rgba(11, 99, 197, 0.28) 0%, rgba(30, 58, 138, 0.45) 100%);
-      border: 1px solid rgba(56, 189, 248, 0.45);
-      border-radius: 10px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(11, 99, 197, 0.25);
-    }
-    .virtual-tour-entry-pill:hover {
-      background: linear-gradient(135deg, rgba(11, 99, 197, 0.5) 0%, rgba(30, 58, 138, 0.7) 100%);
-      border-color: #38BDF8;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(11, 99, 197, 0.4);
-    }
-    .top-banner-tour-btn {
-      margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(11, 99, 197, 0.35);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      color: #FFFFFF;
-      text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 700;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-    .top-banner-tour-btn:hover {
-      background: #0B63C5;
-      border-color: #38BDF8;
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
-      transform: translateY(-1px);
-    }
-
     @media (max-width: 768px) {
       .top-banner-card {
         width: 96%;
@@ -438,9 +395,6 @@
         font-size: 1.15rem;
       }
       .top-banner-desc {
-        display: none;
-      }
-      .top-banner-tour-btn {
         display: none;
       }
       .login-glass-card {
@@ -461,10 +415,6 @@
       <h1 class="top-banner-title">Welcome to Gen-Z University ERP Management System</h1>
       <p class="top-banner-desc">A unified digital workspace for students, staff, faculty, and administration.</p>
     </div>
-    <a href="/virtual-tour" class="top-banner-tour-btn" title="Experience GIET campus in 360°">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <span>Explore Campus in 360°</span>
-    </a>
   </header>
 
   <!-- CENTER LOGIN WRAPPER -->
@@ -549,18 +499,6 @@
         </button>
 
       </form>
-
-      <!-- 360° Virtual Campus Tour Entry Point -->
-      <a href="/virtual-tour" class="virtual-tour-entry-pill" title="Explore Campus in 360°">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span style="font-size: 1.35rem; line-height: 1;">🌐</span>
-          <div style="text-align: left;">
-            <div style="font-size: 0.85rem; font-weight: 700; color: #FFFFFF;">Explore Campus in 360°</div>
-            <div style="font-size: 0.72rem; color: #93C5FD;">Interactive walk through GIET buildings, hostels &amp; grounds</div>
-          </div>
-        </div>
-        <span style="color: #60A5FA; font-size: 0.85rem; font-weight: 700; white-space: nowrap;">Launch Tour &rarr;</span>
-      </a>
     </div>
   </main>
 
