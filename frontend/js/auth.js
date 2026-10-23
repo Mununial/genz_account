@@ -20,6 +20,9 @@ const auth = {
 
     try {
       const res = await api.get('/auth/me');
+      if (!res || !res.data) {
+        throw new Error('Invalid auth session data');
+      }
       this.currentUser = res.data;
       this.renderUserBadge();
       return this.currentUser;
@@ -35,22 +38,48 @@ const auth = {
   async login(email, password, remember = false) {
     try {
       const res = await api.post('/auth/login', { email, password });
+      if (!res || !res.data) {
+        throw new Error((res && res.message) || 'Invalid login response. Please check credentials.');
+      }
       const { token, user } = res.data;
+
+      if (!token || !user) {
+        throw new Error('Authentication succeeded but session token is missing.');
+      }
 
       api.setToken(token, remember);
       this.currentUser = user;
 
       // Handle first login password change requirement
       if (user.mustChangePassword) {
-        ui.showToast('First-time login: You must set a new secure password.', 'warning');
-        return { mustChangePassword: true };
+        if (typeof ui !== 'undefined' && ui.showToast) {
+          ui.showToast('First-time login: You must set a new secure password.', 'warning');
+        }
+        return { mustChangePassword: true, user };
       }
 
-      ui.showToast('Login successful! Welcome to GENZ Finance Portal.', 'success');
-      window.location.href = '/index.html';
-      return { success: true };
+      if (typeof ui !== 'undefined' && ui.showToast) {
+        ui.showToast('Login successful! Redirecting to your portal...', 'success');
+      }
+
+      // Direct, fast route to appropriate portal without extra redirects
+      if (user.role === 'STUDENT') {
+        window.location.href = '/student-portal.html';
+      } else if (user.role === 'HOD') {
+        window.location.href = '/hod-registrations.html';
+      } else if (user.role === 'DIRECTOR') {
+        window.location.href = '/director-registrations.html';
+      } else if (user.role === 'EXAM_CELL' || user.role === 'EXAM_SECTION') {
+        window.location.href = '/exam-registrations.html';
+      } else {
+        window.location.href = '/receipt-desk.html';
+      }
+
+      return { success: true, user };
     } catch (err) {
-      ui.showToast(err.message || 'Login failed. Check credentials.', 'error');
+      if (typeof ui !== 'undefined' && ui.showToast) {
+        ui.showToast(err.message || 'Login failed. Check credentials.', 'error');
+      }
       throw err;
     }
   },
@@ -58,10 +87,14 @@ const auth = {
   async changePassword(currentPassword, newPassword) {
     try {
       await api.post('/auth/change-password', { currentPassword, newPassword });
-      ui.showToast('Password updated successfully.', 'success');
+      if (typeof ui !== 'undefined' && ui.showToast) {
+        ui.showToast('Password updated successfully.', 'success');
+      }
       return true;
     } catch (err) {
-      ui.showToast(err.message || 'Failed to update password.', 'error');
+      if (typeof ui !== 'undefined' && ui.showToast) {
+        ui.showToast(err.message || 'Failed to update password.', 'error');
+      }
       throw err;
     }
   },
