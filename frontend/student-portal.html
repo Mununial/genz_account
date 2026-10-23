@@ -101,32 +101,34 @@
       min-height: calc(100vh - 58px);
     }
 
-    /* 3. STUDENT DRAWER / SIDEBAR (MUI Light Theme Style) */
+    /* 3. STUDENT DRAWER / SIDEBAR (Light Sky Theme) */
     .student-drawer {
       width: 250px;
-      background: #ffffff;
-      border-right: 1px solid #E2E8F0;
+      background: #F0F9FF;
+      background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 60%, #E0F2FE 100%);
+      border-right: 1.5px solid #BAE6FD;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
       transition: transform 0.25s ease;
       z-index: 95;
+      box-shadow: 2px 0 16px rgba(2, 132, 199, 0.08);
     }
 
     .drawer-student-badge {
       padding: 1.25rem 1rem;
-      border-bottom: 1px solid #F1F5F9;
+      border-bottom: 1.5px solid #BAE6FD;
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      background: #F8FAFC;
+      background: #E0F2FE;
     }
 
     .student-avatar-circle {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: #0B63C5;
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
       color: #ffffff;
       display: flex;
       align-items: center;
@@ -134,6 +136,7 @@
       font-weight: 700;
       font-size: 1.1rem;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
     }
 
     .student-meta-details {
@@ -150,7 +153,7 @@
     .drawer-student-roll {
       font-size: 0.78rem;
       color: #0284C7;
-      font-weight: 600;
+      font-weight: 700;
     }
     .drawer-student-branch {
       font-size: 0.75rem;
@@ -161,11 +164,11 @@
     }
 
     .drawer-menu-header {
-      padding: 0.75rem 1.25rem 0.35rem;
-      font-size: 0.78rem;
+      padding: 0.85rem 1.25rem 0.35rem;
+      font-size: 0.72rem;
       font-weight: 800;
-      color: #64748B;
-      letter-spacing: 0.05em;
+      color: #0284C7;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       display: flex;
       align-items: center;
@@ -174,34 +177,40 @@
 
     .bec-drawer-nav {
       flex: 1;
-      padding: 0.5rem 0;
+      padding: 0.5rem 0.65rem;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
     }
 
     .nav-link-item {
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      padding: 0.55rem 1.25rem;
+      padding: 0.6rem 0.95rem;
       font-size: 0.88rem;
-      font-weight: 500;
-      color: #334155;
+      font-weight: 600;
+      color: #1E293B;
       text-decoration: none;
       transition: all 0.15s ease;
-      border-left: 3px solid transparent;
+      border-radius: 8px;
       cursor: pointer;
     }
 
     .nav-link-item:hover {
-      background: #F1F5F9;
-      color: #0B63C5;
+      background: #E0F2FE;
+      color: #0284C7;
     }
 
     .nav-link-item.active {
-      background: #EFF6FF;
-      color: #0B63C5;
-      font-weight: 700;
-      border-left-color: #0B63C5;
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+    .nav-link-item.active .nav-item-icon {
+      filter: brightness(0) invert(1);
     }
 
     .nav-item-icon {

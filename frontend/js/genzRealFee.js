@@ -150,14 +150,21 @@ const becRealFee = {
 
   async loadAllStudentsCache() {
     try {
-      const res = await api.get('/admin/students?limit=2000');
-      if (res && res.data && res.data.students && res.data.students.length > 0) {
-        this.allStudentsCache = res.data.students;
-        this.renderQuickPicks();
-        return;
+      const token = api.getToken();
+      const user = (typeof auth !== 'undefined' && auth.currentUser) ? auth.currentUser : null;
+      const isStudent = user && (user.role === 'STUDENT' || user.role_name === 'STUDENT');
+
+      // Only attempt admin students load if a token is present and user is NOT a student
+      if (token && !isStudent) {
+        const res = await api.get('/admin/students?limit=2000');
+        if (res && res.data && res.data.students && res.data.students.length > 0) {
+          this.allStudentsCache = res.data.students;
+          this.renderQuickPicks();
+          return;
+        }
       }
     } catch (e) {
-      console.warn('Student cache notice:', e.message);
+      // Gracefully fall back to pre-built cohort cache with clean console
     }
 
     // Default robust cohort fallback so search and pickers never fail

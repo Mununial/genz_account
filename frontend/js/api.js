@@ -62,7 +62,7 @@ const api = {
         body: options.body ? JSON.stringify(options.body) : undefined
       });
 
-      // Handle 401 unauthorized
+      // Handle 401 unauthorized or 403 invalid token
       if (response.status === 401 && !endpoint.includes('/auth/login')) {
         this.clearToken();
         if (!window.location.pathname.includes('login')) {
@@ -75,6 +75,11 @@ const api = {
         data = await response.json();
       } catch (parseErr) {
         data = null;
+      }
+
+      // If server explicitly reports invalid or missing token, clear stale storage
+      if (response.status === 403 && data && (data.message === 'Invalid authentication token.' || data.message.includes('token'))) {
+        this.clearToken();
       }
 
       if (!response.ok) {

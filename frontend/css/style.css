@@ -42,14 +42,14 @@
   --info-bg: #F0F9FF;
   --info-border: #BAE6FD;
 
-  /* Sidebar Tokens (Light White & Royal Blue Theme) */
-  --bg-sidebar: #FFFFFF;
-  --sidebar-text: #475569;
-  --sidebar-hover: #F0F7FF;
-  --sidebar-hover-text: #1D4ED8;
-  --sidebar-active-bg: #EFF6FF;
-  --sidebar-active-text: #1D4ED8;
-  --sidebar-active-border: #2563EB;
+  /* Sidebar Tokens (Light Sky Theme) */
+  --bg-sidebar: #F0F9FF;
+  --sidebar-text: #0F172A;
+  --sidebar-hover: #E0F2FE;
+  --sidebar-hover-text: #0284C7;
+  --sidebar-active-bg: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-active-border: #0284C7;
 
   /* Backward Compatibility Aliases */
   --brand-blue: #2563EB;
@@ -133,7 +133,8 @@ a:hover {
 /* 1. SIDEBAR */
 .app-sidebar {
   width: var(--sidebar-width);
-  background-color: var(--bg-sidebar);
+  background: #F0F9FF;
+  background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 60%, #E0F2FE 100%);
   color: var(--sidebar-text);
   display: flex;
   flex-direction: column;
@@ -143,8 +144,8 @@ a:hover {
   left: 0;
   z-index: 100;
   transition: transform var(--transition-normal);
-  border-right: 1px solid var(--border);
-  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.03);
+  border-right: 1.5px solid #BAE6FD;
+  box-shadow: 4px 0 20px rgba(2, 132, 199, 0.08);
 }
 
 .sidebar-brand {
@@ -152,8 +153,8 @@ a:hover {
   padding: 0 1.25rem;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border);
-  background: #FFFFFF;
+  border-bottom: 1.5px solid #BAE6FD;
+  background: #E0F2FE;
 }
 
 .brand-link {
@@ -180,17 +181,18 @@ a:hover {
 }
 
 .brand-title {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: 0.04em;
-  color: #0F172A;
+  color: #0369A1;
   line-height: 1.2;
 }
 
 .brand-subtitle {
   font-size: 0.72rem;
-  color: #2563EB;
-  font-weight: 600;
+  color: #0284C7;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .sidebar-nav {
@@ -199,8 +201,8 @@ a:hover {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  background: #FFFFFF;
+  gap: 0.25rem;
+  background: transparent;
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -222,13 +224,13 @@ a:hover {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #94A3B8;
-  padding: 0.85rem 0.65rem 0.3rem;
-  font-weight: 700;
+  color: #0284C7;
+  padding: 0.95rem 0.65rem 0.35rem;
+  font-weight: 800;
 }
 
 .nav-section-title:first-child {
-  padding-top: 0.2rem;
+  padding-top: 0.25rem;
 }
 
 /* Nav Link Item */
@@ -236,10 +238,10 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.52rem 0.75rem;
-  color: #475569;
-  font-size: 0.85rem;
-  font-weight: 500;
+  padding: 0.58rem 0.85rem;
+  color: #1E293B;
+  font-size: 0.86rem;
+  font-weight: 600;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -247,42 +249,40 @@ a:hover {
   border-left: 3px solid transparent;
 }
 
+.nav-item .nav-icon {
+  stroke: #0284C7;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  transition: all var(--transition-fast);
+}
+
 .nav-item:hover {
-  background: #F0F7FF;
-  color: #1D4ED8;
+  background: #E0F2FE;
+  color: #0284C7;
 }
 .nav-item:hover .nav-icon {
-  stroke: #1D4ED8;
+  stroke: #0369A1;
+  transform: translateX(2px);
 }
 
-/* Active Navigation State: Light soft blue background, royal blue text & icon, solid blue left bar */
+/* Active Navigation State: Vibrant Sky Blue Gradient with Pure White Text & Icon */
 .nav-item.active {
-  background: #EFF6FF !important;
-  color: #1D4ED8 !important;
-  border-left: 3px solid #2563EB !important;
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+  color: #FFFFFF !important;
+  border-left: 3px solid #075985 !important;
   font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
 }
 .nav-item.active .nav-icon {
-  stroke: #2563EB !important;
-}
-
-.nav-icon {
-  width: 17px;
-  height: 17px;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-  flex-shrink: 0;
-  transition: stroke var(--transition-fast);
+  stroke: #FFFFFF !important;
 }
 
 /* Sidebar Footer (Profile & Logout) */
 .sidebar-footer {
-  padding: 0.75rem 0.85rem;
-  border-top: 1px solid var(--border);
-  background: #F8FAFC;
+  padding: 0.85rem 0.85rem;
+  border-top: 1.5px solid #BAE6FD;
+  background: #E0F2FE;
 }
 
 .user-profile-badge {
