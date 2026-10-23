@@ -1824,6 +1824,276 @@ async function adminResetRegistrations(req, res) {
   }
 }
 
+/**
+ * 18. POST /api/registration/counter-register
+ * Accounts Counter Desk: Register walk-in student (e.g. without phone/portal access)
+ * Directly records subject registration, marks fee PAID, issues receipt, and clears status for Student & Exam Section.
+ */
+async function counterRegisterStudent(req, res) {
+  try {
+    const {
+      student_id,
+      reg_no,
+      semester,
+      subject_ids = [],
+      exam_fee_amount = 1550.00,
+      payment_method = 'CASH',
+      payment_remarks = 'Direct counter registration and fee clearance at Accounts Desk (Student in-person walk-in).',
+      direct_exam_confirm = true
+    } = req.body;
+
+    // 1. Identify student
+    let student;
+    if (student_id) {
+      const [rows] = await query(
+        `SELECT s.*, p.name AS prog_name, p.code AS prog_code, d.name AS dept_name, d.code AS dept_code
+         FROM students s
+         LEFT JOIN programs p ON p.id = s.course_id
+         LEFT JOIN departments d ON d.id = s.branch_id
+         WHERE s.id = ? LIMIT 1`,
+        [student_id]
+      );
+      if (rows && rows.length) student = rows[0];
+    } else if (reg_no) {
+      const [rows] = await query(
+        `SELECT s.*, p.name AS prog_name, p.code AS prog_code, d.name AS dept_name, d.code AS dept_code
+         FROM students s
+         LEFT JOIN programs p ON p.id = s.course_id
+         LEFT JOIN departments d ON d.id = s.branch_id
+         WHERE LOWER(s.reg_no) = ? OR LOWER(s.roll_no) = ? LIMIT 1`,
+        [String(reg_no).toLowerCase().trim(), String(reg_no).toLowerCase().trim()]
+      );
+      if (rows && rows.length) student = rows[0];
+    }
+
+    if (!student) {
+      return error(res, 'Student record not found in system.', 404);
+    }
+
+    const sid = student.id;
+    const targetSem = parseInt(semester) || student.current_semester_id || 1;
+    const feeAmount = parseFloat(exam_fee_amount) || 1550.00;
+    const deptId = student.branch_id || 1;
+    const deptCode = student.dept_code || 'GEN';
+    const progId = student.course_id || 1;
+
+    // 2. Resolve subjects if not explicitly passed
+    let selectedSubjectIds = Array.isArray(subject_ids) ? subject_ids.map(Number).filter(Boolean) : [];
+    if (selectedSubjectIds.length === 0) {
+      const [subRows] = await query(
+        `SELECT id, credits FROM subjects
+         WHERE semester = ? AND (department_id = ? OR department_id IS NULL) AND is_active = 1`,
+        [targetSem, deptId]
+      );
+      if (subRows && subRows.length) {
+        selectedSubjectIds = subRows.map(s => s.id);
+      } else {
+        const [fallbackSubs] = await query(
+          `SELECT id, credits FROM subjects WHERE semester = ? AND is_active = 1`,
+          [targetSem]
+        );
+        selectedSubjectIds = (fallbackSubs || []).map(s => s.id);
+      }
+    }
+
+    // Calculate total credits
+    let totalCredits = 24;
+    if (selectedSubjectIds.length > 0) {
+      const ph = selectedSubjectIds.map(() => '?').join(',');
+      const [subInfo] = await query(`SELECT SUM(credits) AS sum_credits FROM subjects WHERE id IN (${ph})`, selectedSubjectIds);
+      if (subInfo && subInfo[0] && subInfo[0].sum_credits) {
+        totalCredits = parseInt(subInfo[0].sum_credits);
+      }
+    }
+
+    // 3. Generate receipt and reference numbers
+    const receiptNum = `EXAM-REC-CTR-${Date.now().toString().slice(-6)}-${String(sid).padStart(4, '0')}`;
+    const accountsUserId = req.user?.id || null;
+    const finalStatus = direct_exam_confirm ? 'CONFIRMED' : 'EXAM_FEE_PAID';
+
+    // 4. Check existing subject_registrations record for this semester
+    const [exist] = await query(
+      `SELECT id, reference_number FROM subject_registrations
+       WHERE student_id = ? AND semester = ? LIMIT 1`,
+      [sid, targetSem]
+    );
+
+    let regId;
+    let refNum;
+
+    if (exist && exist.length) {
+      regId = exist[0].id;
+      refNum = exist[0].reference_number || generateReferenceNumber(deptCode, regId);
+
+      await query(
+        `UPDATE subject_registrations
+         SET roll_number = ?,
+             program_id = ?,
+             department_id = ?,
+             academic_year = '2026-27',
+             registration_type = 'REGULAR',
+             total_credits = ?,
+             status = ?,
+             accounts_id = ?,
+             accounts_action_at = NOW(),
+             accounts_remarks = ?,
+             exam_fee_amount = ?,
+             exam_fee_status = 'PAID',
+             exam_receipt_no = ?,
+             exam_fee_paid_at = NOW(),
+             exam_section_action_at = NOW(),
+             exam_section_remarks = 'Cleared & Confirmed at Accounts Counter Desk for Exam Section & Student.',
+             updated_at = NOW()
+         WHERE id = ?`,
+        [
+          student.roll_no || student.reg_no,
+          progId,
+          deptId,
+          totalCredits,
+          finalStatus,
+          accountsUserId,
+          payment_remarks,
+          feeAmount,
+          receiptNum,
+          regId
+        ]
+      );
+    } else {
+      const [ins] = await query(
+        `INSERT INTO subject_registrations
+         (student_id, roll_number, program_id, department_id, semester, academic_year,
+          registration_type, total_credits, status, submitted_at,
+          accounts_id, accounts_action_at, accounts_remarks,
+          exam_fee_amount, exam_fee_status, exam_receipt_no, exam_fee_paid_at,
+          exam_section_action_at, exam_section_remarks, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, '2026-27', 'REGULAR', ?, ?, NOW(), ?, NOW(), ?, ?, 'PAID', ?, NOW(), NOW(), 'Cleared & Confirmed at Accounts Counter Desk for Exam Section & Student.', NOW(), NOW())`,
+        [
+          sid,
+          student.roll_no || student.reg_no,
+          progId,
+          deptId,
+          targetSem,
+          totalCredits,
+          finalStatus,
+          accountsUserId,
+          payment_remarks,
+          feeAmount,
+          receiptNum
+        ]
+      );
+      regId = ins.insertId;
+      refNum = generateReferenceNumber(deptCode, regId);
+      await query(`UPDATE subject_registrations SET reference_number = ? WHERE id = ?`, [refNum, regId]);
+    }
+
+    // 5. Save registration_subjects
+    if (selectedSubjectIds.length > 0) {
+      await query(`DELETE FROM registration_subjects WHERE registration_id = ?`, [regId]).catch(() => {});
+      for (const subId of selectedSubjectIds) {
+        await query(
+          `INSERT INTO registration_subjects (registration_id, subject_id, is_backlog) VALUES (?, ?, 0)`,
+          [regId, subId]
+        ).catch(() => {});
+      }
+    }
+
+    // 6. Record in official receipts table
+    await query(
+      `INSERT INTO receipts (receipt_no, student_id, amount, payment_mode, semester, remarks, created_by, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [receiptNum, sid, feeAmount, payment_method, `Semester ${targetSem}`, `Accounts Counter Subject Registration Fee [${refNum}]`, accountsUserId]
+    ).catch(() => {});
+
+    // 7. Record in payments table
+    await query(
+      `INSERT INTO payments (payment_no, student_id, amount, payment_method, transaction_id, status, idempotency_key, created_at)
+       VALUES (?, ?, ?, ?, ?, 'SUCCESS', ?, NOW())`,
+      [`PAY-CTR-${Date.now().toString().slice(-6)}`, sid, feeAmount, payment_method, receiptNum, `counter_reg_${regId}_${Date.now()}`]
+    ).catch(() => {});
+
+    // 8. Record in student ledger for Accounts Office
+    await query(
+      `INSERT INTO ledgers (student_id, entry_type, category, amount, description, reference_no, created_at)
+       VALUES (?, 'CREDIT', 'EXAM_FEE', ?, ?, ?, NOW())`,
+      [sid, feeAmount, `Semester ${targetSem} Registration Fee (Paid via Accounts Counter - ${payment_method})`, receiptNum]
+    ).catch(() => {});
+
+    // 9. Send notifications to Student and Exam Section
+    if (student.user_id) {
+      await query(
+        `INSERT INTO notifications (user_id, title, message, category, created_at)
+         VALUES (?, '🎉 Registration Cleared at Accounts Counter', ?, 'REGISTRATION', NOW())`,
+        [
+          student.user_id,
+          `Your Semester ${targetSem} subject registration (#${refNum}) has been completed and fee paid (Receipt: ${receiptNum}) at the Accounts Desk. Your Admit Card is now available.`
+        ]
+      ).catch(() => {});
+    }
+
+    // Notify Exam Cell staff
+    await query(
+      `INSERT INTO notifications (user_id, title, message, category, created_at)
+       SELECT u.id, 'Counter Registration Completed', CONCAT('Student ', ?, ' (', ?, ') registered and fee cleared at Accounts Counter. Ready for Admit Card.'), 'REGISTRATION', NOW()
+       FROM users u JOIN roles r ON r.id = u.role_id
+       WHERE r.name IN ('EXAM_CELL', 'ADMIN', 'DIRECTOR') AND u.is_active = 1 LIMIT 5`,
+      [student.full_name, student.reg_no]
+    ).catch(() => {});
+
+    // 10. Audit log
+    await logAudit(req, {
+      action: 'COUNTER_REGISTRATION_COMPLETED',
+      module: 'ACCOUNTS_REGISTRATION_COUNTER',
+      recordId: regId,
+      newValue: {
+        studentId: sid,
+        regNo: student.reg_no,
+        studentName: student.full_name,
+        semester: targetSem,
+        feeAmount,
+        receiptNumber: receiptNum,
+        referenceNumber: refNum,
+        paymentMethod: payment_method,
+        status: finalStatus
+      }
+    }).catch(() => {});
+
+    // Fetch subjects for return
+    const [savedSubs] = await query(
+      `SELECT s.id, s.code, s.name, s.credits, s.type
+       FROM registration_subjects rs
+       JOIN subjects s ON s.id = rs.subject_id
+       WHERE rs.registration_id = ?`,
+      [regId]
+    );
+
+    return success(res, {
+      registrationId: regId,
+      referenceNumber: refNum,
+      receiptNumber: receiptNum,
+      student: {
+        id: sid,
+        name: student.full_name,
+        reg_no: student.reg_no,
+        roll_no: student.roll_no,
+        phone: student.phone,
+        course_name: student.prog_name,
+        branch_name: student.dept_name,
+        semester: targetSem
+      },
+      subjects: savedSubs || [],
+      feeAmount,
+      feePaid: feeAmount,
+      paymentMethod: payment_method,
+      status: finalStatus,
+      admitCardEligible: true,
+      message: `Registration #${refNum} successfully completed and cleared at Accounts Counter! Status automatically propagated to Exam Section and Student Portal.`
+    });
+  } catch (err) {
+    console.error('[counterRegisterStudent Error]', err);
+    return error(res, 'Failed to complete counter subject registration: ' + err.message, 500);
+  }
+}
+
 module.exports = {
   getProgramsAndDepartments,
   getEligibility,
@@ -1850,5 +2120,6 @@ module.exports = {
   adminBulkImportSubjects,
   adminUpdateSubject,
   adminDeleteSubject,
-  adminResetRegistrations
+  adminResetRegistrations,
+  counterRegisterStudent
 };

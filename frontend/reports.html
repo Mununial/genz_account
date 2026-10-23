@@ -413,7 +413,10 @@
                   </div>
                 </div>
 
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-sm" onclick="reportsModule.openCounterRegModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; background: linear-gradient(135deg, #0284C7, #0B63C5); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 2px 6px rgba(2,132,199,0.35); padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer;" title="Register walk-in student without phone at Accounts counter desk">
+                    <span>⚡ + Counter Student Registration</span>
+                  </button>
                   <button type="button" class="btn btn-sm btn-primary" onclick="reportsModule.exportRegistrationsExcel()" style="display: inline-flex; align-items: center; gap: 0.35rem;" title="Download verified Excel spreadsheet">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     <span>📥 Excel</span>
@@ -495,6 +498,265 @@
     </main>
   </div>
 
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: ACCOUNTS COUNTER SUBJECT REGISTRATION & DIRECT CLEARANCE           -->
+  <!-- ========================================================================= -->
+  <div id="counterRegModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 1050; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto;">
+    <div style="background: #ffffff; border-radius: 12px; width: 100%; max-width: 720px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04); overflow: hidden; border: 1px solid #BAE6FD; margin: auto;">
+      <!-- Modal Header -->
+      <div style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); color: #ffffff; padding: 1.1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">⚡</span>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; color: #ffffff;">Counter Subject Registration Desk</h3>
+          </div>
+          <div style="font-size: 0.78rem; color: #E0F2FE; margin-top: 0.2rem;">Direct in-person registration &amp; fee clearance for walk-in students without phone or portal access</div>
+        </div>
+        <button type="button" onclick="reportsModule.closeCounterRegModal()" style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; font-size: 1.25rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding: 1.35rem 1.5rem; max-height: calc(85vh - 130px); overflow-y: auto;">
+        <!-- Step 1: Select Student -->
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1E293B; margin-bottom: 0.4rem;">
+            1. Select Walk-in Student <span style="color: #DC2626;">*</span>
+          </label>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="counterStudentSelect" class="form-control" style="font-size: 0.85rem; height: 38px; border: 1.5px solid #CBD5E1; border-radius: 8px;" onchange="reportsModule.onCounterStudentSelect()">
+              <option value="">-- Choose Student (Type or Select) --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Student ID Card Preview -->
+        <div id="counterStudentCard" style="display: none; background: #F0F9FF; border: 1.5px solid #BAE6FD; border-radius: 10px; padding: 0.9rem 1.1rem; margin-bottom: 1.2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div id="counterStudentName" style="font-size: 1.05rem; font-weight: 800; color: #0C4A6E;">-</div>
+              <div style="font-size: 0.8rem; color: #0369A1; margin-top: 2px;">
+                Reg No: <code id="counterStudentRegNo" style="font-weight: 700; color: #075985;">-</code> | 
+                Roll: <code id="counterStudentRollNo" style="font-weight: 700; color: #075985;">-</code>
+              </div>
+              <div style="font-size: 0.78rem; color: #64748B; margin-top: 3px;">
+                Program: <span id="counterStudentProg" style="font-weight: 600; color: #334155;">-</span> | 
+                Branch: <span id="counterStudentBranch" style="font-weight: 600; color: #334155;">-</span>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <span id="counterStudentCurrentSemBadge" class="badge badge-info" style="font-size: 0.78rem; padding: 0.3rem 0.65rem;">Current Sem -</span>
+              <div id="counterStudentPhone" style="font-size: 0.75rem; color: #64748B; margin-top: 4px;">Phone: -</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Target Semester & Subject Load -->
+        <div style="margin-bottom: 1.2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: #1E293B; margin: 0;">
+              2. Semester &amp; Registered Subject Syllabus <span style="color: #DC2626;">*</span>
+            </label>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-size: 0.78rem; font-weight: 600; color: #475569;">Target Semester:</span>
+              <select id="counterSemSelect" class="form-control" style="font-size: 0.82rem; height: 32px; width: 140px; padding: 0.2rem 0.5rem;" onchange="reportsModule.onCounterSemesterChange()">
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Subject List Container -->
+          <div id="counterSubjectsContainer" style="border: 1px solid #E2E8F0; border-radius: 8px; max-height: 180px; overflow-y: auto; background: #FAFAFA;">
+            <div style="text-align: center; padding: 1.5rem; color: #94A3B8; font-size: 0.82rem;">Select a student to load active semester curriculum...</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem; font-size: 0.75rem; color: #64748B;">
+            <span>All syllabus subjects auto-selected for regular exam registration.</span>
+            <span id="counterTotalCredits" style="font-weight: 700; color: #0284C7;">Total Credits: 0</span>
+          </div>
+        </div>
+
+        <!-- Step 3: Registration Fee & Payment Details -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #1E293B; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em;">
+            3. Registration Fee Collection &amp; Payment Mode
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem;">
+            <div>
+              <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem;">Fee Amount (₹):</label>
+              <input type="number" id="counterFeeAmount" class="form-control" value="1550" style="font-weight: 700; font-size: 0.95rem; height: 36px; color: #0F172A;" />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem;">Payment Mode:</label>
+              <select id="counterPaymentMode" class="form-control" style="font-size: 0.85rem; height: 36px;">
+                <option value="CASH">💵 Cash (Physical Counter)</option>
+                <option value="UPI">📱 UPI QR (Desk Counter POS)</option>
+                <option value="CARD">💳 POS Card Swipe (Debit/Credit)</option>
+                <option value="DEMAND_DRAFT">📑 Demand Draft / Bank Challan</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top: 0.75rem;">
+            <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem;">Counter Remarks / Memo:</label>
+            <input type="text" id="counterRemarks" class="form-control" placeholder="Walk-in student without smartphone. Fee collected and registered at Accounts Counter." style="font-size: 0.82rem; height: 34px;" />
+          </div>
+
+          <!-- Instant Propagation Notice -->
+          <div style="margin-top: 0.85rem; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 6px; padding: 0.6rem 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.1rem; color: #059669;">✓</span>
+            <div style="font-size: 0.75rem; color: #065F46; line-height: 1.35;">
+              <strong>Automatic Multi-Section Sync:</strong> On submitting, this registration will be marked <strong>CONFIRMED</strong> with instant Accounts clearance. It will immediately show in the <strong>College Examination Section</strong> for Admit Card issuance and in the <strong>Student Portal</strong>!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="background: #F1F5F9; border-top: 1px solid #E2E8F0; padding: 0.85rem 1.5rem; display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" onclick="reportsModule.closeCounterRegModal()" style="font-size: 0.85rem; padding: 0.45rem 1.1rem;">Cancel</button>
+        <button type="button" id="counterSubmitBtn" class="btn btn-primary" onclick="reportsModule.submitCounterRegistration()" style="font-size: 0.85rem; padding: 0.45rem 1.25rem; font-weight: 700; background: linear-gradient(135deg, #0284C7, #0B63C5); border: none; box-shadow: 0 2px 6px rgba(11,99,197,0.35); display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span>⚡ Complete Counter Registration &amp; Clear</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: PRINTABLE COUNTER REGISTRATION & FEE CLEARANCE SLIP               -->
+  <!-- ========================================================================= -->
+  <div id="counterSlipModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 1060; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto;">
+    <div style="background: #ffffff; border-radius: 12px; width: 100%; max-width: 800px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; border: 1.5px solid #0284C7; margin: auto;">
+      <div style="background: #0F172A; color: #ffffff; padding: 0.85rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🖨️</span>
+          <span>Official Registration Clearance Slip</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button type="button" class="btn btn-sm" onclick="reportsModule.printSlipDirect()" style="background: #0284C7; color: #ffffff; border: none; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 6px; cursor: pointer;">
+            🖨️ Print Slip (Paper Copy)
+          </button>
+          <button type="button" onclick="reportsModule.closeCounterSlipModal()" style="background: transparent; border: none; color: #94A3B8; font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Printable Area -->
+      <div id="counterSlipPrintArea" style="padding: 2rem; background: #ffffff; color: #0F172A; font-family: 'Segoe UI', Arial, sans-serif;">
+        <!-- Slip Header -->
+        <div style="border-bottom: 2px solid #0284C7; padding-bottom: 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #0284C7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 900;">G</div>
+            <div>
+              <div style="font-size: 1.25rem; font-weight: 900; color: #0F172A; letter-spacing: 0.02em;">GEN-Z UNIVERSITY</div>
+              <div style="font-size: 0.78rem; color: #475569; font-weight: 600;">Office of the Accounts &amp; Counter Clearance Desk</div>
+              <div style="font-size: 0.72rem; color: #64748B;">Campus Central Block, Institutional Area, Odisha</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span style="display: inline-block; background: #ECFDF5; color: #047857; border: 1.5px solid #A7F3D0; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">
+              ✓ ACCOUNTS CLEARED
+            </span>
+            <div id="slipReceiptNo" style="font-size: 0.82rem; font-weight: 700; color: #0284C7; margin-top: 4px;">-</div>
+            <div id="slipPrintedAt" style="font-size: 0.7rem; color: #64748B;">-</div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 1.2rem;">
+          <h4 style="margin: 0; font-size: 1rem; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.04em;">
+            STUDENT SUBJECT REGISTRATION &amp; EXAMINATION FEE RECEIPT SLIP
+          </h4>
+          <div style="font-size: 0.75rem; color: #64748B; margin-top: 2px;">Official Copy for Student &amp; Examination Section Verification</div>
+        </div>
+
+        <!-- Student Meta Grid -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.2rem; font-size: 0.82rem;">
+          <tbody>
+            <tr>
+              <td style="padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; width: 18%; font-weight: 700; color: #475569;">Registration No:</td>
+              <td id="slipRegNo" style="padding: 6px 10px; border: 1px solid #E2E8F0; width: 32%; font-weight: 800; color: #0F172A;">-</td>
+              <td style="padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; width: 18%; font-weight: 700; color: #475569;">Roll Number:</td>
+              <td id="slipRollNo" style="padding: 6px 10px; border: 1px solid #E2E8F0; width: 32%; font-weight: 700; color: #0F172A;">-</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; font-weight: 700; color: #475569;">Candidate Name:</td>
+              <td id="slipStudentName" style="padding: 6px 10px; border: 1px solid #E2E8F0; font-weight: 800; color: #0F172A;">-</td>
+              <td style="padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; font-weight: 700; color: #475569;">Program / Branch:</td>
+              <td id="slipProgBranch" style="padding: 6px 10px; border: 1px solid #E2E8F0; font-weight: 600; color: #0F172A;">-</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; font-weight: 700; color: #475569;">Registered Semester:</td>
+              <td id="slipSemester" style="padding: 6px 10px; border: 1px solid #E2E8F0; font-weight: 700; color: #0284C7;">-</td>
+              <td style="padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; font-weight: 700; color: #475569;">Reference ID:</td>
+              <td id="slipRefNum" style="padding: 6px 10px; border: 1px solid #E2E8F0; font-weight: 700; color: #0F172A;">-</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Registered Subjects Table -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.8rem; font-weight: 800; color: #1E293B; margin-bottom: 0.35rem; text-transform: uppercase;">Registered Subjects for Examination:</div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem;">
+            <thead>
+              <tr style="background: #F1F5F9; border: 1px solid #CBD5E1;">
+                <th style="padding: 6px 8px; text-align: center; width: 35px; border: 1px solid #CBD5E1;">#</th>
+                <th style="padding: 6px 8px; text-align: left; width: 110px; border: 1px solid #CBD5E1;">Subject Code</th>
+                <th style="padding: 6px 8px; text-align: left; border: 1px solid #CBD5E1;">Subject Title</th>
+                <th style="padding: 6px 8px; text-align: center; width: 70px; border: 1px solid #CBD5E1;">Credits</th>
+                <th style="padding: 6px 8px; text-align: center; width: 85px; border: 1px solid #CBD5E1;">Category</th>
+              </tr>
+            </thead>
+            <tbody id="slipSubjectsTbody">
+              <tr><td colspan="5" style="text-align: center; padding: 1rem; color: #94A3B8;">Loading registered subjects...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Payment Inflow Summary Box -->
+        <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 0.85rem 1.1rem; margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase;">Payment Details:</div>
+            <div id="slipPaymentInfo" style="font-size: 0.85rem; color: #0F172A; font-weight: 600; margin-top: 2px;">
+              Paid via Cash (Accounts Desk)
+            </div>
+            <div style="font-size: 0.72rem; color: #059669; font-weight: 700; margin-top: 2px;">
+              ✓ Dispatched to Exam Section for Admit Card Generation
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: #64748B;">Amount Collected:</div>
+            <div id="slipAmount" style="font-size: 1.25rem; font-weight: 900; color: #047857;">₹1,550.00</div>
+          </div>
+        </div>
+
+        <!-- Signature Blocks -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 1.5rem; margin-top: 1.5rem; border-top: 1px dashed #CBD5E1;">
+          <div style="text-align: center; width: 180px;">
+            <div style="border-bottom: 1px solid #64748B; margin-bottom: 4px; height: 35px;"></div>
+            <div style="font-size: 0.72rem; font-weight: 700; color: #334155;">Student Signature</div>
+            <div style="font-size: 0.65rem; color: #94A3B8;">(Received Clearance Copy)</div>
+          </div>
+          <div style="text-align: center; width: 180px;">
+            <div style="border-bottom: 1px solid #64748B; margin-bottom: 4px; height: 35px; display: flex; align-items: flex-end; justify-content: center; font-size: 0.72rem; font-weight: 700; color: #0284C7;">Harihara Parida</div>
+            <div style="font-size: 0.72rem; font-weight: 700; color: #334155;">Accounts Officer / Head</div>
+            <div style="font-size: 0.65rem; color: #94A3B8;">Counter Clearance Desk</div>
+          </div>
+          <div style="text-align: center; width: 180px;">
+            <div style="border-bottom: 1px solid #64748B; margin-bottom: 4px; height: 35px;"></div>
+            <div style="font-size: 0.72rem; font-weight: 700; color: #334155;">Controller of Examinations</div>
+            <div style="font-size: 0.65rem; color: #94A3B8;">College Exam Cell</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
@@ -518,6 +780,11 @@
       if (endEl) endEl.value = today;
 
       await reportsModule.init();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('action') === 'new' || urlParams.get('action') === 'counter-register' || urlParams.get('register') === 'true') {
+        setTimeout(() => reportsModule.openCounterRegModal(urlParams.get('studentId')), 400);
+      }
     });
   </script>
 </body>

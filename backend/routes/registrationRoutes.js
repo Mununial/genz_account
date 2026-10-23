@@ -42,10 +42,11 @@ router.put('/exam-section/windows/:semester/toggle', authenticateToken, requireR
 router.put('/exam-section/:id/mark-received', authenticateToken, requireRole('EXAM_CELL', 'ADMIN', 'DIRECTOR', 'ACCOUNTS_STAFF', 'ACCOUNTS_HEAD'), ctrl.examSectionMarkReceived);
 router.put('/exam-section/:id/confirm', authenticateToken, requireRole('EXAM_CELL', 'ADMIN', 'DIRECTOR', 'ACCOUNTS_STAFF', 'ACCOUNTS_HEAD'), ctrl.examSectionMarkReceived);
 
-// ── Accounts Routes (Backward-Compatibility) ─────────────────────────────────
+// ── Accounts Routes (Backward-Compatibility & Counter Registration) ───────────
 router.get('/accounts/registrations', authenticateToken, requireRole('ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN'), ctrl.accountsGetRegistrations);
 router.get('/accounts/pending', authenticateToken, requireRole('ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN'), ctrl.accountsGetRegistrations); // alias
 router.put('/accounts/:id/finalize', authenticateToken, requireRole('ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN'), ctrl.accountsFinalize);
+router.post('/counter-register', authenticateToken, requireRole('ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN', 'SUPER_ADMIN'), ctrl.counterRegisterStudent);
 
 // ── Admin Subject Catalog & Bulk Import ────────────────────────────────────────
 router.get('/admin/subjects', authenticateToken, requireRole('ADMIN', 'HOD', 'DIRECTOR'), ctrl.adminGetSubjects);

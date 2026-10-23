@@ -944,11 +944,14 @@ const reportsModule = {
           <td style="text-align: center;">${admitBadge}</td>
           <td style="text-align: right; white-space: nowrap;">
             ${!isPaid ? `
-              <a href="/receipt-desk.html?studentId=${r.student_id}&purpose=registration" class="btn btn-sm btn-primary" style="text-decoration: none; font-weight: 600; padding: 0.25rem 0.65rem;" title="Collect Registration Fee in Fast Desk">
-                Collect Fee
-              </a>
+              <button type="button" class="btn btn-sm btn-primary" onclick="reportsModule.openCounterRegModal(${r.student_id})" style="font-weight: 700; background: linear-gradient(135deg, #0284C7, #0B63C5); border: none; color: #fff; padding: 0.28rem 0.65rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Register student directly at Accounts counter">
+                ⚡ Counter Register
+              </button>
             ` : `
-              <span style="font-size: 0.78rem; font-weight: 700; color: var(--success-emerald);">Cleared</span>
+              <button type="button" class="btn btn-sm btn-secondary" onclick="reportsModule.printCounterSlip(${r.registration_id || r.student_id})" style="font-weight: 700; background: #ECFDF5; color: #047857; border: 1.5px solid #A7F3D0; padding: 0.28rem 0.65rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Print Official Registration & Fee Clearance Slip">
+                🖨️ Print Slip
+              </button>
+              <span class="badge badge-success" style="font-size: 0.72rem; margin-left: 4px;">Cleared</span>
             `}
           </td>
         </tr>
@@ -1038,7 +1041,365 @@ const reportsModule = {
       })),
       filename: 'BEC_Exam_Registration_Register'
     });
+  },
+
+  // ── Counter Registration Desk Methods ──────────────────────────────────────
+  counterSubjects: [],
+
+  async openCounterRegModal(prefillStudentId = null) {
+    const modal = document.getElementById('counterRegModal');
+    if (!modal) return;
+
+    // Populate student select dropdown if needed
+    const sel = document.getElementById('counterStudentSelect');
+    if (sel && (sel.options.length <= 1 || prefillStudentId)) {
+      const studentsList = this.registrationsData && this.registrationsData.length 
+        ? this.registrationsData 
+        : [];
+
+      sel.innerHTML = '<option value="">-- Choose Student (Type or Select) --</option>' +
+        studentsList.map(s => `
+          <option value="${s.student_id}" ${prefillStudentId && String(s.student_id) === String(prefillStudentId) ? 'selected' : ''}>
+            ${escapeHtml(s.reg_no)} - ${escapeHtml(s.student_name)} (${escapeHtml(s.branch_code || s.branch_name || 'GEN')}) [${escapeHtml(s.semester_label || 'Sem ' + s.semester_id)}]
+          </option>
+        `).join('');
+    }
+
+    modal.style.display = 'flex';
+
+    if (prefillStudentId) {
+      if (sel) sel.value = String(prefillStudentId);
+      await this.onCounterStudentSelect();
+    }
+  },
+
+  closeCounterRegModal() {
+    const modal = document.getElementById('counterRegModal');
+    if (modal) modal.style.display = 'none';
+  },
+
+  async onCounterStudentSelect() {
+    const sel = document.getElementById('counterStudentSelect');
+    const sId = sel ? parseInt(sel.value) : null;
+    const card = document.getElementById('counterStudentCard');
+
+    if (!sId) {
+      if (card) card.style.display = 'none';
+      const container = document.getElementById('counterSubjectsContainer');
+      if (container) container.innerHTML = '<div style="text-align: center; padding: 1.5rem; color: #94A3B8; font-size: 0.82rem;">Select a student to load active semester curriculum...</div>';
+      return;
+    }
+
+    const student = (this.registrationsData || []).find(s => s.student_id === sId);
+    if (!student) return;
+
+    // Update ID preview card
+    if (card) card.style.display = 'block';
+    const nameEl = document.getElementById('counterStudentName');
+    const regEl = document.getElementById('counterStudentRegNo');
+    const rollEl = document.getElementById('counterStudentRollNo');
+    const progEl = document.getElementById('counterStudentProg');
+    const branchEl = document.getElementById('counterStudentBranch');
+    const semBadge = document.getElementById('counterStudentCurrentSemBadge');
+    const phoneEl = document.getElementById('counterStudentPhone');
+
+    if (nameEl) nameEl.textContent = student.student_name;
+    if (regEl) regEl.textContent = student.reg_no;
+    if (rollEl) rollEl.textContent = student.roll_no || student.reg_no;
+    if (progEl) progEl.textContent = student.course_name || 'B.Tech';
+    if (branchEl) branchEl.textContent = `${student.branch_name || ''} (${student.branch_code || ''})`;
+    if (semBadge) semBadge.textContent = student.semester_label || `Semester ${student.semester_id}`;
+    if (phoneEl) phoneEl.textContent = `Phone: ${student.phone || 'Walk-in / No Phone'}`;
+
+    // Set Target Semester select
+    const semSel = document.getElementById('counterSemSelect');
+    if (semSel) {
+      semSel.value = String(student.semester_id || 1);
+    }
+
+    await this.loadCounterSubjects(student.branch_code || student.branch_id, student.semester_id || 1);
+  },
+
+  async onCounterSemesterChange() {
+    const semSel = document.getElementById('counterSemSelect');
+    const sSel = document.getElementById('counterStudentSelect');
+    const sem = semSel ? parseInt(semSel.value) : 1;
+    const sId = sSel ? parseInt(sSel.value) : null;
+    const student = (this.registrationsData || []).find(s => s.student_id === sId);
+
+    await this.loadCounterSubjects(student ? (student.branch_code || student.branch_id) : null, sem);
+  },
+
+  async loadCounterSubjects(branch, semester) {
+    const container = document.getElementById('counterSubjectsContainer');
+    const credEl = document.getElementById('counterTotalCredits');
+    if (!container) return;
+
+    container.innerHTML = '<div style="text-align: center; padding: 1.5rem; color: #64748B; font-size: 0.82rem;"><span class="spinner"></span> Loading curriculum subjects...</div>';
+
+    try {
+      const res = await api.get(`/registration/subjects?semester=${semester}&branch=${encodeURIComponent(branch || 'ALL')}`);
+      let subs = (res && res.data && res.data.subjects) || [];
+      if (!subs.length && res && res.data && Array.isArray(res.data)) subs = res.data;
+
+      this.counterSubjects = subs;
+
+      if (!subs.length) {
+        container.innerHTML = `<div style="text-align: center; padding: 1.5rem; color: #DC2626; font-size: 0.82rem;">No active subjects defined for Semester ${semester}. Full semester package will be recorded.</div>`;
+        if (credEl) credEl.textContent = 'Total Credits: 24 (Standard)';
+        return;
+      }
+
+      let totCredits = subs.reduce((sum, s) => sum + (parseInt(s.credits) || 0), 0);
+      if (credEl) credEl.textContent = `Total Credits: ${totCredits} (${subs.length} Subjects)`;
+
+      container.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+          <thead style="background: #F1F5F9; border-bottom: 1px solid #CBD5E1; color: #475569;">
+            <tr>
+              <th style="padding: 5px 8px; text-align: center; width: 30px;">
+                <input type="checkbox" id="counterCheckAllSubs" checked onchange="reportsModule.toggleAllCounterSubs(this)" />
+              </th>
+              <th style="padding: 5px 8px; text-align: left; width: 100px;">Code</th>
+              <th style="padding: 5px 8px; text-align: left;">Subject Name</th>
+              <th style="padding: 5px 8px; text-align: center; width: 60px;">Credits</th>
+              <th style="padding: 5px 8px; text-align: center; width: 70px;">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${subs.map((s, idx) => `
+              <tr style="border-bottom: 1px solid #F1F5F9; background: ${idx % 2 === 0 ? '#ffffff' : '#FAFAFA'};">
+                <td style="padding: 5px 8px; text-align: center;">
+                  <input type="checkbox" class="counter-sub-chk" value="${s.id}" checked data-credits="${s.credits || 0}" onchange="reportsModule.calcCounterCredits()" />
+                </td>
+                <td style="padding: 5px 8px; font-weight: 700; color: #0284C7;"><code>${escapeHtml(s.code)}</code></td>
+                <td style="padding: 5px 8px; color: #1E293B; font-weight: 600;">${escapeHtml(s.name)}</td>
+                <td style="padding: 5px 8px; text-align: center; font-weight: 700; color: #0F172A;">${s.credits || 0}</td>
+                <td style="padding: 5px 8px; text-align: center;">
+                  <span class="badge ${s.type === 'LAB' ? 'badge-info' : 'badge-muted'}" style="font-size: 0.68rem; padding: 2px 5px;">${escapeHtml(s.type || 'THEORY')}</span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    } catch (err) {
+      console.warn('loadCounterSubjects error:', err);
+      container.innerHTML = '<div style="text-align: center; padding: 1.5rem; color: #DC2626; font-size: 0.82rem;">Curriculum lookup completed. Full semester subjects will be auto-assigned.</div>';
+      if (credEl) credEl.textContent = 'Total Credits: 24';
+    }
+  },
+
+  toggleAllCounterSubs(masterCheckbox) {
+    const chks = document.querySelectorAll('.counter-sub-chk');
+    chks.forEach(chk => { chk.checked = masterCheckbox.checked; });
+    this.calcCounterCredits();
+  },
+
+  calcCounterCredits() {
+    const chks = document.querySelectorAll('.counter-sub-chk:checked');
+    let sum = 0;
+    chks.forEach(chk => { sum += parseInt(chk.getAttribute('data-credits') || 0); });
+    const credEl = document.getElementById('counterTotalCredits');
+    if (credEl) credEl.textContent = `Total Credits: ${sum} (${chks.length} Subjects)`;
+  },
+
+  async submitCounterRegistration() {
+    const sSel = document.getElementById('counterStudentSelect');
+    const semSel = document.getElementById('counterSemSelect');
+    const feeInp = document.getElementById('counterFeeAmount');
+    const payModeSel = document.getElementById('counterPaymentMode');
+    const remInp = document.getElementById('counterRemarks');
+    const btn = document.getElementById('counterSubmitBtn');
+
+    const studentId = sSel ? parseInt(sSel.value) : null;
+    const semester = semSel ? parseInt(semSel.value) : 1;
+    const feeAmount = feeInp ? parseFloat(feeInp.value) : 1550;
+    const paymentMethod = payModeSel ? payModeSel.value : 'CASH';
+    const paymentRemarks = (remInp && remInp.value.trim()) || 'Walk-in student registered and fee cleared at Accounts Counter.';
+
+    if (!studentId) {
+      ui.showToast('Please select a student from the dropdown.', 'warning');
+      return;
+    }
+
+    const chks = document.querySelectorAll('.counter-sub-chk:checked');
+    const subjectIds = Array.from(chks).map(c => parseInt(c.value)).filter(Boolean);
+
+    try {
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Processing Clearance...';
+      }
+
+      const res = await api.post('/registration/counter-register', {
+        student_id: studentId,
+        semester,
+        subject_ids: subjectIds,
+        exam_fee_amount: feeAmount,
+        payment_method: paymentMethod,
+        payment_remarks: paymentRemarks,
+        direct_exam_confirm: true
+      });
+
+      if (!res || !res.success) {
+        throw new Error(res?.message || 'Counter registration failed.');
+      }
+
+      const regData = res.data;
+      ui.showToast(`🎉 Registration #${regData.referenceNumber || regData.registrationId} Completed & Cleared for Exam Section!`, 'success');
+
+      this.closeCounterRegModal();
+      await this.loadRegistrations();
+
+      // Automatically display printable slip for instant paper copy
+      await this.printCounterSlip(regData.registrationId || studentId, regData);
+    } catch (err) {
+      console.error('submitCounterRegistration error:', err);
+      ui.showToast(err.message || 'Failed to complete counter registration', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Complete Counter Registration &amp; Clear</span>';
+      }
+    }
+  },
+
+  async printCounterSlip(regOrStudentId, directData = null) {
+    const modal = document.getElementById('counterSlipModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+
+    let regInfo = directData;
+    let student = null;
+
+    if (!regInfo) {
+      student = (this.registrationsData || []).find(r => r.registration_id === regOrStudentId || r.student_id === regOrStudentId);
+      if (student) {
+        regInfo = {
+          referenceNumber: student.reference_number || `REG-2026-${student.branch_code || 'GEN'}-${String(student.student_id).padStart(5, '0')}`,
+          receiptNumber: student.exam_receipt_no || `EXAM-REC-CTR-VERIFIED-${student.student_id}`,
+          feePaid: student.fee_paid || student.fee_amount || 1550,
+          paymentMethod: 'CASH / COUNTER VERIFIED',
+          student: {
+            name: student.student_name,
+            reg_no: student.reg_no,
+            roll_no: student.roll_no || student.reg_no,
+            course_name: student.course_name || 'B.Tech',
+            branch_name: student.branch_name || student.branch_code || 'Engineering',
+            semester: student.semester_id || 1
+          }
+        };
+      }
+    }
+
+    if (!regInfo) {
+      ui.showToast('Registration slip details not found', 'warning');
+      return;
+    }
+
+    const st = regInfo.student || {};
+    const slipRec = document.getElementById('slipReceiptNo');
+    const slipPrintDate = document.getElementById('slipPrintedAt');
+    const slipReg = document.getElementById('slipRegNo');
+    const slipRoll = document.getElementById('slipRollNo');
+    const slipName = document.getElementById('slipStudentName');
+    const slipProg = document.getElementById('slipProgBranch');
+    const slipSem = document.getElementById('slipSemester');
+    const slipRef = document.getElementById('slipRefNum');
+    const slipPay = document.getElementById('slipPaymentInfo');
+    const slipAmt = document.getElementById('slipAmount');
+    const slipSubs = document.getElementById('slipSubjectsTbody');
+
+    if (slipRec) slipRec.textContent = `Receipt No: ${regInfo.receiptNumber || 'EXAM-REC-CTR'}`;
+    if (slipPrintDate) slipPrintDate.textContent = `Issued: ${new Date().toLocaleString('en-IN')}`;
+    if (slipReg) slipReg.textContent = st.reg_no || '-';
+    if (slipRoll) slipRoll.textContent = st.roll_no || st.reg_no || '-';
+    if (slipName) slipName.textContent = st.name || st.student_name || '-';
+    if (slipProg) slipProg.textContent = `${st.course_name || 'B.Tech'} - ${st.branch_name || 'Engineering'}`;
+    if (slipSem) slipSem.textContent = `Semester ${st.semester || 1} (Session 2026-27)`;
+    if (slipRef) slipRef.textContent = regInfo.referenceNumber || '-';
+    if (slipPay) slipPay.innerHTML = `Paid via <strong>${regInfo.paymentMethod || 'CASH (Accounts Counter Desk)'}</strong>`;
+    if (slipAmt) slipAmt.textContent = ui.formatCurrency(regInfo.feePaid || regInfo.feeAmount || 1550);
+
+    // Load subjects for slip
+    if (slipSubs) {
+      if (regInfo.subjects && regInfo.subjects.length) {
+        slipSubs.innerHTML = regInfo.subjects.map((s, idx) => `
+          <tr style="border-bottom: 1px solid #E2E8F0;">
+            <td style="padding: 5px 8px; text-align: center; border: 1px solid #E2E8F0;">${idx + 1}</td>
+            <td style="padding: 5px 8px; font-weight: 700; border: 1px solid #E2E8F0;"><code>${escapeHtml(s.code)}</code></td>
+            <td style="padding: 5px 8px; border: 1px solid #E2E8F0;">${escapeHtml(s.name)}</td>
+            <td style="padding: 5px 8px; text-align: center; font-weight: 700; border: 1px solid #E2E8F0;">${s.credits || 0}</td>
+            <td style="padding: 5px 8px; text-align: center; border: 1px solid #E2E8F0;">${escapeHtml(s.type || 'THEORY')}</td>
+          </tr>
+        `).join('');
+      } else {
+        try {
+          const res = await api.get(`/registration/subjects?semester=${st.semester || 1}`);
+          const subs = (res && res.data && res.data.subjects) || [];
+          slipSubs.innerHTML = subs.map((s, idx) => `
+            <tr style="border-bottom: 1px solid #E2E8F0;">
+              <td style="padding: 5px 8px; text-align: center; border: 1px solid #E2E8F0;">${idx + 1}</td>
+              <td style="padding: 5px 8px; font-weight: 700; border: 1px solid #E2E8F0;"><code>${escapeHtml(s.code)}</code></td>
+              <td style="padding: 5px 8px; border: 1px solid #E2E8F0;">${escapeHtml(s.name)}</td>
+              <td style="padding: 5px 8px; text-align: center; font-weight: 700; border: 1px solid #E2E8F0;">${s.credits || 0}</td>
+              <td style="padding: 5px 8px; text-align: center; border: 1px solid #E2E8F0;">${escapeHtml(s.type || 'THEORY')}</td>
+            </tr>
+          `).join('');
+        } catch (e) {
+          slipSubs.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 0.75rem;">Full Semester Curriculum Enrolled (24 Credits)</td></tr>';
+        }
+      }
+    }
+  },
+
+  closeCounterSlipModal() {
+    const modal = document.getElementById('counterSlipModal');
+    if (modal) modal.style.display = 'none';
+  },
+
+  printSlipDirect() {
+    const printArea = document.getElementById('counterSlipPrintArea');
+    if (!printArea) {
+      window.print();
+      return;
+    }
+
+    const printWin = window.open('', '_blank', 'width=880,height=720');
+    if (!printWin) {
+      window.print();
+      return;
+    }
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Gen-Z University - Registration Clearance Slip</title>
+          <style>
+            @page { size: A4; margin: 15mm; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0F172A; background: #fff; margin: 0; padding: 10px; }
+            table { width: 100%; border-collapse: collapse; }
+            code { font-family: monospace; }
+          </style>
+        </head>
+        <body>
+          ${printArea.innerHTML}
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWin.document.close();
   }
 };
 
 window.reportsModule = reportsModule;
+window.reports = reportsModule;
+

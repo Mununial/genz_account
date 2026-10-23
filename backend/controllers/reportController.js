@@ -213,8 +213,77 @@ async function getRegistrationsReport(req, res) {
   const { paymentStatus, branchId, search } = req.query;
 
   try {
-    const mockDb = require('../config/mockDb');
-    let list = mockDb.examRegistrations || [];
+    const sql = `
+      SELECT 
+        s.id AS student_id,
+        s.reg_no,
+        s.roll_no,
+        s.full_name AS student_name,
+        s.phone,
+        COALESCE(p.name, 'B.Tech') AS course_name,
+        COALESCE(p.code, 'BTECH') AS prog_code,
+        COALESCE(d.name, 'General Engineering') AS branch_name,
+        COALESCE(d.code, 'GEN') AS branch_code,
+        COALESCE(s.current_semester_id, 1) AS semester_id,
+        COALESCE(sem.label, CONCAT(
+          COALESCE(s.current_semester_id, 1),
+          CASE 
+            WHEN COALESCE(s.current_semester_id, 1) = 1 THEN 'st'
+            WHEN COALESCE(s.current_semester_id, 1) = 2 THEN 'nd'
+            WHEN COALESCE(s.current_semester_id, 1) = 3 THEN 'rd'
+            ELSE 'th'
+          END,
+          ' Semester'
+        )) AS semester_label,
+        sr.id AS registration_id,
+        sr.reference_number,
+        COALESCE(sr.academic_year, '2026-27') AS session,
+        COALESCE(sr.academic_year, '2026-27') AS session_name,
+        CASE
+          WHEN COALESCE(s.current_semester_id, 1) <= 2 THEN '1st Year'
+          WHEN COALESCE(s.current_semester_id, 1) <= 4 THEN '2nd Year'
+          WHEN COALESCE(s.current_semester_id, 1) <= 6 THEN '3rd Year'
+          ELSE '4th Year'
+        END AS academic_year,
+        sr.status AS reg_status,
+        COALESCE(sr.exam_fee_amount, 1550.00) AS fee_amount,
+        sr.exam_fee_status,
+        sr.exam_receipt_no,
+        sr.exam_fee_paid_at
+      FROM students s
+      LEFT JOIN programs p ON p.id = s.course_id
+      LEFT JOIN departments d ON d.id = s.branch_id
+      LEFT JOIN semesters sem ON sem.semester_number = s.current_semester_id
+      LEFT JOIN (
+        SELECT sr1.*
+        FROM subject_registrations sr1
+        INNER JOIN (
+          SELECT student_id, MAX(id) AS max_id
+          FROM subject_registrations
+          GROUP BY student_id
+        ) sr2 ON sr1.id = sr2.max_id
+      ) sr ON sr.student_id = s.id
+      ORDER BY s.id ASC
+    `;
+
+    const [rows] = await query(sql);
+
+    let list = (rows || []).map(r => {
+      const isPaid = (r.exam_fee_status === 'PAID') || (['CONFIRMED', 'EXAM_FEE_PAID'].includes(r.reg_status));
+      const feeAmount = parseFloat(r.fee_amount) || 1550.00;
+      const feePaid = isPaid ? feeAmount : 0.00;
+      const payment_status = isPaid ? 'PAID' : 'UNPAID';
+      const admit_card_eligible = isPaid;
+
+      return {
+        ...r,
+        fee_amount: feeAmount,
+        fee_paid: feePaid,
+        payment_status,
+        admit_card_eligible,
+        is_registered: !!r.registration_id
+      };
+    });
 
     if (paymentStatus && paymentStatus !== 'ALL') {
       list = list.filter(r => r.payment_status === paymentStatus);
@@ -227,7 +296,8 @@ async function getRegistrationsReport(req, res) {
       list = list.filter(r => 
         (r.student_name && r.student_name.toLowerCase().includes(q)) ||
         (r.reg_no && r.reg_no.toLowerCase().includes(q)) ||
-        (r.roll_no && r.roll_no.toLowerCase().includes(q))
+        (r.roll_no && r.roll_no.toLowerCase().includes(q)) ||
+        (r.phone && r.phone.toLowerCase().includes(q))
       );
     }
 
