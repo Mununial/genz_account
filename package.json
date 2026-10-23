@@ -2,10 +2,11 @@
   "name": "genz-accounts-system",
   "version": "1.0.0",
   "description": "Gen-Z University Accounts & Finance Management System",
+  "main": "backend/server.js",
   "scripts": {
     "build": "cd backend && npm install",
     "postinstall": "cd backend && npm install",
-    "start": "cd backend && node server.js",
+    "start": "node backend/server.js",
     "dev": "cd backend && node --watch server.js",
     "test": "cd backend && node ../tests/run_tests.js",
     "deploy:firebase": "npx firebase-tools deploy --only hosting"
