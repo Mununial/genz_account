@@ -12,8 +12,8 @@ const adminSubjects = {
   async init() {
     const user = await auth.checkAuth();
     if (!user) return;
-    if (!['ADMIN', 'SUPER_ADMIN', 'DIRECTOR', 'HOD'].includes(user.role)) {
-      ui.showToast('Access restricted to Academic Administrators.', 'error');
+    if (!['ADMIN', 'SUPER_ADMIN', 'DIRECTOR', 'HOD', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF'].includes(user.role)) {
+      ui.showToast('Access restricted to Academic Administrators and Accounts Officers.', 'error');
       setTimeout(() => window.location.replace('/dashboard.html'), 1200);
       return;
     }

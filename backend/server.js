@@ -158,6 +158,30 @@ app.get('/master-control', (req, res) => {
   res.sendFile(path.join(frontendPath, 'master-control.html'));
 });
 
+app.get('/accounts-registrations', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'accounts-registrations.html'));
+});
+
+app.get('/admin-subjects', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'admin-subjects.html'));
+});
+
+app.get('/hod-registrations', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'hod-registrations.html'));
+});
+
+app.get('/director-registrations', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'director-registrations.html'));
+});
+
+app.get('/director-loans', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'director-loans.html'));
+});
+
+app.get('/exam-registrations', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'exam-registrations.html'));
+});
+
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ success: false, message: `API endpoint '${req.originalUrl}' not found.` });

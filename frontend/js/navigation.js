@@ -99,7 +99,8 @@ const navigation = {
       }, WARNING_MS);
 
       this.inactivityTimer = setTimeout(() => {
-        if (typeof auth !== 'undefined' && auth.getToken()) {
+        const token = (typeof api !== 'undefined' && api.getToken) ? api.getToken() : null;
+        if (token && typeof auth !== 'undefined' && auth.logout) {
           ui.showToast('Session timed out after 15 minutes of inactivity.', 'error');
           setTimeout(() => auth.logout(), 1000);
         }
@@ -216,11 +217,11 @@ const navigation = {
       if (!user) return;
       this.currentUser = user;
 
-      const currentPath = window.location.pathname.toLowerCase();
+      const currentPath = window.location.pathname.toLowerCase().replace(/\.html$/, '');
 
       // 1. Strict Isolation for Student
       if (user.role === 'STUDENT') {
-        if (!currentPath.endsWith('/student-portal.html')) {
+        if (!currentPath.endsWith('/student-portal') && currentPath !== '/student-portal') {
           window.location.replace('/student-portal.html');
           return;
         }
@@ -228,8 +229,8 @@ const navigation = {
 
       // 2. Strict Isolation for HOD (Only academic pages allowed)
       if (user.role === 'HOD') {
-        const hodAllowed = ['/hod-registrations.html', '/admin-subjects.html', '/students.html'];
-        if (!hodAllowed.some(p => currentPath.endsWith(p))) {
+        const hodAllowed = ['/hod-registrations', '/admin-subjects', '/students'];
+        if (!hodAllowed.some(p => currentPath === p || currentPath.endsWith(p))) {
           window.location.replace('/hod-registrations.html');
           return;
         }
@@ -237,15 +238,15 @@ const navigation = {
 
       // 3. Strict Isolation for Director (Only academic executive pages allowed)
       if (user.role === 'DIRECTOR') {
-        const dirAllowed = ['/director-registrations.html', '/director-loans.html', '/admin-subjects.html', '/students.html'];
-        if (!dirAllowed.some(p => currentPath.endsWith(p))) {
+        const dirAllowed = ['/director-registrations', '/director-loans', '/admin-subjects', '/students'];
+        if (!dirAllowed.some(p => currentPath === p || currentPath.endsWith(p))) {
           window.location.replace('/director-registrations.html');
           return;
         }
       }
 
       // 4. Accounts staff/admin cannot access student portal
-      if (!['STUDENT'].includes(user.role) && currentPath.endsWith('/student-portal.html')) {
+      if (!['STUDENT'].includes(user.role) && (currentPath.endsWith('/student-portal') || currentPath === '/student-portal')) {
         window.location.replace('/receipt-desk.html');
         return;
       }

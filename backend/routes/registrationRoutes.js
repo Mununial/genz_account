@@ -21,16 +21,16 @@ router.post('/:id/pay-exam-fee', authenticateToken, requireRole('STUDENT'), ctrl
 router.get('/my', authenticateToken, requireRole('STUDENT', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN', 'SUPER_ADMIN', 'DIRECTOR', 'EXAM_CELL'), ctrl.getMyRegistrations);
 
 // ── HOD & Review Detail Routes (All Review Authorities) ───────────────────────
-router.get('/hod/registrations', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN'), ctrl.hodGetRegistrations);
-router.get('/hod/pending', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN'), ctrl.hodGetRegistrations); // alias
+router.get('/hod/registrations', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF'), ctrl.hodGetRegistrations);
+router.get('/hod/pending', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF'), ctrl.hodGetRegistrations); // alias
 router.get('/hod/:id', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN', 'DIRECTOR', 'ACCOUNTS_STAFF', 'ACCOUNTS_HEAD', 'EXAM_CELL'), ctrl.hodGetDetail);
 router.get('/detail/:id', authenticateToken, ctrl.hodGetDetail); // universal detail endpoint
 router.put('/hod/:id/forward', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN'), ctrl.hodForward);
 router.put('/hod/:id/revert', authenticateToken, requireRole('HOD', 'ADMIN', 'SUPER_ADMIN'), ctrl.hodRevert);
 
 // ── Director Routes (All Departments) ─────────────────────────────────────────
-router.get('/director/registrations', authenticateToken, requireRole('DIRECTOR', 'ADMIN'), ctrl.directorGetRegistrations);
-router.get('/director/pending', authenticateToken, requireRole('DIRECTOR', 'ADMIN'), ctrl.directorGetRegistrations); // alias
+router.get('/director/registrations', authenticateToken, requireRole('DIRECTOR', 'ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF'), ctrl.directorGetRegistrations);
+router.get('/director/pending', authenticateToken, requireRole('DIRECTOR', 'ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF'), ctrl.directorGetRegistrations); // alias
 router.put('/director/:id/approve', authenticateToken, requireRole('DIRECTOR', 'ADMIN'), ctrl.directorApprove);
 router.put('/director/:id/reject', authenticateToken, requireRole('DIRECTOR', 'ADMIN'), ctrl.directorReject);
 
@@ -50,7 +50,7 @@ router.put('/accounts/:id/finalize', authenticateToken, requireRole(...ACCOUNTS_
 router.post('/counter-register', authenticateToken, requireRole(...ACCOUNTS_REVIEW_ROLES), ctrl.counterRegisterStudent);
 
 // ── Admin Subject Catalog & Bulk Import ────────────────────────────────────────
-router.get('/admin/subjects', authenticateToken, requireRole('ADMIN', 'HOD', 'DIRECTOR'), ctrl.adminGetSubjects);
+router.get('/admin/subjects', authenticateToken, requireRole('ADMIN', 'HOD', 'DIRECTOR', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'SUPER_ADMIN'), ctrl.adminGetSubjects);
 router.post('/admin/subjects', authenticateToken, requireRole('ADMIN'), ctrl.adminCreateSubject);
 router.post('/admin/subjects/bulk', authenticateToken, requireRole('ADMIN'), ctrl.adminBulkImportSubjects);
 router.post('/admin/registrations/reset', authenticateToken, requireRole('ADMIN'), ctrl.adminResetRegistrations);

@@ -30,7 +30,14 @@ const api = {
         return qToken;
       }
     } catch (e) {}
-    return sessionStorage.getItem('bec_auth_token') || localStorage.getItem('bec_auth_token');
+    const tok = sessionStorage.getItem('bec_auth_token') || localStorage.getItem('bec_auth_token');
+    if (tok) {
+      try {
+        if (!sessionStorage.getItem('bec_auth_token')) sessionStorage.setItem('bec_auth_token', tok);
+        if (!localStorage.getItem('bec_auth_token')) localStorage.setItem('bec_auth_token', tok);
+      } catch (e) {}
+    }
+    return tok;
   },
 
   setToken(token, remember = false) {
@@ -69,19 +76,19 @@ const api = {
         body: options.body ? JSON.stringify(options.body) : undefined
       });
 
-      // Handle 401 unauthorized: Only clear token & redirect if specifically from session verification (/auth/me)
-      if (response.status === 401 && endpoint.includes('/auth/me')) {
-        this.clearToken();
-        if (!window.location.pathname.includes('login')) {
-          window.location.href = '/login.html';
-        }
-      }
-
       let data = null;
       try {
         data = await response.json();
       } catch (parseErr) {
         data = null;
+      }
+
+      // Handle 401 unauthorized: Only clear token if server explicitly confirms token expiration or invalid session
+      if (response.status === 401 && endpoint.includes('/auth/me') && data && (data.message?.toLowerCase().includes('expired') || data.message?.toLowerCase().includes('token') || data.message?.toLowerCase().includes('inactive'))) {
+        this.clearToken();
+        if (!window.location.pathname.includes('login')) {
+          window.location.href = '/login.html';
+        }
       }
 
       // If server explicitly reports invalid or missing token on auth check, clear stale storage

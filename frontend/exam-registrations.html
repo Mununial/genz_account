@@ -319,11 +319,11 @@
 
   <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/ui.js"></script>
-  <script src="/js/navigation.js"></script>
-  <script src="/js/examRegistrations.js"></script>
+  <script src="/js/api.js?v=20261024_1"></script>
+  <script src="/js/auth.js?v=20261024_1"></script>
+  <script src="/js/ui.js?v=20261024_1"></script>
+  <script src="/js/navigation.js?v=20261024_1"></script>
+  <script src="/js/examRegistrations.js?v=20261024_1"></script>
   <script>
     function toggleSidebar() {
       const sb = document.getElementById('appSidebar');
@@ -333,6 +333,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      navigation.init('exam-registrations');
       await examRegistrations.init();
     });
   </script>

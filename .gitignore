@@ -30,3 +30,5 @@ temp/
 coverage/
 dist/
 build/
+scratch/
+backup_tour_integration/

@@ -7,6 +7,12 @@ const auth = {
   currentUser: null,
   _authPromise: null,
 
+  getToken() {
+    return (typeof api !== 'undefined' && api.getToken)
+      ? api.getToken()
+      : (sessionStorage.getItem('bec_auth_token') || localStorage.getItem('bec_auth_token'));
+  },
+
   async checkAuth() {
     // 1. If auth is already resolved in memory, return immediately
     if (this.currentUser) {
