@@ -34,8 +34,14 @@ async function login(req, res) {
     if (['admin', 'master', 'superadmin', 'root', 'ayush', 'ayush mallick', 'ayush.mallick@genz.edu.in', 'ayushmallick', 'admin@genz', 'admin@genz.edu.in'].includes(normalizedEmail)) {
       lookupTerm = 'admin@genz';
     }
-    // Accountant shortcuts
-    else if (['staff', 'account', 'accounts', 'accountant', 'harihara', 'harihara parida', 'harihara.parida@genz.edu.in', 'account@genz', 'accounts@genz', 'accounts.head@genz.edu.in'].includes(normalizedEmail)) {
+    // Accountant shortcuts (supports account, accounts, acccount, and @genz.edu.in)
+    else if (
+      cleanPrefixNoDot.includes('account') || 
+      cleanPrefixNoDot.includes('acccount') ||
+      cleanPrefixNoDot === 'staff' ||
+      cleanPrefixNoDot === 'cashier' ||
+      ['staff', 'account', 'accounts', 'accountant', 'account@genz', 'accounts@genz', 'account@genz.edu.in', 'accounts@genz.edu.in', 'acccount@genz.edu.in', 'acccount@genz', 'harihara', 'harihara parida', 'harihara.parida@genz.edu.in', 'accounts.head@genz.edu.in'].includes(normalizedEmail)
+    ) {
       lookupTerm = 'account@genz';
     }
     else if (normalizedEmail === 'head') lookupTerm = 'account@genz';
