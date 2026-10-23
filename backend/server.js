@@ -96,6 +96,11 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/transport', transportRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/registration', registrationRoutes);
+app.use('/api/registrations', registrationRoutes);
+app.post('/api/counter-register', (req, res, next) => {
+  req.url = '/counter-register';
+  registrationRoutes(req, res, next);
+});
 
 // 7. HTML Page Routes & Fallbacks
 app.get('/login', (req, res) => {

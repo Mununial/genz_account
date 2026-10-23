@@ -16,11 +16,15 @@ const ui = {
       container = document.createElement('div');
       container.id = 'toastContainer';
       container.className = 'toast-container';
+      container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:92vw;';
       document.body.appendChild(container);
+    } else {
+      container.style.zIndex = '99999999';
     }
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
+    toast.style.cssText = 'pointer-events:auto;z-index:99999999;box-shadow:0 10px 25px rgba(0,0,0,0.25);';
 
     let iconSvg = '';
     if (type === 'success') {

@@ -616,11 +616,13 @@
               <strong>Automatic Multi-Section Sync:</strong> On submitting, this registration will be marked <strong>CONFIRMED</strong> with instant Accounts clearance. It will immediately show in the <strong>College Examination Section</strong> for Admit Card issuance and in the <strong>Student Portal</strong>!
             </div>
           </div>
+          <!-- In-Modal Dynamic Alert Notification -->
+          <div id="counterModalAlert" style="display: none; margin-top: 0.85rem; border-radius: 8px; padding: 0.65rem 0.9rem; font-size: 0.82rem; font-weight: 600; line-height: 1.4;"></div>
         </div>
       </div>
 
       <!-- Modal Footer -->
-      <div style="background: #F1F5F9; border-top: 1px solid #E2E8F0; padding: 0.85rem 1.5rem; display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem;">
+      <div style="background: #F1F5F9; border-top: 1px solid #E2E8F0; padding: 0.85rem 1.5rem; display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
         <button type="button" class="btn btn-secondary" onclick="reportsModule.closeCounterRegModal()" style="font-size: 0.85rem; padding: 0.45rem 1.1rem;">Cancel</button>
         <button type="button" id="counterSubmitBtn" class="btn btn-primary" onclick="reportsModule.submitCounterRegistration()" style="font-size: 0.85rem; padding: 0.45rem 1.25rem; font-weight: 700; background: linear-gradient(135deg, #0284C7, #0B63C5); border: none; box-shadow: 0 2px 6px rgba(11,99,197,0.35); display: inline-flex; align-items: center; gap: 0.4rem;">
           <span>⚡ Complete Counter Registration &amp; Clear</span>
