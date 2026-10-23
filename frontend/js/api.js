@@ -3,9 +3,7 @@
  * Gen-Z University Accounts System
  */
 
-const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-  ? '/api'
-  : (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com') ? '/api' : 'https://genz-account.onrender.com/api');
+const API_BASE = '/api';
 
 window.API_BASE = API_BASE;
 

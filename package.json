@@ -2,14 +2,29 @@
   "name": "genz-accounts-system",
   "version": "1.0.0",
   "description": "Gen-Z University Accounts & Finance Management System",
-  "main": "backend/server.js",
+  "main": "server.js",
   "scripts": {
     "build": "cd backend && npm install",
     "postinstall": "cd backend && npm install",
-    "start": "node backend/server.js",
-    "dev": "cd backend && node --watch server.js",
-    "test": "cd backend && node ../tests/run_tests.js",
-    "deploy:firebase": "npx firebase-tools deploy --only hosting"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "cd backend && node ../tests/run_tests.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.12.0",
+    "nodemailer": "^10.1.0",
+    "pdfkit": "^0.20.2",
+    "qrcode": "^1.5.4",
+    "razorpay": "^2.9.8",
+    "xlsx": "^0.18.5"
   },
   "author": "Gen-Z University",
   "license": "ISC"
