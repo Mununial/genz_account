@@ -214,7 +214,10 @@ async function getProgramsAndDepartments(req, res) {
  */
 async function getEligibility(req, res) {
   try {
-    const sid = req.user.studentId;
+    let sid = req.user.studentId;
+    if (!sid && req.query.student_id && ['ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'DIRECTOR', 'EXAM_CELL'].includes(req.user.role)) {
+      sid = parseInt(req.query.student_id);
+    }
     if (!sid) return error(res, 'Student account record not found.', 404);
 
     const [stuRows] = await query(
@@ -608,8 +611,16 @@ async function submitRegistration(req, res) {
  */
 async function getMyRegistrations(req, res) {
   try {
-    const sid = req.user.studentId;
-    if (!sid) return error(res, 'Student account record not found.', 404);
+    let sid = req.user.studentId;
+    if (!sid && req.query.student_id && ['ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'DIRECTOR', 'EXAM_CELL'].includes(req.user.role)) {
+      sid = parseInt(req.query.student_id);
+    }
+    if (!sid) {
+      if (['ADMIN', 'SUPER_ADMIN', 'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'DIRECTOR', 'EXAM_CELL'].includes(req.user.role)) {
+        return success(res, { registrations: [], total: 0 }, 'No student registrations for staff preview.');
+      }
+      return error(res, 'Student account record not found.', 404);
+    }
 
     const [rows] = await query(
       `SELECT sr.*,

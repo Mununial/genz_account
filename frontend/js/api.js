@@ -26,6 +26,7 @@ const api = {
       const qToken = urlParams.get('token');
       if (qToken) {
         localStorage.setItem('bec_auth_token', qToken);
+        sessionStorage.setItem('bec_auth_token', qToken);
         return qToken;
       }
     } catch (e) {}
@@ -33,16 +34,22 @@ const api = {
   },
 
   setToken(token, remember = false) {
-    if (remember) {
-      localStorage.setItem('bec_auth_token', token);
-    } else {
+    try {
       sessionStorage.setItem('bec_auth_token', token);
-    }
+      localStorage.setItem('bec_auth_token', token);
+      if (remember) {
+        localStorage.setItem('bec_remember_me', '1');
+      }
+    } catch (e) {}
   },
 
   clearToken() {
-    sessionStorage.removeItem('bec_auth_token');
-    localStorage.removeItem('bec_auth_token');
+    try {
+      sessionStorage.removeItem('bec_auth_token');
+      localStorage.removeItem('bec_auth_token');
+      sessionStorage.removeItem('bec_user_cache');
+      localStorage.removeItem('bec_user_cache');
+    } catch (e) {}
   },
 
   async request(endpoint, options = {}) {
@@ -62,8 +69,8 @@ const api = {
         body: options.body ? JSON.stringify(options.body) : undefined
       });
 
-      // Handle 401 unauthorized or 403 invalid token
-      if (response.status === 401 && !endpoint.includes('/auth/login')) {
+      // Handle 401 unauthorized: Only clear token & redirect if specifically from session verification (/auth/me)
+      if (response.status === 401 && endpoint.includes('/auth/me')) {
         this.clearToken();
         if (!window.location.pathname.includes('login')) {
           window.location.href = '/login.html';
@@ -77,8 +84,8 @@ const api = {
         data = null;
       }
 
-      // If server explicitly reports invalid or missing token, clear stale storage
-      if (response.status === 403 && data && (data.message === 'Invalid authentication token.' || data.message.includes('token'))) {
+      // If server explicitly reports invalid or missing token on auth check, clear stale storage
+      if (response.status === 403 && endpoint.includes('/auth/me') && data && (data.message === 'Invalid authentication token.' || data.message.includes('token'))) {
         this.clearToken();
       }
 

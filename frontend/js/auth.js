@@ -5,34 +5,78 @@
 
 const auth = {
   currentUser: null,
+  _authPromise: null,
 
   async checkAuth() {
-    const token = api.getToken();
-    const isMasterRoute = window.location.pathname.includes('master');
-    const fallbackLogin = isMasterRoute ? '/master-login.html' : '/login.html';
-
-    if (!token) {
-      if (!window.location.pathname.includes('login')) {
-        window.location.href = fallbackLogin;
-      }
-      return null;
-    }
-
-    try {
-      const res = await api.get('/auth/me');
-      if (!res || !res.data) {
-        throw new Error('Invalid auth session data');
-      }
-      this.currentUser = res.data;
+    // 1. If auth is already resolved in memory, return immediately
+    if (this.currentUser) {
       this.renderUserBadge();
       return this.currentUser;
-    } catch (err) {
-      api.clearToken();
-      if (!window.location.pathname.includes('login')) {
-        window.location.href = fallbackLogin;
-      }
-      return null;
     }
+
+    // 2. Try loading cached user session from storage for instant UI render
+    try {
+      const cached = sessionStorage.getItem('bec_user_cache') || localStorage.getItem('bec_user_cache');
+      if (cached && !this.currentUser) {
+        this.currentUser = JSON.parse(cached);
+        this.renderUserBadge();
+      }
+    } catch (e) {}
+
+    // 3. Deduplicate in-flight requests (navigation.init & page.init share single fetch)
+    if (this._authPromise) {
+      return this._authPromise;
+    }
+
+    this._authPromise = (async () => {
+      const token = api.getToken();
+      const isMasterRoute = window.location.pathname.includes('master');
+      const fallbackLogin = isMasterRoute ? '/master-login.html' : '/login.html';
+
+      if (!token) {
+        if (!window.location.pathname.includes('login')) {
+          window.location.href = fallbackLogin;
+        }
+        return null;
+      }
+
+      try {
+        const res = await api.get('/auth/me');
+        if (!res || !res.data) {
+          throw new Error('Invalid auth session data');
+        }
+        this.currentUser = res.data;
+        try {
+          sessionStorage.setItem('bec_user_cache', JSON.stringify(res.data));
+          localStorage.setItem('bec_user_cache', JSON.stringify(res.data));
+        } catch (e) {}
+        this.renderUserBadge();
+        return this.currentUser;
+      } catch (err) {
+        console.warn('Session verification notice:', err);
+
+        // ONLY clear token if the backend explicitly reports 401 Unauthorized
+        if (err.status === 401) {
+          api.clearToken();
+          if (!window.location.pathname.includes('login')) {
+            window.location.href = fallbackLogin;
+          }
+          return null;
+        }
+
+        // On network latency, 502/504 gateway timeouts, or offline, PRESERVE THE SESSION
+        if (this.currentUser) {
+          this.renderUserBadge();
+          return this.currentUser;
+        }
+
+        return null;
+      } finally {
+        this._authPromise = null;
+      }
+    })();
+
+    return this._authPromise;
   },
 
   async login(email, password, remember = false) {

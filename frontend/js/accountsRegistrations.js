@@ -12,7 +12,12 @@ const accountsRegistrations = {
   async init() {
     const user = await auth.checkAuth();
     if (!user) return;
-    if (!['ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN', 'SUPER_ADMIN', 'DIRECTOR', 'EXAM_CELL'].includes(user.role)) {
+    const allowedRoles = [
+      'ACCOUNTS_HEAD', 'ACCOUNTS_STAFF', 'ADMIN', 'SUPER_ADMIN', 
+      'DIRECTOR', 'EXAM_CELL', 'EXAM_SECTION', 'CASHIER', 
+      'ACCOUNTS_MANAGER', 'AUDITOR_READ_ONLY', 'STAFF'
+    ];
+    if (user.role && !allowedRoles.includes(user.role)) {
       ui.showToast('Access restricted to Accounts Department & Administrative Officers.', 'error');
       setTimeout(() => window.location.replace('/dashboard.html'), 1200);
       return;
