@@ -464,7 +464,11 @@ const paymentDetails = {
       });
 
       // ── Official Razorpay Popup Checkout ────────────────────────────────────
-      if (typeof Razorpay !== 'undefined' && orderRes?.data?.key && orderRes?.data?.orderId) {
+      const isRealRazorpayKey = typeof Razorpay !== 'undefined' && 
+                                orderRes?.data?.key && 
+                                (orderRes.data.key.startsWith('rzp_test_') || orderRes.data.key.startsWith('rzp_live_')) && 
+                                orderRes?.data?.orderId;
+      if (isRealRazorpayKey) {
         const ord = orderRes.data;
         const options = {
           key: ord.key,

@@ -2079,101 +2079,110 @@ const studentPortal = {
 
       const ord = (orderRes && orderRes.data) ? orderRes.data : {};
 
-      // ── Step 2: Launch Official Razorpay Popup ───────────────────────────────
-      if (typeof Razorpay !== 'undefined' && ord.key && ord.orderId) {
-        const s = this.currentStudent || {};
-        const options = {
-          key: ord.key,
-          amount: Math.round(amount * 100),
-          currency: ord.currency || 'INR',
-          name: 'Gen-Z University',
-          description: `${desc || 'College Fee Payment'} (${ord.invoiceNo || 'Fee'})`,
-          image: '/assets/logo.svg',
-          order_id: ord.orderId,
-          prefill: {
-            name: s.full_name || '',
-            email: s.email || 'accounts@genz.edu.in',
-            contact: s.contact_number || s.phone || '9876543210'
-          },
-          notes: {
-            studentId: String(s.id || ''),
-            studentRegNo: s.reg_no || '',
-            invoiceId: String(invoiceId || '')
-          },
-          method: {
-            upi: true,
-            card: true,
-            netbanking: true,
-            wallet: true
-          },
-          theme: {
-            color: '#006644'
-          },
-          handler: async (response) => {
-            this.checkoutState.step = 'PROCESSING';
-            this.renderCheckoutModal();
-            const stepEl = document.getElementById('becProcessingSubstep');
-            if (stepEl) stepEl.textContent = 'Verifying cryptographic digital signature with Razorpay...';
+      // ── Step 2: Launch Official Razorpay Popup (Only if a valid rzp_ key is present) ──
+      const isRealRazorpayKey = typeof Razorpay !== 'undefined' && 
+                                ord.key && 
+                                (ord.key.startsWith('rzp_test_') || ord.key.startsWith('rzp_live_')) && 
+                                ord.provider === 'RAZORPAY';
 
-            try {
-              const verifyRes = await api.post('/payments/verify', {
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-                invoiceId,
-                paymentMethod: 'RAZORPAY_TEST_ONLINE'
-              });
+      if (isRealRazorpayKey && ord.orderId) {
+        try {
+          const s = this.currentStudent || {};
+          const options = {
+            key: ord.key,
+            amount: Math.round(amount * 100),
+            currency: ord.currency || 'INR',
+            name: 'Gen-Z University',
+            description: `${desc || 'College Fee Payment'} (${ord.invoiceNo || 'Fee'})`,
+            image: '/assets/logo.svg',
+            order_id: ord.orderId,
+            prefill: {
+              name: s.full_name || '',
+              email: s.email || 'accounts@genz.edu.in',
+              contact: s.contact_number || s.phone || '9876543210'
+            },
+            notes: {
+              studentId: String(s.id || ''),
+              studentRegNo: s.reg_no || '',
+              invoiceId: String(invoiceId || '')
+            },
+            method: {
+              upi: true,
+              card: true,
+              netbanking: true,
+              wallet: true
+            },
+            theme: {
+              color: '#006644'
+            },
+            handler: async (response) => {
+              this.checkoutState.step = 'PROCESSING';
+              this.renderCheckoutModal();
+              const stepEl = document.getElementById('becProcessingSubstep');
+              if (stepEl) stepEl.textContent = 'Verifying cryptographic digital signature with Razorpay...';
 
-              const receiptData = (verifyRes && verifyRes.data) ? verifyRes.data : {};
-              const receiptNo = receiptData.receiptNo || `REC-2026-${Date.now().toString().slice(-5)}`;
+              try {
+                const verifyRes = await api.post('/payments/verify', {
+                  orderId: response.razorpay_order_id,
+                  paymentId: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                  invoiceId,
+                  paymentMethod: 'RAZORPAY_TEST_ONLINE'
+                });
 
-              if (this.currentStudent) {
-                const currentPaid = parseFloat(this.currentStudent.total_paid || 0);
-                const currentOut = parseFloat(this.currentStudent.total_outstanding !== undefined ? this.currentStudent.total_outstanding : this.checkoutState.totalDue);
-                this.currentStudent.total_paid = currentPaid + amount;
-                this.currentStudent.total_outstanding = Math.max(0, currentOut - amount);
+                const receiptData = (verifyRes && verifyRes.data) ? verifyRes.data : {};
+                const receiptNo = receiptData.receiptNo || `REC-2026-${Date.now().toString().slice(-5)}`;
+
+                if (this.currentStudent) {
+                  const currentPaid = parseFloat(this.currentStudent.total_paid || 0);
+                  const currentOut = parseFloat(this.currentStudent.total_outstanding !== undefined ? this.currentStudent.total_outstanding : this.checkoutState.totalDue);
+                  this.currentStudent.total_paid = currentPaid + amount;
+                  this.currentStudent.total_outstanding = Math.max(0, currentOut - amount);
+                }
+
+                const newReceipt = {
+                  id: receiptData.receiptId || (this.receiptsList.length + 1),
+                  receipt_no: receiptNo,
+                  amount: amount,
+                  date: new Date().toISOString().split('T')[0],
+                  invoice_no: ord.invoiceNo || 'INV-2026-FEE',
+                  payment_method: 'Razorpay Online (UPI/Card/NetBanking)',
+                  status: 'SUCCESS'
+                };
+                this.receiptsList.unshift(newReceipt);
+
+                this.checkoutState.step = 'SUCCESS';
+                this.checkoutState.latestReceipt = newReceipt;
+                this.renderCheckoutModal();
+                this.renderFeesLedger();
+                this.updateHeaderProfile();
+                ui.showToast(`Payment of ${ui.formatCurrency(amount)} verified successfully!`, 'success');
+              } catch (verr) {
+                console.error('Razorpay verification error:', verr);
+                this.checkoutState.step = 'FAILED';
+                this.checkoutState.failureReason = verr.message || 'Signature verification failed.';
+                this.renderCheckoutModal();
               }
-
-              const newReceipt = {
-                id: receiptData.receiptId || (this.receiptsList.length + 1),
-                receipt_no: receiptNo,
-                amount: amount,
-                date: new Date().toISOString().split('T')[0],
-                invoice_no: ord.invoiceNo || 'INV-2026-FEE',
-                payment_method: 'Razorpay Online (UPI/Card/NetBanking)',
-                status: 'SUCCESS'
-              };
-              this.receiptsList.unshift(newReceipt);
-
-              this.checkoutState.step = 'SUCCESS';
-              this.checkoutState.latestReceipt = newReceipt;
-              this.renderCheckoutModal();
-              this.renderFeesLedger();
-              this.updateHeaderProfile();
-              ui.showToast(`Payment of ${ui.formatCurrency(amount)} verified successfully!`, 'success');
-            } catch (verr) {
-              console.error('Razorpay verification error:', verr);
-              this.checkoutState.step = 'FAILED';
-              this.checkoutState.failureReason = verr.message || 'Signature verification failed.';
-              this.renderCheckoutModal();
+            },
+            modal: {
+              ondismiss: () => {
+                this.checkoutState.step = 'CONFIG';
+                this.renderCheckoutModal();
+              }
             }
-          },
-          modal: {
-            ondismiss: () => {
-              this.checkoutState.step = 'CONFIG';
-              this.renderCheckoutModal();
-            }
-          }
-        };
+          };
 
-        const rzp = new Razorpay(options);
-        rzp.on('payment.failed', (errResp) => {
-          this.checkoutState.step = 'FAILED';
-          this.checkoutState.failureReason = errResp?.error?.description || 'Payment was declined or cancelled.';
-          this.renderCheckoutModal();
-        });
-        rzp.open();
-        return;
+          const rzp = new Razorpay(options);
+          rzp.on('payment.failed', (errResp) => {
+            this.checkoutState.step = 'FAILED';
+            this.checkoutState.failureReason = errResp?.error?.description || 'Payment was declined or cancelled.';
+            this.renderCheckoutModal();
+          });
+          rzp.open();
+          return;
+        } catch (rzpErr) {
+          console.warn('Razorpay open failed, switching to institutional gateway:', rzpErr);
+        }
       }
 
       // ── Step 3: Fallback Simulation (if Razorpay SDK unavailable) ─────────────
@@ -4327,7 +4336,10 @@ const studentPortal = {
         `;
 
         const orderRes = await api.post(`/registration/${regId}/create-exam-order`, { amount });
-        if (orderRes && orderRes.data && orderRes.data.orderId) {
+        const isRealRzpKey = orderRes && orderRes.data && orderRes.data.orderId && 
+                             orderRes.data.key && 
+                             (orderRes.data.key.startsWith('rzp_test_') || orderRes.data.key.startsWith('rzp_live_'));
+        if (isRealRzpKey) {
           const ord = orderRes.data;
           const options = {
             key: ord.key,

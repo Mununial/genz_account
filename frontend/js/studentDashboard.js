@@ -341,7 +341,11 @@ const studentDashboard = {
       const ord = (orderRes && orderRes.data) ? orderRes.data : {};
 
       // ── Launch Official Razorpay Popup ──────────────────────────────────────
-      if (typeof Razorpay !== 'undefined' && ord.key && ord.orderId) {
+      const isRealRazorpayKey = typeof Razorpay !== 'undefined' && 
+                                ord.key && 
+                                (ord.key.startsWith('rzp_test_') || ord.key.startsWith('rzp_live_')) && 
+                                ord.orderId;
+      if (isRealRazorpayKey) {
         const u = auth.getUser() || {};
         const options = {
           key: ord.key,
